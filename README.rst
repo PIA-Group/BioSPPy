@@ -17,8 +17,9 @@ Installation
 
 Installation can be easily done with pip:
 
-```
+```bash
 $ pip install biosppy
+```
 
 Dependencies
 ------------
