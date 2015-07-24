@@ -21,6 +21,12 @@ Installation can be easily done with pip:
 $ pip install biosppy
 ```
 
+```
+function test() {
+  console.log("notice the blank line before this function?");
+}
+```
+
 Dependencies
 ------------
 
