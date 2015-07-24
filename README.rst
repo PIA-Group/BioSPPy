@@ -27,6 +27,10 @@ function test() {
 }
 ```
 
+```bash
+$ pip install biosppy
+```
+
 Dependencies
 ------------
 
