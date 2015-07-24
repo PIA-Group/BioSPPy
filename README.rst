@@ -17,19 +17,8 @@ Installation
 
 Installation can be easily done with pip:
 
-```bash
-$ pip install biosppy
-```
+    $ pip install biosppy
 
-```
-function test() {
-  console.log("notice the blank line before this function?");
-}
-```
-
-```bash
-$ pip install biosppy
-```
 
 Dependencies
 ------------
