@@ -1,47 +1,39 @@
-BioSPPy - Biosignal Processing in Python
-========================================
+# BioSPPy - Biosignal Processing in Python
 
 A toolbox for biosignal processing written in Python.
 
-The toolbox bundles together various signal processing and pattern
-recognition methods geared towards the analysis of biosignals.
+The toolbox bundles together various signal processing and pattern recognition methods geared towards the analysis of biosignals.
 
 Highlights:
 
--  Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration;
--  Signal analysis primitives: filtering, frequency analysis
--  Clustering
--  Biometrics
+- Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration;
+- Signal analysis primitives: filtering, frequency analysis
+- Clustering
+- Biometrics
 
-Installation
-------------
+## Installation
 
-Installation can be easily done with ``pip``:
+Installation can be easily done with `pip`:
 
-.. code:: bash
+```bash
+$ pip install biosppy
+```
 
-    $ pip install biosppy
+## Dependencies
 
-Dependencies
-------------
+- numpy
+- matplotlib
+- scipy
+- scikit-learn
+- h5py
+- shortuuid
+- bidict
 
--  numpy
--  matplotlib
--  scipy
--  scikit-learn
--  h5py
--  shortuuid
--  bidict
+## License and Citation
 
-License and Citation
---------------------
-
-BioSPPy is released under the BSD 3-clause license. See LICENSE for more
-details.
+BioSPPy is released under the BSD 3-clause license. See LICENSE for more details.
 
 Please cite BioSPPy in your publication if it helps your research:
-
-::
 
     @article{biosppy2015,
       Author = {},
@@ -50,8 +42,7 @@ Please cite BioSPPy in your publication if it helps your research:
       Year = {2015}
     }
 
-Disclaimer
-----------
+## Disclaimer
 
 This program is distributed in the hope it will be useful and provided
 to you "as is", but WITHOUT ANY WARRANTY, without even the implied
