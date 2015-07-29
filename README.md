@@ -9,7 +9,7 @@ Highlights:
 - Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration;
 - Signal analysis primitives: filtering, frequency analysis
 - Clustering
-- Biometrics
+- Biometrics (to do)
 
 ## Installation
 
@@ -29,18 +29,9 @@ $ pip install biosppy
 - shortuuid
 - bidict
 
-## License and Citation
+## License
 
 BioSPPy is released under the BSD 3-clause license. See LICENSE for more details.
-
-Please cite BioSPPy in your publication if it helps your research:
-
-    @article{biosppy2015,
-      Author = {},
-      Journal = {},
-      Title = {},
-      Year = {2015}
-    }
 
 ## Disclaimer
 
