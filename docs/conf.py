@@ -22,7 +22,7 @@ import mock
 MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.signal', 'scipy.interpolate',
 'scipy.optimize', 'scipy.stats', 'scipy.cluster', 'scipy.cluster.hierarchy', 'scipy.cluster.vq', 'scipy.sparse',
 'scipy.spatial', 'scipy.spatial.distance', 'sklearn', 'sklearn.cluster', 'sklearn.grid_search', 'sklearn.external',
-'matplotlib.gridspec', 'h5py']
+'matplotlib.gridspec', 'h5py', 'shortuuid', 'bidict']
 for mod_name in MOCK_MODULES:
     sys.modules[mod_name] = mock.Mock()
 
