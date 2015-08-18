@@ -341,7 +341,8 @@ class HDF(object):
         """Retrieve header metadata.
         
         Returns:
-            header (dict): Header metadata.
+            (ReturnTuple): containing:
+                header (dict): Header metadata.
         
         """
         
@@ -367,9 +368,10 @@ class HDF(object):
             compress (bool): If True, the signal will be compressed with gzip (optional).
         
         Returns:
-            group (str): Destination group.
-            
-            name (str): Name of the created signal dataset.
+            (ReturnTuple): containing:
+                group (str): Destination group.
+                
+                name (str): Name of the created signal dataset.
         
         """
         
@@ -414,7 +416,8 @@ class HDF(object):
             name (str): Name of the signal dataset.
         
         Returns:
-            dataset (h5py.Dataset): HDF5 dataset.
+            (ReturnTuple): containing:
+                dataset (h5py.Dataset): HDF5 dataset.
         
         """
         
@@ -446,9 +449,10 @@ class HDF(object):
             name (str): Name of the signal dataset.
         
         Returns:
-            signal (array): Retrieved signal.
-            
-            mdata (dict): Signal metadata.
+            (ReturnTuple): containing:
+                signal (array): Retrieved signal.
+                
+                mdata (dict): Signal metadata.
         
         Notes:
             * Loads the entire signal data into memory.
@@ -520,7 +524,8 @@ class HDF(object):
             recursive (bool): It True, also lists signals in sub-groups (optional).
         
         Returns:
-            signals (list): List of (group, name) tuples of the found signals.
+            (ReturnTuple): containing:
+                signals (list): List of (group, name) tuples of the found signals.
         
         """
         
@@ -558,9 +563,10 @@ class HDF(object):
             compress (bool): If True, the data will be compressed with gzip (optional).
         
         Returns:
-            group (str): Destination group.
-            
-            name (str): Name of the created event dataset.
+            (ReturnTuple): containing:
+                group (str): Destination group.
+                
+                name (str): Name of the created event dataset.
         
         """
         
@@ -660,11 +666,12 @@ class HDF(object):
             name (str): Name of the event dataset.
         
         Returns:
-            ts (array): Array of time stamps.
-            
-            values (array): Array with data for each time stamp.
-            
-            mdata (dict): Event metadata.
+            (ReturnTuple): containing:
+                ts (array): Array of time stamps.
+                
+                values (array): Array with data for each time stamp.
+                
+                mdata (dict): Event metadata.
         
         Notes:
             * Loads the entire event data into memory.
@@ -737,7 +744,8 @@ class HDF(object):
             recursive (bool): It True, also lists events in sub-groups (optional).
         
         Returns:
-            events (list): List of (group, name) tuples of the found events.
+            (ReturnTuple): containing:
+                events (list): List of (group, name) tuples of the found events.
         
         """
         

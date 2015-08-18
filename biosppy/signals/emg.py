@@ -33,11 +33,12 @@ def emg(signal=None, sampling_rate=1000., show=True):
         show (bool): If True, show a summary plot (optional).
     
     Returns:
-        ts (array): Signal time axis reference (seconds).
-        
-        filtered (array): Filtered EMG signal.
-        
-        onsets (array): Indices of EMG pulse onsets.
+        (ReturnTuple): containing:
+            ts (array): Signal time axis reference (seconds).
+            
+            filtered (array): Filtered EMG signal.
+            
+            onsets (array): Indices of EMG pulse onsets.
     
     """
     
@@ -89,7 +90,8 @@ def find_onsets(signal=None, sampling_rate=1000., size=0.05, threshold=None):
         threshold (float): Detection threshold (optional).
     
     Returns:
-        onsets (array): Indices of BVP pulse onsets.
+        (ReturnTuple): containing:
+            onsets (array): Indices of BVP pulse onsets.
     
     """
     

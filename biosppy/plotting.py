@@ -587,9 +587,10 @@ def _yscaling(signal=None, alpha=1.5):
         alpha (float): Scaling factor.
     
     Returns:
-        ymin (float): Minimum y value.
-        
-        ymax (float): Maximum y value.
+        (tulpe): containing:
+            ymin (float): Minimum y value.
+            
+            ymax (float): Maximum y value.
     
     """
     

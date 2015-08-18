@@ -33,15 +33,16 @@ def bvp(signal=None, sampling_rate=1000., show=True):
         show (bool): If True, show a summary plot (optional).
     
     Returns:
-        ts (array): Signal time axis reference (seconds).
-        
-        filtered (array): Filtered BVP signal.
-        
-        onsets (array): Indices of BVP pulse onsets.
-        
-        heart_rate_ts (array): Heart rate time axis reference (seconds).
-        
-        heart_rate (array): Instantaneous heart rate (bpm).
+        (ReturnTuple): containing:
+            ts (array): Signal time axis reference (seconds).
+            
+            filtered (array): Filtered BVP signal.
+            
+            onsets (array): Indices of BVP pulse onsets.
+            
+            heart_rate_ts (array): Heart rate time axis reference (seconds).
+            
+            heart_rate (array): Instantaneous heart rate (bpm).
     
     """
     
@@ -94,7 +95,8 @@ def find_onsets(signal=None, sampling_rate=1000.):
         sampling_rate (int, float): Sampling frequency (Hz).
     
     Returns:
-        onsets (array): Indices of BVP pulse onsets.
+        (ReturnTuple): containing:
+            onsets (array): Indices of BVP pulse onsets.
     
     """
     

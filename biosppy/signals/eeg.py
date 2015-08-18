@@ -35,25 +35,26 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
         show (bool): If True, show a summary plot (optional).
     
     Returns:
-        ts (array): Signal time axis reference (seconds).
-        
-        filtered (array): Filtered BVP signal.
-        
-        features_ts (array): Features time axis reference (seconds).
-        
-        theta (array): Average power in the 4 to 8 Hz frequency band; each column is one EEG channel.
-        
-        alpha_low (array): Average power in the 8 to 10 Hz frequency band; each column is one EEG channel.
-        
-        alpha_high (array): Average power in the 10 to 13 Hz frequency band; each column is one EEG channel.
-        
-        beta (array): Average power in the 13 to 25 Hz frequency band; each column is one EEG channel.
-        
-        gamma (array): Average power in the 25 to 40 Hz frequency band; each column is one EEG channel.
-        
-        plf_pairs (list): PLF pair indices.
-        
-        plf (array): PLF matrix; each column is a channel pair.
+        (ReturnTuple): containing:
+            ts (array): Signal time axis reference (seconds).
+            
+            filtered (array): Filtered BVP signal.
+            
+            features_ts (array): Features time axis reference (seconds).
+            
+            theta (array): Average power in the 4 to 8 Hz frequency band; each column is one EEG channel.
+            
+            alpha_low (array): Average power in the 8 to 10 Hz frequency band; each column is one EEG channel.
+            
+            alpha_high (array): Average power in the 10 to 13 Hz frequency band; each column is one EEG channel.
+            
+            beta (array): Average power in the 13 to 25 Hz frequency band; each column is one EEG channel.
+            
+            gamma (array): Average power in the 25 to 40 Hz frequency band; each column is one EEG channel.
+            
+            plf_pairs (list): PLF pair indices.
+            
+            plf (array): PLF matrix; each column is a channel pair.
     
     """
     
@@ -123,7 +124,8 @@ def car_reference(signal=None):
         signal (array): Input EEG signal matrix; each column is one EEG channel.
     
     Returns:
-        signal (array): Re-referenced EEG signal matrix; each column is one EEG channel.
+        (ReturnTuple): containing:
+            signal (array): Re-referenced EEG signal matrix; each column is one EEG channel.
     
     """
     
@@ -160,17 +162,18 @@ def get_power_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5)
         overlap (float): Window overlap (0 to 1) (optional).
     
     Returns:
-        ts (array): Features time axis reference (seconds).
-        
-        theta (array): Average power in the 4 to 8 Hz frequency band; each column is one EEG channel.
-        
-        alpha_low (array): Average power in the 8 to 10 Hz frequency band; each column is one EEG channel.
-        
-        alpha_high (array): Average power in the 10 to 13 Hz frequency band; each column is one EEG channel.
-        
-        beta (array): Average power in the 13 to 25 Hz frequency band; each column is one EEG channel.
-        
-        gamma (array): Average power in the 25 to 40 Hz frequency band; each column is one EEG channel.
+        (ReturnTuple): containing:
+            ts (array): Features time axis reference (seconds).
+            
+            theta (array): Average power in the 4 to 8 Hz frequency band; each column is one EEG channel.
+            
+            alpha_low (array): Average power in the 8 to 10 Hz frequency band; each column is one EEG channel.
+            
+            alpha_high (array): Average power in the 10 to 13 Hz frequency band; each column is one EEG channel.
+            
+            beta (array): Average power in the 13 to 25 Hz frequency band; each column is one EEG channel.
+            
+            gamma (array): Average power in the 25 to 40 Hz frequency band; each column is one EEG channel.
     
     """
     
@@ -246,11 +249,12 @@ def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
         overlap (float): Window overlap (0 to 1) (optional).
     
     Returns:
-        ts (array): Features time axis reference (seconds).
-        
-        plf_pairs (list): PLF pair indices.
-        
-        plf (array): PLF matrix; each column is a channel pair.
+        (ReturnTuple): containing:
+            ts (array): Features time axis reference (seconds).
+            
+            plf_pairs (list): PLF pair indices.
+            
+            plf (array): PLF matrix; each column is a channel pair.
     
     """
     
