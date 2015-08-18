@@ -13,11 +13,11 @@
 # built-in
 import json
 import os
+import zipfile
 
 # 3rd party
 import h5py
 import shortuuid
-import zipfile
 from sklearn.externals import joblib
 
 # local
