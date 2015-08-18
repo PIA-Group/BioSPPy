@@ -46,8 +46,9 @@ def dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', **kwargs):
         **kwargs (dict): Additional keyword arguments are passed to the distance function.
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
+                             outliers have key -1; clusters are assigned integer keys starting at 0.
     
     References:
         [1] M. Ester, H. P. Kriegel, J. Sander, and X. Xu, “A Density-Based Algorithm
@@ -87,8 +88,9 @@ def hierarchical(data=None, k=0, linkage='average', metric='euclidean', **kwargs
         **kwargs (dict): Additional keyword arguments are passed to the distance function.
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
+                             outliers have key -1; clusters are assigned integer keys starting at 0.
     
     """
     
@@ -144,8 +146,9 @@ def kmeans(data=None, k=None, init='random', max_iter=300, n_init=10, tol=0.0001
         tol (float): Relative tolerance to declare convergence (optional).
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
+                             outliers have key -1; clusters are assigned integer keys starting at 0.
     
     """
     
@@ -183,8 +186,9 @@ def consensus(data=None, k=0, linkage='average', fcn=None, grid=None):
                            of the clustering method (see sklearn.grid_search.ParameterGrid).
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
+                             outliers have key -1; clusters are assigned integer keys starting at 0.
     
     """
     
@@ -229,8 +233,9 @@ def consensus_kmeans(data=None, k=0, linkage='average', nensemble=100, kmin=None
         kmax (int): Maximum k for the k-means partitions: defaults to sqrt(m) (optional).
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
+                             outliers have key -1; clusters are assigned integer keys starting at 0.
     
     """
     
@@ -267,7 +272,8 @@ def create_ensemble(data=None, fcn=None, grid=None):
                            of the clustering method (see sklearn.grid_search.ParameterGrid).
     
     Returns:
-        ensemble (list): Obtained ensemble partitions.
+        (ReturnTuple): containing:
+            ensemble (list): Obtained ensemble partitions.
      
     """
     
@@ -301,7 +307,8 @@ def create_coassoc(ensemble=None, N=None):
         N (int): Number of data samples.
     
     Returns:
-        coassoc (array): Co-association matrix.
+        (ReturnTuple): containing:
+            coassoc (array): Co-association matrix.
     
     """
     
@@ -355,8 +362,9 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
                        'single', 'ward', or 'weighted'.
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
+                             outliers have key -1; clusters are assigned integer keys starting at 0.
     
     """
     
@@ -410,7 +418,8 @@ def mdist_templates(data=None, clusters=None, ntemplates=1, metric='euclidean'):
         metric (str): 
     
     Retrurns:
-        templates (array): Selected templates from the input data.
+        (ReturnTuple): containing:
+            templates (array): Selected templates from the input data.
     
     References:
         [1]  U. Uludag, A. Ross, A. Jain, "Biometric template selection and
@@ -499,7 +508,8 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
                           k-means is used to obtain more templates.
     
     Retrurns:
-        templates (array): Selected templates from the input data.
+        (ReturnTuple): containing:
+            templates (array): Selected templates from the input data.
     
     """
     
@@ -648,9 +658,10 @@ def _mean_distance(data, metric='euclidean', **kwargs):
         **kwargs (dict): Additional keyword arguments are passed to the distance function.
     
     Returns:
-        indices (array): Indices that sort the computed mean distances.
-        
-        mdist (array): Mean distance characterizing each data sample.
+        (tulpe): containing:
+            indices (array): Indices that sort the computed mean distances.
+            
+            mdist (array): Mean distance characterizing each data sample.
     
     """
     

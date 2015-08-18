@@ -33,15 +33,16 @@ def resp(signal=None, sampling_rate=1000., show=True):
         show (bool): If True, show a summary plot (optional).
     
     Returns:
-        ts (array): Signal time axis reference (seconds).
-        
-        filtered (array): Filtered Respiration signal.
-        
-        zeros (array): Indices of Respiration zero crossings.
-        
-        resp_rate_ts (array): Respiration rate time axis reference (seconds).
-        
-        resp_rate (array): Instantaneous respiration rate (Hz).
+        (ReturnTuple): containing:
+            ts (array): Signal time axis reference (seconds).
+            
+            filtered (array): Filtered Respiration signal.
+            
+            zeros (array): Indices of Respiration zero crossings.
+            
+            resp_rate_ts (array): Respiration rate time axis reference (seconds).
+            
+            resp_rate (array): Instantaneous respiration rate (Hz).
     
     """
     

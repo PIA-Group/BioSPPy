@@ -33,15 +33,16 @@ def eda(signal=None, sampling_rate=1000., show=True):
         show (bool): If True, show a summary plot (optional).
     
     Returns:
-        ts (array): Signal time axis reference (seconds).
-        
-        filtered (array): Filtered EDA signal.
-        
-        onsets (array): Indices of SCR pulse onsets.
-        
-        peaks (array): Indices of the SCR peaks.
-        
-        amplitudes (array): SCR pulse amplitudes.
+        (ReturnTuple): containing:
+            ts (array): Signal time axis reference (seconds).
+            
+            filtered (array): Filtered EDA signal.
+            
+            onsets (array): Indices of SCR pulse onsets.
+            
+            peaks (array): Indices of the SCR peaks.
+            
+            amplitudes (array): SCR pulse amplitudes.
     
     """
     
@@ -91,11 +92,12 @@ def basic_scr(signal=None, sampling_rate=1000.):
         sampling_rate (int, float): Sampling frequency (Hz).
     
     Returns:
-        onsets (array): Indices of the SCR onsets.
-        
-        peaks (array): Indices of the SRC peaks.
-        
-        amplitudes (array): SCR pulse amplitudes.
+        (ReturnTuple): containing:
+            onsets (array): Indices of the SCR onsets.
+            
+            peaks (array): Indices of the SRC peaks.
+            
+            amplitudes (array): SCR pulse amplitudes.
     
     """
     
@@ -147,11 +149,12 @@ def kbk_scr(signal=None, sampling_rate=1000.):
         sampling_rate (int, float): Sampling frequency (Hz).
     
     Returns:
-        onsets (array): Indices of the SCR onsets.
-        
-        peaks (array): Indices of the SRC peaks.
-        
-        amplitudes (array): SCR pulse amplitudes.
+        (ReturnTuple): containing:
+            onsets (array): Indices of the SCR onsets.
+            
+            peaks (array): Indices of the SRC peaks.
+            
+            amplitudes (array): SCR pulse amplitudes.
     
     References:
         [1] K.H. Kim, S.W. Bang, and S.R. Kim, "Emotion recognition system

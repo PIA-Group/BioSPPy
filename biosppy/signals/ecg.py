@@ -35,19 +35,20 @@ def ecg(signal=None, sampling_rate=1000., show=True):
         show (bool): If True, show a summary plot (optional).
     
     Returns:
-        ts (array): Signal time axis reference (seconds).
-        
-        filtered (array): Filtered ECG signal.
-        
-        rpeaks (array): R-peak location indices.
-        
-        templates_ts (array): Templates time axis reference (seconds).
-        
-        templates (array): Extracted heartbeat templates.
-        
-        heart_rate_ts (array): Heart rate time axis reference (seconds).
-        
-        heart_rate (array): Instantaneous heart rate (bpm).
+        (ReturnTuple): containing:
+            ts (array): Signal time axis reference (seconds).
+            
+            filtered (array): Filtered ECG signal.
+            
+            rpeaks (array): R-peak location indices.
+            
+            templates_ts (array): Templates time axis reference (seconds).
+            
+            templates (array): Extracted heartbeat templates.
+            
+            heart_rate_ts (array): Heart rate time axis reference (seconds).
+            
+            heart_rate (array): Instantaneous heart rate (bpm).
     
     """
     
@@ -110,9 +111,10 @@ def _extract_heartbeats(signal=None, rpeaks=None, before=200, after=400):
         after (int): Number of samples to include after the R peak.
     
     Returns:
-        templates (array): Extracted heartbeat templates.
-        
-        rpeaks (array): Corresponding R-peak location indices of the extracted heartbeat templates.
+        (tuple): containing:
+            templates (array): Extracted heartbeat templates.
+            
+            rpeaks (array): Corresponding R-peak location indices of the extracted heartbeat templates.
     
     """
     
@@ -152,9 +154,10 @@ def extract_heartbeats(signal=None, rpeaks=None, sampling_rate=1000., before=0.2
         after (int): Window size to include after the R peak (seconds).
     
     Returns:
-        templates (array): Extracted heartbeat templates.
-        
-        rpeaks (array): Corresponding R-peak location indices of the extracted heartbeat templates.
+        (ReturnTuple): containing:
+            templates (array): Extracted heartbeat templates.
+            
+            rpeaks (array): Corresponding R-peak location indices of the extracted heartbeat templates.
     
     """
     
@@ -197,31 +200,32 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000., offset=
         tol (float): Tolerance between corresponding reference and test R-peak locations (seconds) (optional).
     
     Returns:
-        TP (int): Number of true positive R-peaks.
-        
-        FP (int): Number of false positive R-peaks.
-        
-        performance (float): Test performance; TP / len(reference).
-        
-        acc (float): Accuracy rate; TP / (TP + FP).
-        
-        err (float): Error rate; FP / (TP + FP).
-        
-        match (list): Indices of the elements of 'test' that match to an R-peak from 'reference'.
-        
-        deviation (array): Absolute errors of the matched R-peaks (seconds).
-        
-        mean_deviation (float): Mean error (seconds).
-        
-        std_deviation (float): Standard deviation of error (seconds).
-        
-        mean_ref_ibi (float): Mean of the reference interbeat intervals (seconds).
-        
-        std_ref_ibi (float): Standard deviation of the reference interbeat intervals (seconds).
-        
-        mean_test_ibi (float): Mean of the test interbeat intervals (seconds).
-        
-        std_test_ibi (float): Standard deviation of the test interbeat intervals (seconds).
+        (ReturnTuple): containing:
+            TP (int): Number of true positive R-peaks.
+            
+            FP (int): Number of false positive R-peaks.
+            
+            performance (float): Test performance; TP / len(reference).
+            
+            acc (float): Accuracy rate; TP / (TP + FP).
+            
+            err (float): Error rate; FP / (TP + FP).
+            
+            match (list): Indices of the elements of 'test' that match to an R-peak from 'reference'.
+            
+            deviation (array): Absolute errors of the matched R-peaks (seconds).
+            
+            mean_deviation (float): Mean error (seconds).
+            
+            std_deviation (float): Standard deviation of error (seconds).
+            
+            mean_ref_ibi (float): Mean of the reference interbeat intervals (seconds).
+            
+            std_ref_ibi (float): Standard deviation of the reference interbeat intervals (seconds).
+            
+            mean_test_ibi (float): Mean of the test interbeat intervals (seconds).
+            
+            std_test_ibi (float): Standard deviation of the test interbeat intervals (seconds).
     
     """
     
@@ -351,7 +355,8 @@ def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03, a
         after (float): Search window size after R-peak candidate (seconds) (optional).
     
     Returns:
-        rpeaks (array): R-peak location indices.
+        (ReturnTuple): containing:
+            rpeaks (array): R-peak location indices.
     
     """
     
@@ -406,7 +411,8 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
         sampling_rate (int, float): Sampling frequency (Hz).
     
     Returns:
-        rpeaks (array): R-peak location indices.
+        (ReturnTuple): containing:
+            rpeaks (array): R-peak location indices.
     
     References:
         [1] Ivaylo I Christov, "Real time electrocardiogram QRS detection using
@@ -558,7 +564,8 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
         threshold (float): Detection threshold.
     
     Returns:
-        rpeaks (array): R-peak location indices.
+        (ReturnTuple): containing:
+            rpeaks (array): R-peak location indices.
     
     References:
         [1] Andre Lourenco, Hugo Silva, Paulo Leite, Renato Lourenco and Ana Fred,
@@ -701,7 +708,8 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
         tol (float): Tolerance parameter.
     
     Returns:
-        rpeaks (array): R-peak location indices.
+        (ReturnTuple): containing:
+            rpeaks (array): R-peak location indices.
     
     """
     
@@ -753,7 +761,8 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
         sampling_rate (int, float): Sampling frequency (Hz).
     
     Returns:
-        rpeaks (array): R-peak location indices.
+        (ReturnTuple): containing:
+            rpeaks (array): R-peak location indices.
     
     References:
         [1] P.S. Hamilton, "Open Source ECG Analysis Software Documentation", E.P.Limited
