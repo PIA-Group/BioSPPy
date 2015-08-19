@@ -16,6 +16,16 @@ import sys
 import os
 import shlex
 
+# To be able to import to ReadTheDocs
+import mock
+ 
+MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.signal', 'scipy.interpolate',
+'scipy.optimize', 'scipy.stats', 'scipy.cluster', 'scipy.cluster.hierarchy', 'scipy.cluster.vq', 'scipy.sparse',
+'scipy.spatial', 'scipy.spatial.distance', 'sklearn', 'sklearn.cluster', 'sklearn.grid_search', 'sklearn.externals',
+'matplotlib.gridspec', 'h5py', 'shortuuid', 'bidict']
+for mod_name in MOCK_MODULES:
+    sys.modules[mod_name] = mock.Mock()
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -116,7 +126,7 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
