@@ -17,14 +17,21 @@ import os
 import shlex
 
 # To be able to import to ReadTheDocs
-import mock
- 
+from mock import Mock as MagicMock
+
+
+class Mock(MagicMock):
+    @classmethod
+    def __getattr__(cls, name):
+            return Mock()
+
+
 MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.signal', 'scipy.interpolate',
 'scipy.optimize', 'scipy.stats', 'scipy.cluster', 'scipy.cluster.hierarchy', 'scipy.cluster.vq', 'scipy.sparse',
 'scipy.spatial', 'scipy.spatial.distance', 'sklearn', 'sklearn.cluster', 'sklearn.grid_search', 'sklearn.externals',
-'matplotlib.gridspec', 'h5py', 'shortuuid', 'bidict']
-for mod_name in MOCK_MODULES:
-    sys.modules[mod_name] = mock.Mock()
+'matplotlib.gridspec', 'h5py', 'shortuuid', 'bidict', 'svm', 'sksvm']
+
+sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
