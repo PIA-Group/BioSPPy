@@ -16,14 +16,15 @@
 
 # Imports
 # built-in
-import os
 
 # 3rd party
 import numpy as np
+import shortuuid
 from bidict import bidict
+from sklearn import svm as sksvm
 
 # local
-from . import storage, utils
+from . import metrics, plotting, storage, utils
 from .signals import tools
 
 # Globals
@@ -32,11 +33,14 @@ from .signals import tools
 class SubjectError(Exception):
     """Exception raised when the subject is unknown."""
     
-    def __init__(self, subject):
+    def __init__(self, subject=None):
         self.subject = subject
     
     def __str__(self):
-        return str("Subject %r is not enrolled." % self.subject)
+        if self.subject is None:
+            return str("Subject is not enrolled.")
+        else:
+            return str("Subject %r is not enrolled." % self.subject)
 
 
 class UntrainedError(Exception):
@@ -64,7 +68,7 @@ class SubjectDict(bidict):
     """
     
     LEFT = ''
-    RIGHT = -1
+    RIGHT = ''
     
     def __getitem__(self, keyorslice):
         """Get an item; based on the bidict source."""
@@ -100,158 +104,81 @@ class SubjectDict(bidict):
 class BaseClassifier(object):
     """Base biometric classifier class.
     
-    Args:
-        path (str): Path to working directory; if None, uses in-memory storage (optional).
-        
-        name (str): Classifier name (optional).
+    This class is a skeleton for actual classifier classes.
+    The following methods must be overridden or adapted to build a new classifier:
+        * __init__
+        * _authenticate
+        * _get_thresholds
+        * _identify
+        * _prepare
+        * _train
+        * _update
     
     Attributes:
-        NAME (str): Classifier name.
-        
-        EXT (str): Classifier file extension.
-        
         EER_IDX (int): Reference index for the Equal Error Rate.
     
     """
     
-    NAME = 'BaseClassifier'
-    EXT = '.clf'
     EER_IDX = 0
     
-    def __init__(self, path=None, name=None):
+    def __init__(self):
         # generic self things
-        self._reset()
-        
-        if name is not None:
-            self.NAME = name
-        
-        # choose IO mode
-        if path is None:
-            # memory-base IO
-            self._iomode = 'mem'
-            self._iofile = {}
-        elif isinstance(path, basestring):
-            # file-based IO
-            path = utils.normpath(path)
-            self._iomode = 'file'
-            self._iopath = path
-            self._iofile = os.path.join(self._iopath, self.NAME + self.EXT)
-            
-            # verify path
-            if not os.path.exists(path):
-                os.makedirs(path)
-            
-            self._prepareIO()
-        else:
-            raise ValueError("Unknown path format.")
-    
-    def _reset(self):
-        """Reset the classifier."""
-        
-        self.subject2label = SubjectDict()
-        self.nbSubjects = 0
         self.is_trained = False
+        self._subject2label = SubjectDict()
+        self._nbSubjects = 0
         self._thresholds = {}
         self._autoThresholds = None
-    
-    def _snapshot(self):
-        """Get a snapshot of the classifier."""
         
-        subject2label = self.subject2label
-        nbSubjects = self.nbSubjects
+        # init data storage
+        self._iofile = {}
         
-        return subject2label, nbSubjects
+        # defer flag
+        self._defer_flag = False
+        self._reset_defer()
     
-    def _rebrand(self, name):
-        """Change classifier name.
+    def _reset_defer(self):
+        """Reset defer buffer."""
+        
+        self._defer_dict = {'enroll': set(), 'dismiss': set()}
+    
+    def _defer(self, label, case):
+        """Add deferred task.
         
         Args:
-            name (str): New classifier name.
+            label (str): Internal classifier subject label.
+            
+            case (str): One of 'enroll' or 'dismiss'.
+        
+        Notes:
+            * An enroll overrides a previous dismiss for the same subject.
+            * A dismiss overrides a previous enroll for the same subject.
         
         """
         
-        if self._iomode == 'file':
-            new = self._iofile.replace(self.NAME, name)
-            os.rename(self._iofile, new)
-            self._iofile = new
+        if case == 'enroll':
+            self._defer_dict['enroll'].add(label)
+            if label in self._defer_dict['dismiss']:
+                self._defer_dict['dismiss'].remove(label)
+        elif case == 'dismiss':
+            self._defer_dict['dismiss'].add(label)
+            if label in self._defer_dict['enroll']:
+                self._defer_dict['enroll'].remove(label)
         
-        self.NAME = name
+        self._defer_flag = True
     
-    def _update_fileIO(self, path):
-        # update file IO to new path
+    def _check_state(self):
+        """Check and update the train state."""
         
-        if self.iomode == 'file':
-            self.iopath = path
-            self.iofile = os.path.join(path, self.NAME + self.EXT)
-    
-    def _prepareIO(self):
-        # create dirs, initialize files
-        
-        storage.alloc_h5(self._iofile)
+        if self._nbSubjects > 0:
+            self.is_trained = True
+        else:
+            self.is_trained = False
     
     def io_load(self, label):
         """Load enrolled subject data.
         
         Args:
-            label (int): Internal classifier subject label.
-        
-        Returns:
-            data (array): Subject data.
-        
-        """
-        
-        if self.iomode == 'file':
-            return self._fileIO_load(label)
-        elif self.iomode == 'mem':
-            return self._memIO_load(label)
-    
-    def io_save(self, label, data):
-        """Save subject data.
-        
-        Args:
-            label (int): Internal classifier subject label.
-            
-            data (array): Subject data.
-        
-        """
-        
-        if self.iomode == 'file':
-            self._fileIO_save(label, data)
-        elif self.iomode == 'mem':
-            self._memIO_save(label, data)
-    
-    def _fileIO_load(self, label):
-        """Load data in file mode.
-        
-        Args:
-            label (int): Internal classifier subject label.
-        
-        Returns:
-            data (array): Subject data.
-        
-        """
-        
-        data = storage.load_h5(self._iofile, label)
-        
-        return data
-    
-    def _fileIO_save(self, label, data):
-        """Save data in file mode.
-        
-        Args:
-            label (int): Internal classifier subject label.
-            
-            data (array): Subject data.
-        
-        """
-        
-        storage.store_h5(self._iofile, label, data)
-    
-    def _memIO_load(self, label):
-        """Load data in memory mode.
-        
-        Args:
-            label (int): Internal classifier subject label.
+            label (str): Internal classifier subject label.
         
         Returns:
             data (array): Subject data.
@@ -260,11 +187,11 @@ class BaseClassifier(object):
         
         return self._iofile[label]
     
-    def _memIO_save(self, label, data):
-        """Save data in memory mode.
+    def io_save(self, label, data):
+        """Save subject data.
         
         Args:
-            label (int): Internal classifier subject label.
+            label (str): Internal classifier subject label.
             
             data (array): Subject data.
         
@@ -272,94 +199,48 @@ class BaseClassifier(object):
         
         self._iofile[label] = data
     
-    def io_iterator(self):
-        """Iterate over the files used by the classifier.
+    def io_del(self, label):
+        """Delete subject data.
         
-        Returns:
-            files (iterator): Iterator over the classifier files.
+        Args:
+            label (str): Internal classifier subject label.
         
         """
         
-        yield self.NAME + self.EXT
+        del self._iofile[label]
     
-    
-    def fileIterator(self):
-        # iterator for the classifier files
+    def save(self, path):
+        """Save classifier instance to a file.
         
-        yield self.NAME + self.EXT
-    
-    def dirIterator(self):
-        # iterator for the directories
+        Args:
+            path (str): Destination file path.
         
-        return iter([])
-    
-    def save(self, dstPath):
-        # save the classifier to the path
+        """
         
-        # classifier files
-        if self.iomode == 'file':
-            tmpPath = os.path.join(self.iopath, 'clf-tmp')
-            if not os.path.exists(tmpPath):
-                os.makedirs(tmpPath)
-            
-            # dirs
-            for d in self.dirIterator():
-                path = os.path.join(tmpPath, d)
-                if not os.path.exists(path):
-                    os.makedirs(path)
-            
-            # files
-            for f in self.fileIterator():
-                src = os.path.join(self.iopath, f)
-                dst = os.path.join(tmpPath, f)
-                try:
-                    shutil.copy(src, dst)
-                except IOError:
-                    pass
-        else:
-            tmpPath = os.path.abspath(os.path.expanduser('~/clf-tmp'))
-            if not os.path.exists(tmpPath):
-                os.makedirs(tmpPath)
-        
-        # save classifier instance to temp file
-        datamanager.skStore(os.path.join(tmpPath, 'clfInstance.p'), self)
-        
-        # save to zip archive
-        dstPath = os.path.join(dstPath, self.NAME)
-        datamanager.zipArchiveStore(tmpPath, dstPath)
-        
-        # remove temp dir
-        shutil.rmtree(tmpPath, ignore_errors=True)
-        
-        return dstPath
+        storage.serialize(self, path)
     
     @classmethod
-    def load(cls, srcPath, dstPath=None):
-        # load a classifier instance from a file
-        # do not include the extension in the path
+    def load(cls, path):
+        """Load classifier instance from a file.
         
-        if dstPath is None:
-            dstPath, _ = os.path.split(srcPath)
+        Args:
+            path (str): Source file path.
         
-        # unzip files
-        datamanager.zipArchiveLoad(srcPath, dstPath)
+        Returns:
+            clf (object): Loaded classifier instance.
+        
+        """
         
         # load classifier
-        tmpPath = os.path.join(dstPath, 'clfInstance.p')
-        clf = datamanager.skLoad(tmpPath)
+        clf = storage.deserialize(path)
         
-        # classifier files
-        clf._update_fileIO(dstPath)
-        
-        # remove temp file
-        os.remove(tmpPath)
-        
+        # check class type
         if not isinstance(clf, cls):
-            raise TypeError, "Mismatch between target class and loaded file."
+            raise TypeError("Mismatch between target class and loaded file.")
         
         return clf
     
-    def checkSubject(self, subject):
+    def check_subject(self, subject):
         """Check if a subject is enrolled.
         
         Args:
@@ -371,11 +252,11 @@ class BaseClassifier(object):
         """
         
         if self.is_trained:
-            return subject in self.subject2label
+            return subject in self._subject2label
         
         return False
     
-    def listSubjects(self):
+    def list_subjects(self):
         """List all the enrolled subjects.
         
         Returns:
@@ -383,381 +264,383 @@ class BaseClassifier(object):
         
         """
         
-        subjects = [self.subject2label[:i] for i in xrange(self.nbSubjects)]
+        subjects = [self._subject2label[:i] for i in xrange(self._nbSubjects)]
         
         return subjects
     
-    def _prepareData(self, data):
-        # prepare date
-        ### user
+    def enroll(self, data=None, subject=None, deferred=False):
+        """Enroll new data for a subject.
         
-        return data
-    
-    def _updateStrategy(self, oldData, newData):
-        # update the training data of a class when new data is available
+        If the subject is already enrolled, new data is combined with existing data.
         
-        return newData
-    
-    def authThreshold(self, subject, ready=False):
-        # get the user threshold (authentication)
+        Args:
+            data (array): Data to enroll.
+            
+            subject (hashable): Subject identity.
+            
+            deferred (bool): If True, computations are delayed until flush is called (optional).
         
-        if not ready:
-            aux = subject
-            subject = self.subject2label[subject]
-            if subject == -1:
-                raise SubjectError(aux)
+        Notes:
+            * When using deferred calls, an enroll overrides a previous dismiss for the same subject.
         
-        return self.thresholds[subject]['auth']
-    
-    def setAuthThreshold(self, subject, threshold, ready=False):
-        # set the user threshold (authentication)
+        """
         
-        if not ready:
-            aux = subject
-            subject = self.subject2label[subject]
-            if subject == -1:
-                raise SubjectError(aux)
-        try:
-            self.thresholds[subject]['auth'] = threshold
-        except KeyError:
-            self.thresholds[subject] = {'auth': threshold, 'id': None}
-    
-    def idThreshold(self, subject, ready=False):
-        # get the user threshold (identification)
+        # check inputs
+        if data is None:
+            raise TypeError("Please specify the data to enroll.")
         
-        if not ready:
-            aux = subject
-            subject = self.subject2label[subject]
-            if subject == -1:
-                raise SubjectError(aux)
+        if subject is None:
+            raise TypeError("Plase specify the subject identity.")
         
-        return self.thresholds[subject]['id']
-    
-    def setIdThreshold(self, subject, threshold, ready=False):
-        # set the user threshold (identification)
-        
-        if not ready:
-            aux = subject
-            subject = self.subject2label[subject]
-            if subject == -1:
-                raise SubjectError(aux)
-        try:
-            self.thresholds[subject]['id'] = threshold
-        except KeyError:
-            self.thresholds[subject] = {'auth': None, 'id': threshold}
-    
-    def autoRejectionThresholds(self):
-        # generate thresholds automatically
-        ### user
-        
-        if self._autoThresholds is not None:
-            return self._autoThresholds
-        
-        ths = np.array([])
-        
-        return ths
-    
-    def _subThrIterator(self, overwrite):
-        # iterate over the subjects in order to update the thresholds
-        
-        if overwrite:
-            for i in xrange(self.nbSubjects):
-                yield i
+        if self.check_subject(subject):
+            # load existing
+            label = self._subject2label[subject]
+            old = self.io_load(label)
+            
+            # combine data
+            data = self._update(old, data)
         else:
-            for i in xrange(self.nbSubjects):
-                try:
-                    _ = self.authThreshold(i, ready=True)
-                except KeyError:
-                    yield i
-    
-    def updateThresholds(self, overwrite=False, fraction=1.):
-        # update the user thresholds based on the enrolled data
+            # create new label
+            label = shortuuid.uuid()
+            self._subject2label[subject] = label
+            self._nbSubjects += 1
         
-        ths = self.autoRejectionThresholds()
+        # store data
+        self.io_save(label, data)
+        
+        if deferred:
+            # delay computations
+            self._defer(label, 'enroll')
+        else:
+            self._train([label], None)
+            self._check_state()
+            self.update_thresholds()
+    
+    def dismiss(self, subject=None, deferred=False):
+        """Remove a subject.
+        
+        Args:
+            subject (hashable): Subject identity.
+            
+            deferred (bool): If True, computations are delayed until flush is called (optional).
+        
+        Notes:
+            * When using deferred calls, a dismiss overrides a previous enroll for the same subject.
+        
+        """
+        
+        # check inputs
+        if subject is None:
+            raise TypeError("Please specify the subject identity.")
+        
+        if not self.check_subject(subject):
+            raise SubjectError(subject)
+        
+        label = self._subject2label[subject]
+        del self._subject2label[subject]
+        del self._thresholds[label]
+        self._nbSubjects -= 1
+        self.io_del(label)
+        
+        if deferred:
+            self._defer(label, 'dismiss')
+        else:
+            self._train(None, [label])
+            self._check_state()
+            self.update_thresholds()
+    
+    def batch_train(self, data=None):
+        """Train the classifier in batch mode.
+        
+        Args:
+            data (dict): Dictionary holding training data for each subject.
+                         If the object for a subject is None, performs a 'dismiss'.
+        
+        """
+        
+        # check inputs
+        if data is None:
+            raise TypeError("Please specify the data to train.")
+        
+        for sub, val in data.iteritems():
+            if val is None:
+                try:
+                    self.dismiss(sub, deferred=True)
+                except SubjectError:
+                    continue
+            else:
+                self.enroll(val, sub, deferred=True)
+        
+        self.flush()
+    
+    def flush(self):
+        """Flush deferred computations."""
+        
+        if self._defer_flag:
+            self._defer_flag = False
+            
+            # train
+            enroll = list(self._defer_dict['enroll'])
+            dismiss = list(self._defer_dict['dismiss'])
+            self._train(enroll, dismiss)
+            
+            # update thresholds
+            self._check_state()
+            self.update_thresholds()
+            
+            # reset
+            self._reset_defer()
+    
+    def update_thresholds(self, fraction=1.):
+        """Update subject-specific thresholds based on the enrolled data.
+        
+        Args:
+            fraction (float): Fraction of samples to select from training data.
+        
+        """
+        
+        ths = self.get_thresholds(force=True)
         
         # gather data to test
         data = {}
-        for lbl in self._subThrIterator(overwrite):
-            subject = self.subject2label[:lbl]
-            
+        for subject, label in self._subject2label.items():
             # select a random fraction of the training data
-            aux = self.io_load(lbl)
+            aux = self.io_load(label)
             indx = range(len(aux))
-            use, _ = parted.randomFraction(indx, 0, fraction)
+            use, _ = utils.random_fraction(indx, fraction, sort=True)
             
             data[subject] = aux[use]
         
         # evaluate classifier
-        if len(data.keys()) > 42:
-            out = self.evaluate(data, ths)
-        else:
-            out = self.seqEvaluate(data, ths)
+        _, res = self.evaluate(data, ths)
         
         # choose thresholds at EER
-        for lbl in self._subThrIterator(overwrite):
-            subject = self.subject2label[:lbl]
-            
-            EER_auth = out['assessment']['subject'][subject]['authentication']['rates']['EER']
-            self.setAuthThreshold(lbl, EER_auth[self.EER_IDX, 0], ready=True)
+        for subject, label in self._subject2label.items():
+            EER_auth = res['subject'][subject]['authentication']['rates']['EER']
+            self.set_auth_thr(label, EER_auth[self.EER_IDX, 0], ready=True)
              
-            EER_id = out['assessment']['subject'][subject]['identification']['rates']['EER']
-            self.setIdThreshold(lbl, EER_id[self.EER_IDX, 0], ready=True)
+            EER_id = res['subject'][subject]['identification']['rates']['EER']
+            self.set_id_thr(label, EER_id[self.EER_IDX, 0], ready=True)
     
-    def train(self, data=None, updateThresholds=True):
-        # data is {subject: features (array)}
-        ### user
+    def set_auth_thr(self, subject, threshold, ready=False):
+        """Set the authentication threshold of a subject.
         
-        # check inputs
-        if data is None:
-            raise TypeError, "Please provide input data."
-        
-        # check if classifier was already trained
-        if self.is_trained:
-            # this is a retrain
-            self.re_train(data)
-        else:
-            # get subjects
-            subjects = data.keys()
-            self.nbSubjects = len(subjects)
+        Args:
+            subject (hashable): Subject identity.
             
-            # determine classifier mode
-            if self.nbSubjects == 0:
-                raise ValueError, "Please provide input data - empty dict."
-            else:
-                for i in xrange(self.nbSubjects):
-                    # build dicts
-                    sub = subjects[i]
-                    self.subject2label[sub] = i
-                    
-                    # save data
-                    self.io_save(i, data[sub])
-                    
-                    # prepare data
-                    _ = self._prepareData(data[sub])
-                    
-                    ### user
+            threshold (int, float): Threshold value.
+            
+            ready (bool): If True, 'subject' is the internal classifier label.
         
-        # train flag
-        self.is_trained = True
+        """
         
-        if updateThresholds:
-            # update thresholds
-            self.updateThresholds()
+        if not ready:
+            if not self.check_subject(subject):
+                raise SubjectError(subject)
+            subject = self._subject2label[subject]
+        
+        try:
+            self._thresholds[subject]['auth'] = threshold
+        except KeyError:
+            self._thresholds[subject] = {'auth': threshold, 'id': None}
     
-    def re_train(self, data):
-        # data is {subject: features (array)}
-        ### user
+    def get_auth_thr(self, subject, ready=False):
+        """Get the authentication threshold of a subject.
         
-        for sub in data.iterkeys():
-            if sub in self.subject2label:
-                # existing subject
-                if data[sub] is not None:
-                    # change subject's data
-                    label = self.subject2label[sub]
-                    
-                    # update templates
-                    aux = self._updateStrategy(self.io_load(label), data[sub])
-                    
-                    # save data
-                    self.io_save(label, aux)
-                    
-                    # prepare data
-                    _ = self._prepareData(aux)
-                    
-                    ### user
-                    
-                    
-                else:
-                    # delete subject
-                    if self.nbSubjects == 1:
-                        # reset classifier to untrained
-                        self._reset()
-                    else:
-                        # reorder the labels/subjects and models dicts
-                        subject2label, nbSubjects = self._snapshot()
-                        self._reset()
-                        
-                        label = subject2label[sub]
-                        clabels = np.setdiff1d(np.unique(subject2label.values()),
-                                                  [label], assume_unique=True)
-                        self.nbSubjects = nbSubjects - 1
-                        
-                        i = 0
-                        for ii in xrange(len(clabels)):
-                            # build dicts
-                            sub = subject2label[:clabels[ii]]
-                            self.subject2label[sub] = i
-                            
-                            # move data
-                            self.io_save(i, self.io_load(clabels[ii]))
-                            
-                            ### user
-                            
-                            # update i
-                            i += 1
-            else:
-                # new subject
-                # add to dicts
-                label = self.nbSubjects
-                self.subject2label[sub] = label
-                
-                # save data
-                self.io_save(label, data[sub])
-                
-                # prepare data
-                _ = self._prepareData(data[sub])
-                
-                ### user
-                
-                
-                # increment number of subjects
-                self.nbSubjects += 1
+        Args:
+            subject (hashable): Subject identity.
+            
+            ready (bool): If True, 'subject' is the internal classifier label.
+        
+        Returns:
+            threshold (int, float): Threshold value.
+        
+        """
+        
+        if not ready:
+            if not self.check_subject(subject):
+                raise SubjectError(subject)
+            subject = self._subject2label[subject]
+        
+        return self._thresholds[subject].get('auth', None)
     
-    def authenticate(self, data, subject, threshold=None, ready=False, labels=False, **kwargs):
-        # data is a list of feature vectors, allegedly belonging to the given subject
-        ### user
+    def set_id_thr(self, subject, threshold, ready=False):
+        """Set the identification threshold of a subject.
+        
+        Args:
+            subject (hashable): Subject identity.
+            
+            threshold (int, float): Threshold value.
+            
+            ready (bool): If True, 'subject' is the internal classifier label.
+        
+        """
+        
+        if not ready:
+            if not self.check_subject(subject):
+                raise SubjectError(subject)
+            subject = self._subject2label[subject]
+        
+        try:
+            self._thresholds[subject]['id'] = threshold
+        except KeyError:
+            self._thresholds[subject] = {'auth': None, 'id': threshold}
+    
+    def get_id_thr(self, subject, ready=False):
+        """Get the identification threshold of a subject.
+        
+        Args:
+            subject (hashable): Subject identity.
+            
+            ready (bool): If True, 'subject' is the internal classifier label.
+        
+        Returns:
+            threshold (int, float): Threshold value.
+        
+        """
+        
+        if not ready:
+            if not self.check_subject(subject):
+                raise SubjectError(subject)
+            subject = self._subject2label[subject]
+        
+        return self._thresholds[subject].get('id', None)
+    
+    def get_thresholds(self, force=False):
+        """Get an array of reasonable thresholds.
+        
+        Args:
+            force (bool): If True, forces generation of thresholds (optional).
+        
+        Returns:
+            ths (array): Generated thresholds.
+        
+        """
+        
+        if force or (self._autoThresholds is not None):
+            self._autoThresholds = self._get_thresholds()
+        
+        return self._autoThresholds
+    
+    def authenticate(self, data, subject, threshold=None):
+        """Authenticate a set of feature vectors, allegedly belonging to the given subject.
+        
+        Args:
+            data (array): Input test data.
+            
+            subject (hashable): Subject identity.
+            
+            threshold (int, float): Authentication threshold (optional).
+        
+        Returns:
+            decision (array): Authentication decision for each input sample.
+        
+        """
         
         # check train state
         if not self.is_trained:
             raise UntrainedError
         
-        # translate subject ID to class label
-        label = self.subject2label[subject]
-        if label == -1:
+        # check subject
+        if not self.check_subject(subject):
             raise SubjectError(subject)
         
+        label = self._subject2label[subject]
+        
+        # check threshold
         if threshold is None:
-            # get user-tuned threshold
-            threshold = self.authThreshold(label, ready=True)
+            threshold = self.get_auth_thr(label, ready=True)
         
         # prepare data
-        if not ready:
-            _ = self._prepareData(data)
-        else:
-            _ = data
+        aux = self._prepare(data, targets=label)
         
-        # outputs
-        decision = []
-        prediction = []
+        # authenticate
+        decision = self._authenticate(aux, label, threshold)
         
-        ### user
-        
-        # convert to numpy
-        decision = np.array(decision)
-        
-        if labels:
-            # translate class label to subject ID
-            subPrediction = [self.subject2label[:item] for item in prediction]
-            return decision, subPrediction
-        else:
-            return decision
+        return decision
     
-    def _identify(self, data, threshold=None, ready=False):
-        # data is list of feature vectors
-        ### user
+    def identify(self, data, threshold=None):
+        """Identify a set of feature vectors.
+        
+        Args:
+            data (array): Input test data.
+            
+            threshold (int, float): Identification threshold.
+        
+        Returns:
+            subjects (list): Identity of each input sample.
+        
+        """
         
         # check train state
         if not self.is_trained:
             raise UntrainedError
         
-        # threshold
-        if threshold is None:
-            _ = lambda label: self.idThreshold(label, ready=True)
-        else:
-            _ = lambda label: threshold
-        
         # prepare data
-        if not ready:
-            _ = self._prepareData(data)
-        else:
-            _ = data
+        aux = self._prepare(data)
         
-        # outputs
-        labels = []
+        # identify
+        labels = self._identify(aux, threshold)
         
-        ### user
-        
-        return np.array(labels)
-    
-    def identify(self, data, threshold=None, ready=False, **kwargs):
-        # data is list of feature vectors
-        
-        labels = self._identify(data=data, threshold=threshold, ready=ready, **kwargs)
-        
-        # translate class labels to subject IDs
-        subjects = [self.subject2label[:item] for item in labels]
+        # translate class labels
+        subjects = [self._subject2label[:item] for item in labels]
         
         return subjects
     
-    def seqEvaluate(self, data, thresholds=None):
+    def evaluate(self, data, thresholds=None, show=False):
+        """Assess the performance of the classifier in both authentication and
+        identification scenarios.
+        
+        Args:
+            data (dict): Dictionary holding test data for each subject.
+            
+            thresholds (array): Classifier thresholds to use.
+            
+            show (bool): If True, show a summary plot (optional).
+        
+        Returns:
+            (ReturnTuple): containing:
+                classification (dict): Classification results.
+                
+                assessment (dict): Biometric statistics.
+        
         """
-        Assess the performance of the classifier in both biometric scenarios: authentication and identification.
-        
-        Workflow:
-            For each test subject and for each threshold, test authentication and identification;
-            Authentication results stored in a 3 dimensional array of booleans, shape = (N thresholds, M subjects, K samples);
-            Identification results stored in a 2 dimensional array, shape = (N thresholds, K samples);
-            Subject and global statistics are then computed by evaluation.assessClassification.
-        
-        Kwargs:
-            data (dict): Dictionary holding the testing samples for each subject.
-            
-            rejection_thresholds (array): Thresholds used to compute the ROCs.
-            
-            dstPath (string): Path for multiprocessing.
-            
-            log2file (bool): Flag to control the use of logging in multiprocessing.
-        
-        Kwrvals:
-            classification (dict): Results of the classification.
-            
-            assessment (dict): Biometric statistics.
-        
-        See Also:
-            
-        
-        Notes:
-            
-        
-        Example:
-            
-        
-        References:
-            .. [1]
-            
-        """
-        # data is {subject: features (array)}
         
         # check train state
         if not self.is_trained:
             raise UntrainedError
         
-        # choose thresholds
+        # check thresholds
         if thresholds is None:
-            thresholds = self.autoRejectionThresholds()
-        nth = len(thresholds)
+            thresholds = self.get_thresholds()
         
-        subjects = data.keys()
+        # get subjects
+        subjects = filter(lambda item: self.check_subject(item), data.keys())
+        if len(subjects) == 0:
+            raise ValueError("No enrolled subjects in test set.")
+        
         results = {'subjectList': subjects,
-                   'subjectDict': self.subject2label,
+                   'subjectDict': self._subject2label,
                    }
         
         for subject in subjects:
             # prepare data
-            aux = self._prepareData(data[subject])
+            aux = self._prepare(data[subject])
             
             # test
             auth_res = []
             id_res = []
-            for i in xrange(nth):
-                th = thresholds[i]
-                
+            for th in thresholds:
+                # authentication
                 auth = []
                 for subject_tst in subjects:
-                    auth.append(self.authenticate(aux, subject_tst, th, ready=True))
+                    label = self._subject2label[subject_tst]
+                    auth.append(self._authenticate(aux, label, th))
+                
                 auth_res.append(np.array(auth))
                 
-                id_res.append(self._identify(aux, th, ready=True))
+                # identification
+                id_res.append(self._identify(aux, th))
             
             auth_res = np.array(auth_res)
             id_res = np.array(id_res)
@@ -768,12 +651,795 @@ class BaseClassifier(object):
         # assess classification results
         assess, = assess_classification(results, thresholds)
         
-        # final output
-        output = {'classification': results,
-                  'assessment': assess,
-                  }
+        # output
+        out = utils.ReturnTuple((results, assess), ('classification', 'assessment'))
         
-        return output
+        if show:
+            # plot
+            plotting.plot_biometrics(assess, self.EER_IDX, show=True)
+        
+        return out
+    
+    def _authenticate(self, data, label, threshold):
+        """Authenticate a set of feature vectors, allegedly belonging to the given subject.
+        
+        Args:
+            data (array): Input test data.
+            
+            label (str): Internal classifier subject label.
+            
+            threshold (int, float): Authentication threshold.
+        
+        Returns:
+            decision (array): Authentication decision for each input sample.
+        
+        """
+        
+        decision = np.zeros(len(data), dtype='bool')
+        
+        return decision
+    
+    def _get_thresholds(self):
+        """Generate an array of reasonable thresholds.
+        
+        Returns:
+            ths (array): Generated thresholds.
+        
+        """
+        
+        ths = np.array([])
+        
+        return ths
+    
+    def _identify(self, data, threshold=None):
+        """Identify a set of feature vectors.
+        
+        Args:
+            data (array): Input test data.
+            
+            threshold (int, float): Identification threshold.
+        
+        Returns:
+            labels (list): Identity (internal label) of each input sample.
+        
+        """
+        
+        labels = [''] * len(data)
+        
+        return labels
+    
+    def _prepare(self, data, targets=None):
+        """Prepare data to be processed.
+        
+        Args:
+            data (array): Data to process.
+            
+            targets (list, str): Target subject labels (optional).
+        
+        Returns:
+            out (object): Processed data.
+        
+        """
+        
+        # target class labels
+        if targets is None:
+            targets = self._subject2label.values()
+        elif isinstance(targets, basestring):
+            targets = [targets]
+        
+        return data
+    
+    def _train(self, enroll=None, dismiss=None):
+        """Train the classifier.
+        
+        Args:
+            enroll (list): Labels of new or updated subjects.
+            
+            dismiss (list): Labels of deleted subjects.
+        
+        """
+        
+        if enroll is None:
+            enroll = []
+        if dismiss is None:
+            dismiss = []
+        
+        # process dismiss
+        for _ in dismiss:
+            pass
+        
+        # process enroll
+        for _ in enroll:
+            pass
+    
+    def _update(self, old, new):
+        """Combine new data with existing templates (for one subject).
+        
+        Args:
+            old (array): Existing data.
+            
+            new (array): New data.
+        
+        Returns:
+            out (array): Combined data.
+        
+        """
+        
+        return new
+
+
+class KNN(BaseClassifier):
+    """K Nearest Neighbors (k-NN) biometric classifier.
+    
+    Args:
+        k (int): Number of neighbors.
+        
+        metric (str): Distance metric (optional).
+        
+        metric_args (dict): Additional keyword arguments are passed to the distance function (optional).
+    
+    Attributes:
+        EER_IDX (int): Reference index for the Equal Error Rate.
+    
+    """
+    
+    EER_IDX = 0
+    
+    def __init__(self, k=3, metric='euclidean', metric_args=None):
+        # parent __init__
+        super(KNN, self).__init__()
+        
+        # algorithm self things
+        self.k = k
+        self.metric = metric
+        if metric_args is None:
+            metric_args = {}
+        self.metric_args = metric_args
+        
+        # test metric args
+        _ = metrics.pdist(np.zeros((2, 2)), metric, **metric_args)
+        
+        # minimum threshold
+        self.min_thr = 10 * np.finfo('float').eps
+    
+    def _sort(self, dists, train_labels):
+        """Sort the computed distances.
+        
+        Args:
+            dists (array): Unsorted computed distances.
+                
+            train_labels (list): Unsorted target subject labels.
+        
+        Returns:
+            (tuple): containing:
+                dists (array): Sorted computed distances.
+                    
+                train_labels (list): Sorted target subject labels.
+        
+        """
+        
+        ind = dists.argsort()
+        # sneaky trick from http://stackoverflow.com/questions/6155649
+        static_inds = np.arange(dists.shape[0]).reshape((dists.shape[0], 1))
+        dists = dists[static_inds, ind]
+        train_labels = train_labels[static_inds, ind]
+        
+        return dists, train_labels
+    
+    def _authenticate(self, data, label, threshold):
+        """Authenticate a set of feature vectors, allegedly belonging to the given subject.
+        
+        Args:
+            data (array): Input test data.
+            
+            label (str): Internal classifier subject label.
+            
+            threshold (int, float): Authentication threshold.
+        
+        Returns:
+            decision (array): Authentication decision for each input sample.
+        
+        """
+        
+        # unpack prepared data
+        dists = data['dists']
+        train_labels = data['train_labels']
+        
+        # select based on subject label
+        aux = []
+        ns = len(dists)
+        for i in xrange(ns):
+            aux.append(dists[i, train_labels[i, :] == label])
+        
+        dists = np.array(aux)
+        
+        # nearest neighbors
+        dists = dists[:, :self.k]
+        
+        decision = np.zeros(ns, dtype='bool')
+        for i in xrange(ns):
+            # compare distances to threshold
+            count = np.sum(dists[i, :] <= threshold)
+            
+            # decide accept
+            if count > (self.k / 2):
+                decision[i] = True
+        
+        return decision
+    
+    def _get_thresholds(self):
+        """Generate an array of reasonable thresholds.
+        
+        For metrics other than 'cosine' or 'pcosine', which have a clear limits,
+        generates an array based on the maximum distances between enrolled subjects.
+        
+        Returns:
+            ths (array): Generated thresholds.
+        
+        """
+        
+        if self.metric == 'cosine':
+            return np.linspace(self.min_thr, 2., 100)
+        elif self.metric == 'pcosine':
+            return np.linspace(self.min_thr, 1., 100)
+        
+        maxD = []
+        for _ in xrange(3):
+            for label in self._subject2label.values():
+                # randomly select samples
+                aux = self.io_load(label)
+                ind = np.random.randint(0, aux.shape[0], 3)
+                obs = aux[ind]
+                
+                # compute distances
+                dists = self._prepare(obs)['dists']
+                maxD.append(np.max(dists))
+        
+        # maximum distance
+        maxD = 1.5 * np.max(maxD)
+        
+        ths = np.linspace(self.min_thr, maxD, 100)
+        
+        return ths
+    
+    def _identify(self, data, threshold=None):
+        """Identify a set of feature vectors.
+        
+        Args:
+            data (array): Input test data.
+            
+            threshold (int, float): Identification threshold.
+        
+        Returns:
+            labels (list): Identity (internal label) of each input sample.
+        
+        """
+        
+        if threshold is None:
+            thrFcn = lambda label: self.get_id_thr(label, ready=True)
+        else:
+            thrFcn = lambda label: threshold
+        
+        # unpack prepared data
+        dists = data['dists']
+        train_labels = data['train_labels']
+        
+        # nearest neighbors
+        dists = dists[:, :self.k]
+        train_labels = train_labels[:, :self.k]
+        ns = len(dists)
+        
+        labels = []
+        for i in xrange(ns):
+            lbl, _ = majority_rule(train_labels[i, :], random=True)
+            
+            # compare distances to threshold
+            count = np.sum(dists[i, :] <= thrFcn(lbl))
+            
+            # decide
+            if count > (self.k / 2):
+                # accept
+                labels.append(lbl)
+            else:
+                # reject
+                labels.append('')
+        
+        return labels
+    
+    def _prepare(self, data, targets=None):
+        """Prepare data to be processed.
+        
+        Computes the distances of the input data set to the target subjects.
+        
+        Args:
+            data (array): Data to process.
+            
+            targets (list, str): Target subject labels (optional).
+        
+        Returns:
+            out (dict): Processed data containing:
+                dists (array): Computed distances.
+                
+                train_labels (array): Target subject labels.
+        
+        """
+        
+        # target class labels
+        if targets is None:
+            targets = self._subject2label.values()
+        elif isinstance(targets, basestring):
+            targets = [targets]
+        
+        dists = []
+        train_labels = []
+        
+        for label in targets:
+            # compute distances
+            D = metrics.cdist(data, self.io_load(label), metric=self.metric,
+                              **self.metric_args)
+            
+            dists.append(D)
+            train_labels.append(np.tile(label, D.shape))
+        
+        dists = np.concatenate(dists, axis=1)
+        train_labels = np.concatenate(train_labels, axis=1)
+        
+        # sort
+        dists, train_labels = self._sort(dists, train_labels)
+        
+        return {'dists': dists, 'train_labels': train_labels}
+    
+    def _update(self, old, new):
+        """Combine new data with existing templates (for one subject).
+        
+        Simply concatenates old data with new data.
+        
+        Args:
+            old (array): Existing data.
+            
+            new (array): New data.
+        
+        Returns:
+            out (array): Combined data.
+        
+        """
+        
+        out = np.concatenate([old, new], axis=0)
+        
+        return out
+
+
+class SVM(BaseClassifier):
+    """Support Vector Machines (SVM) biometric classifier.
+    
+    Wraps the 'OneClassSVM' and 'SVC' classes from 'scikit-learn'.
+    
+    Args:
+        C (float, optional): Penalty parameter C of the error term.
+        
+        kernel (str, optional): Specifies the kernel type to be used in the
+                                algorithm. It must be one of ‘linear’, ‘poly’,
+                                ‘rbf’, ‘sigmoid’, ‘precomputed’ or a callable.
+                                If none is given, ‘rbf’ will be used. If a
+                                callable is given it is used to precompute the
+                                kernel matrix.
+        
+        degree (int, optional): Degree of the polynomial kernel function
+                                (‘poly’). Ignored by all other kernels.
+        
+        gamma (float, optional): Kernel coefficient for ‘rbf’, ‘poly’ and
+                                 ‘sigmoid’. If gamma is 0.0 then 1/n_features
+                                 will be used instead.
+        
+        coef0 (float, optional): Independent term in kernel function. It is only
+                                 significant in ‘poly’ and ‘sigmoid’.
+        
+        shrinking (bool, optional): Whether to use the shrinking heuristic.
+        
+        tol (float, optional): Tolerance for stopping criterion.
+        
+        cache_size (float, optional): Specify the size of the kernel
+                                      cache (in MB).
+        
+        max_iter (int, optional): Hard limit on iterations within solver, or -1
+                                  for no limit.
+        
+        random_state (int, RandomState, optional): The seed of the pseudo random
+                                                   number generator to use when
+                                                   shuffling the data for
+                                                   probability estimation.
+    
+    Attributes:
+        EER_IDX (int): Reference index for the Equal Error Rate.
+    
+    """
+    
+    EER_IDX = -1
+    
+    def __init__(self, C=1.0, kernel='linear', degree=3, gamma=0.0, coef0=0.0,
+                 shrinking=True, tol=0.001, cache_size=200, max_iter=-1,
+                 random_state=None):
+        # parent __init__
+        super(SVM, self).__init__()
+        
+        # algorithm self things
+        self._models = {}
+        self._clf_kwargs = {'C': C,
+                            'kernel': kernel,
+                            'degree': degree,
+                            'gamma': gamma,
+                            'coef0': coef0,
+                            'shrinking': shrinking,
+                            'tol': tol,
+                            'cache_size': cache_size,
+                            'max_iter': max_iter,
+                            'random_state': random_state,
+                            }
+        
+        # minimum threshold
+        self.min_thr = 10 * np.finfo('float').eps
+    
+    def _get_weights(self, n1, n2):
+        """Compute class weights.
+        
+        The weights are inversely proportional to the number of samples in each
+        class.
+        
+        Args:
+            n1 (int): Number of samples in the first class.
+            
+            n2 (int): Number of samples in the second class.
+        
+        Returns:
+            weights (dict): Weights for each class.
+        
+        """
+        
+        w = np.array([1. / n1, 1. / n2])
+        w *= 2 / np.sum(w)
+        weights = {-1: w[0], 1: w[1]}
+        
+        return weights
+    
+    def _get_single_clf(self, X, label):
+        """Instantiate and train a One Class SVM classifier.
+        
+        Args:
+            X (array): Training data.
+            
+            label (str): Class label.
+        
+        """
+        
+        clf = sksvm.OneClassSVM(kernel='rbf', nu=0.1)
+        clf.fit(X)
+        
+        # add to models
+        self._models[('', label)] = clf
+    
+    def _get_kernel_clf(self, X1, X2, n1, n2, label1, label2):
+        """Instantiate and train a SVC SVM classifier.
+        
+        Args:
+            X1 (array): Trainig data for the first class.
+            
+            X2 (array): Training data for the second class.
+            
+            n1 (int): Number of samples in the first class.
+            
+            n2 (int): Number of samples in the second class.
+            
+            label1 (str): Label for the first class.
+            
+            label2 (str): Label for the first class.
+        
+        """
+        
+        # prepare data to train
+        X = np.concatenate((X1, X2), axis=0)
+        Y = np.ones(n1 + n2)
+        
+        if label1 < label2:
+            Y[:n1] = -1
+            pair = (label1, label2)
+        else:
+            Y[n1:] = -1
+            pair = (label2, label1)
+        
+        # class weights
+        weights = self._get_weights(n1, n2)
+        
+        # instantiate and fit
+        clf = sksvm.SVC(class_weight=weights, **self._clf_kwargs)
+        clf.fit(X, Y)
+        
+        # add to models
+        self._models[pair] = clf
+    
+    def _del_clf(self, pair):
+        """Delete a binary classifier.
+        
+        Args:
+            pair (list, tuple): Label pair.
+        
+        """
+        
+        pair = self._convert_pair(pair)
+        m = self._models.pop(pair)
+        del m
+    
+    def _convert_pair(self, pair):
+        """Sort and convert a label pair to the internal representation format.
+        
+        Args:
+            pair (list, tuple): Input label pair.
+        
+        Returns:
+            pair (tuple): Sorted label pair.
+        
+        """
+        
+        pair = tuple(sorted(pair))
+        
+        return pair
+    
+    def _predict(self, pair, X):
+        """Get a classifier prediction of the input data, given the label pair.
+        
+        Args:
+            pair (list, tuple): Label pair.
+            
+            X (array): Input data to classify.
+        
+        Returns:
+            prediction (array): Prediction for each sample in the input data.
+        
+        """
+        
+        # convert pair
+        pair = self._convert_pair(pair)
+        
+        # classify
+        aux = self._models[pair].predict(X)
+        
+        prediction = []
+        for item in aux:
+            if item < 0:
+                prediction.append(pair[0])
+            elif item > 0:
+                prediction.append(pair[1])
+            else:
+                prediction.append('')
+        
+        prediction = np.array(prediction)
+        
+        return prediction
+    
+    def _authenticate(self, data, label, threshold):
+        """Authenticate a set of feature vectors, allegedly belonging to the
+        given subject.
+        
+        Args:
+            data (array): Input test data.
+            
+            label (str): Internal classifier subject label.
+            
+            threshold (int, float): Authentication threshold.
+        
+        Returns:
+            decision (array): Authentication decision for each input sample.
+        
+        """
+        
+        # unpack prepared data
+        aux = data['predictions']
+        ns = aux.shape[1]
+        pairs = data['pairs']
+        
+        # normalization
+        if self._nbSubjects > 1:
+            norm = float(self._nbSubjects - 1)
+        else:
+            norm = 1.0
+        
+        # select pairs
+        sel = np.nonzero([label in p for p in pairs])[0]
+        aux = aux[sel, :]
+        
+        decision = []
+        for i in xrange(ns):
+            # determine majority
+            predMax, count = majority_rule(aux[:, i], random=True)
+            rate = float(count) / norm
+            
+            if predMax == '':
+                decision.append(False)
+            else:
+                # compare with threshold
+                if rate > threshold:
+                    decision.append(predMax == label)
+                else:
+                    decision.append(False)
+        
+        decision = np.array(decision)
+        
+        return decision
+    
+    def _get_thresholds(self):
+        """Generate an array of reasonable thresholds.
+        
+        The thresholds correspond to the relative number of binary classifiers
+        that agree on a class.
+        
+        Returns:
+            ths (array): Generated thresholds.
+        
+        """
+        
+        ths = np.linspace(self.min_thr, 1.0, 100)
+        
+        return ths
+    
+    def _identify(self, data, threshold=None):
+        """Identify a set of feature vectors.
+        
+        Args:
+            data (array): Input test data.
+            
+            threshold (int, float): Identification threshold.
+        
+        Returns:
+            labels (list): Identity (internal label) of each input sample.
+        
+        """
+        
+        if threshold is None:
+            thrFcn = lambda label: self.get_id_thr(label, ready=True)
+        else:
+            thrFcn = lambda label: threshold
+        
+        # unpack prepared data
+        aux = data['predictions']
+        ns = aux.shape[1]
+        
+        # normalization
+        if self._nbSubjects > 1:
+            norm = float(self._nbSubjects - 1)
+        else:
+            norm = 1.0
+        
+        labels = []
+        for i in xrange(ns):
+            # determine majority
+            predMax, count = majority_rule(aux[:, i], random=True)
+            rate = float(count) / norm
+            
+            if predMax == '':
+                labels.append('')
+            else:
+                # compare with threshold
+                if rate > thrFcn(predMax):
+                    # accept
+                    labels.append(predMax)
+                else:
+                    # reject
+                    labels.append('')
+        
+        return labels
+    
+    def _prepare(self, data, targets=None):
+        """Prepare data to be processed.
+        
+        Computes the predictions for each of the targeted classifier pairs.
+        
+        Args:
+            data (array): Data to process.
+            
+            targets (list, str): Target subject labels (optional).
+        
+        Returns:
+            out (dict): Processed data containing:
+                predictions (array): Predictions of each input sample for the
+                                     targeted classifier pairs.
+                
+                pairs (list): Target label pairs.
+        
+        """
+        
+        # target class labels
+        if self._nbSubjects == 1:
+            pairs = self._models.keys()
+        else:
+            if targets is None:
+                pairs = self._models.keys()
+            elif isinstance(targets, basestring):
+                labels = list(set(self._subject2label.values()) - set([targets]))
+                pairs = [[targets, lbl] for lbl in labels]
+            else:
+                pairs = []
+                for t in targets:
+                    labels = list(set(self._subject2label.values()) - set([t]))
+                    pairs.extend([t, lbl] for lbl in labels)
+        
+        # predict
+        predictions = np.array([self._predict(p, data) for p in pairs])
+        
+        out = {'predictions': predictions,
+               'pairs': pairs,
+               }
+        
+        return out
+    
+    def _train(self, enroll=None, dismiss=None):
+        """Train the classifier.
+        
+        Args:
+            enroll (list): Labels of new or updated subjects.
+            
+            dismiss (list): Labels of deleted subjects.
+        
+        """
+        
+        if enroll is None:
+            enroll = []
+        if dismiss is None:
+            dismiss = []
+        
+        # process dismiss
+        pairs = self._models.keys()
+        for t in dismiss:
+            pairs = filter(lambda p: t in p, pairs)
+        
+        for p in pairs:
+            self._del_clf(p)
+        
+        # process enroll
+        existing = list(set(self._subject2label.values()) - set(enroll))
+        for i, t1 in enumerate(enroll):
+            X1 = self.io_load(t1)
+            n1 = len(X1)
+            
+            # existing subjects
+            for t2 in existing:
+                X2 = self.io_load(t2)
+                n2 = len(X2)
+                self._get_kernel_clf(X1, X2, n1, n2, t1, t2)
+            
+            # new subjects
+            for t2 in enroll[i+1:]:
+                X2 = self.io_load(t2)
+                n2 = len(X2)
+                self._get_kernel_clf(X1, X2, n1, n2, t1, t2)
+        
+        # check singles
+        if self._nbSubjects == 1:
+            label = self._subject2label.values()[0]
+            X = self.io_load(label)
+            self._get_single_clf(X, label)
+        elif self._nbSubjects > 1:
+            aux = filter(lambda p: '' in p, self._models.keys())
+            if len(aux) != 0:
+                for p in aux:
+                    self._del_clf(p)
+    
+    def _update(self, old, new):
+        """Combine new data with existing templates (for one subject).
+        
+        Simply concatenates old data with new data.
+        
+        Args:
+            old (array): Existing data.
+            
+            new (array): New data.
+        
+        Returns:
+            out (array): Combined data.
+        
+        """
+        
+        out = np.concatenate([old, new], axis=0)
+        
+        return out
 
 
 def get_auth_rates(TP=None, FP=None, TN=None, FN=None, thresholds=None):
@@ -922,7 +1588,8 @@ def get_id_rates(H=None, M=None, R=None, N=None, thresholds=None):
 
 def get_subject_results(results=None, subject=None, thresholds=None, subjects=None,
                         subject_dict=None, subject_idx=None):
-    """Compute authentication and identification performance metrics for a given subject.
+    """Compute authentication and identification performance metrics for a given
+    subject.
     
     Args:
         results (dict): Classification results.
@@ -1006,7 +1673,7 @@ def get_subject_results(results=None, subject=None, thresholds=None, subjects=No
         res = id_res[i, :]
         hits = res == label
         nhits = np.sum(hits)
-        rejects = res == -1
+        rejects = res == ''
         nrejects = np.sum(rejects)
         misses = np.logical_not(np.logical_or(hits, rejects))
         nmisses = ns - (nhits + nrejects)
@@ -1272,13 +1939,14 @@ def combination(results=None, weights=None):
         weights (dict): Weight for each classifier (optional).
     
     Returns:
-        decision (bool, int, str): Consensus decision.
-        
-        confidence (float): Confidence estimate of the decision.
-        
-        counts (array): Weight for each possible decision outcome.
-        
-        classes (array): List of possible decision outcomes.
+        (ReturnTuple): containing:
+            decision (object): Consensus decision.
+            
+            confidence (float): Confidence estimate of the decision.
+            
+            counts (array): Weight for each possible decision outcome.
+            
+            classes (array): List of possible decision outcomes.
     
     """
     
@@ -1333,10 +2001,48 @@ def combination(results=None, weights=None):
     return utils.ReturnTuple(args, names)
 
 
-
-
-
-
-
-
+def majority_rule(labels=None, random=True):
+    """Determine the most frequent class label.
+    
+    Args:
+        labels (array, list): List of clas labels.
+        
+        random (bool): If True, will choose randomly in case of tied classes,
+            otherwise the first element is chosen.
+    
+    Returns:
+        (ReturnTuple): containing:
+            decision (object): Consensus decision.
+            
+            count (int): Number of elements of the consensus decision.
+    
+    """
+    
+    # check inputs
+    if labels is None:
+        raise TypeError("Please specify the input list of class labels.")
+    
+    if len(labels) == 0:
+        raise CombinationError("Empty list of class labels.")
+    
+    # count unique occurrences
+    unq, counts = np.unique(labels, return_counts=True)
+    
+    # most frequent class
+    predMax = counts.argmax()
+    
+    if random:
+        # check for repeats
+        ind = np.nonzero(counts == counts[predMax])[0]
+        length = len(ind)
+        
+        if length > 1:
+            predMax = ind[np.random.randint(0, length)]
+    
+    decision = unq[predMax]
+    cnt = counts[predMax]
+    
+    out = utils.ReturnTuple((decision, cnt), ('decision', 'count'))
+    
+    return out
 

@@ -799,3 +799,129 @@ def plot_ecg(ts=None, raw=None, filtered=None, rpeaks=None, templates_ts=None,
     # close
     plt.close(fig)
 
+
+def _plot_rates(thresholds, rates, variables, lw=1, colors=None, alpha=1,
+                eer_idx=None, labels=False, ax=None):
+    """Plot biometric rates.
+    
+    Args:
+        thresholds (array): 
+        
+        rates (dict): Dictionary of rates.
+        
+        variables (list): Keys from 'rates' to plot.
+        
+        lw (int, float): Plot linewidth (optional).
+        
+        colors (list): Plot line color for each variable (optional).
+        
+        alpha (float): Plot line alpha value (optional).
+        
+        eer_idx (int): Classifier reference index for the Equal Error Rate (optional).
+        
+        labels (bool): If True, will show plot labels (optional).
+        
+        ax (axis): Plot Axis to use (optional).
+    
+    Returns:
+        fig (Figure): Figure object.
+    
+    """
+    
+    if ax is None:
+        fig = plt.figure()
+        ax = fig.add_subplot(111)
+    else:
+        fig = ax.figure
+    
+    if colors is None:
+        x = np.linspace(0., 1., len(variables))
+        colors = plt.get_cmap('rainbow')(x)
+    
+    if labels:
+        for i, v in enumerate(variables):
+            ax.plot(thresholds, rates[v], colors[i], lw=lw, alpha=alpha, label=v)
+    else:
+        for i, v in enumerate(variables):
+            ax.plot(thresholds, rates[v], colors[i], lw=lw, alpha=alpha)
+    
+    if eer_idx is not None:
+        x, y = rates['EER'][eer_idx]
+        ax.vlines(x, 0, 1, 'r', lw=lw)
+        ax.set_title('EER = %0.2f %%' % (100. * y))
+    
+    return fig
+
+
+def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
+    """Create a summary plot of a biometrics test run.
+    
+    Args:
+        assessment (dict): Classification assessment results.
+        
+        eer_idx (int): Classifier reference index for the Equal Error Rate.
+        
+        path (str): If provided, the plot will be saved to the specified file (optional).
+        
+        show (bool): If True, show the plot immediately.
+    
+    """
+    
+    fig = plt.figure()
+    fig.suptitle('Biometrics Summary')
+    
+    c_sub = ['#008bff', '#8dd000']
+    c_global = ['#0037ff', 'g']
+    
+    ths = assessment['thresholds']
+    
+    auth_ax = fig.add_subplot(121)
+    id_ax = fig.add_subplot(122)
+    
+    # subject results
+    for sub in assessment['subject'].iterkeys():
+        _ = _plot_rates(ths, assessment['subject'][sub]['authentication']['rates'],
+                        ['FAR', 'FRR'], lw=MINOR_LW, colors=c_sub, alpha=0.4,
+                        eer_idx=None, labels=False, ax=auth_ax)
+        
+        _ = _plot_rates(ths, assessment['subject'][sub]['identification']['rates'],
+                        ['MR', 'RR'], lw=MINOR_LW, colors=c_sub, alpha=0.4,
+                        eer_idx=None, labels=False, ax=id_ax)
+    
+    # global results
+    _ = _plot_rates(ths, assessment['global']['authentication']['rates'],
+                    ['FAR', 'FRR'], lw=MAJOR_LW, colors=c_global, alpha=1,
+                    eer_idx=eer_idx, labels=True, ax=auth_ax)
+    
+    _ = _plot_rates(ths, assessment['global']['identification']['rates'],
+                    ['MR', 'RR'], lw=MAJOR_LW, colors=c_global, alpha=1,
+                    eer_idx=eer_idx, labels=True, ax=id_ax)
+    
+    # set labels and grids
+    auth_ax.set_xlabel('Threshold')
+    auth_ax.set_ylabel('Authentication')
+    auth_ax.grid()
+    auth_ax.legend()
+    
+    id_ax.set_xlabel('Threshold')
+    id_ax.set_ylabel('Identification')
+    id_ax.grid()
+    id_ax.legend()
+    
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+        
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+    
+    # show
+    if show:
+        plt.show()
+    
+    # close
+    plt.close(fig)
+
