@@ -17,17 +17,16 @@ import numpy as np
 import scipy.cluster.hierarchy as sch
 import scipy.cluster.vq as scv
 import scipy.sparse as sp
-import scipy.spatial.distance as ssd
 import sklearn.cluster as skc
 from sklearn.grid_search import ParameterGrid
 
 # local
-from . import utils
+from . import metrics, utils
 
 # Globals
 
 
-def dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', **kwargs):
+def dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', metric_args=None):
     """Perform clustering using the DBSCAN algorithm [1].
     
     The algorithm works by grouping data points that are closely packed together
@@ -43,7 +42,7 @@ def dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', **kwargs):
         
         metric (str): Distance metric (see scipy.spatial.distance).
         
-        **kwargs (dict): Additional keyword arguments are passed to the distance function.
+        metric_args (dict): Additional keyword arguments to pass to the distance function (optional).
     
     Returns:
         (ReturnTuple): containing:
@@ -62,9 +61,16 @@ def dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', **kwargs):
     if data is None:
         raise TypeError("Please specify input data.")
     
+    if metric_args is None:
+        metric_args = {}
+    
+    # compute distances
+    D = metrics.pdist(data, metric=metric, **metric_args)
+    D = metrics.squareform(D)
+    
     # fit
-    db = skc.DBSCAN(eps=eps, min_samples=min_samples, metric=metric)
-    labels = db.fit_predict(data)
+    db = skc.DBSCAN(eps=eps, min_samples=min_samples, metric='precomputed')
+    labels = db.fit_predict(D)
     
     # get cluster indices
     clusters = _extract_clusters(labels)
@@ -72,7 +78,7 @@ def dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', **kwargs):
     return utils.ReturnTuple((clusters, ), ('clusters', ))
 
 
-def hierarchical(data=None, k=0, linkage='average', metric='euclidean', **kwargs):
+def hierarchical(data=None, k=0, linkage='average', metric='euclidean', metric_args=None):
     """Perform clustering using hierarchical agglomerative algorithms.
     
     Args:
@@ -85,7 +91,7 @@ def hierarchical(data=None, k=0, linkage='average', metric='euclidean', **kwargs
         
         metric (str): Data distances metric (see scipy.spatial.distance).
         
-        **kwargs (dict): Additional keyword arguments are passed to the distance function.
+        metric_args (dict): Additional keyword arguments to pass to the distance function (optional).
     
     Returns:
         (ReturnTuple): containing:
@@ -101,6 +107,9 @@ def hierarchical(data=None, k=0, linkage='average', metric='euclidean', **kwargs
     if linkage not in ['average', 'centroid', 'complete', 'median', 'single', 'ward', 'weighted']:
         raise ValueError("Unknown linkage criterion '%r'." % linkage)
     
+    if metric_args is None:
+        metric_args = {}
+    
     N = len(data)
     if k > N:
         raise ValueError("Number of clusters 'k' is higher than the number of input samples.")
@@ -109,7 +118,7 @@ def hierarchical(data=None, k=0, linkage='average', metric='euclidean', **kwargs
         k = 0
     
     # compute distances
-    D = ssd.pdist(data, metric=metric, **kwargs)
+    D = metrics.pdist(data, metric=metric, **metric_args)
     
     # build linkage
     Z = sch.linkage(D, method=linkage)
@@ -384,7 +393,7 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
     
     # convert coassoc to condensed format, dissimilarity
     mx = np.max(coassoc)
-    D = ssd.squareform(mx - coassoc)
+    D = metrics.squareform(mx - coassoc)
     
     # build linkage
     Z = sch.linkage(D, method=linkage)
@@ -402,7 +411,7 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
     return utils.ReturnTuple((clusters, ), ('clusters', ))
 
 
-def mdist_templates(data=None, clusters=None, ntemplates=1, metric='euclidean'):
+def mdist_templates(data=None, clusters=None, ntemplates=1, metric='euclidean', metric_args=None):
     """Template selection based on the MDIST method [1].
     
     Extends the original method with the option of also providing a data clustering,
@@ -411,11 +420,13 @@ def mdist_templates(data=None, clusters=None, ntemplates=1, metric='euclidean'):
     Args:
         data (array): An m by n array of m data samples in an n-dimensional space.
         
-        clusters clusters (dict): Dictionary with the sample indices (rows from 'data') for each cluster (optional).
+        clusters (dict): Dictionary with the sample indices (rows from 'data') for each cluster (optional).
         
         ntemplates (int): Number of templates to extract.
         
-        metric (str): 
+        metric (str): Data distances metric (see scipy.spatial.distance).
+        
+        metric_args (dict): Additional keyword arguments to pass to the distance function (optional).
     
     Retrurns:
         (ReturnTuple): containing:
@@ -484,7 +495,7 @@ def mdist_templates(data=None, clusters=None, ntemplates=1, metric='euclidean'):
                     templates.append(data[c][j])
         else:
             # compute mean distances
-            indices, _ = _mean_distance(data[c], metric=metric)
+            indices, _ = _mean_distance(data[c], metric=metric, metric_args=metric_args)
             
             # select templates
             sel = indices[:nt]
@@ -502,7 +513,7 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
     Args:
         data (array): An m by n array of m data samples in an n-dimensional space.
         
-        clusters clusters (dict): Dictionary with the sample indices (rows from 'data') for each cluster.
+        clusters (dict): Dictionary with the sample indices (rows from 'data') for each cluster.
         
         ntemplates (int): Number of templates to extract; if more than 1,
                           k-means is used to obtain more templates.
@@ -572,6 +583,155 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
     return utils.ReturnTuple((templates, ), ('templates', ))
 
 
+def outliers_dbscan(data=None, min_samples=5, eps=0.5, metric='euclidean', metric_args=None):
+    """Perform outlier removal using the DBSCAN algorithm [1].
+    
+    Args:
+        data (array): An m by n array of m data samples in an n-dimensional space.
+        
+        min_samples (int): Minimum number of samples in a cluster.
+        
+        eps (float): Maximum distance between two samples in the same cluster.
+        
+        metric (str): Distance metric (see scipy.spatial.distance).
+        
+        metric_args (dict): Additional keyword arguments to pass to the distance function (optional).
+    
+    Returns:
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from
+                             'data') for the outliers (key -1) and the normal
+                             (key 0) groups.
+            
+            templates (dict): Elements from 'data' for the outliers (key -1) and
+                              the normal (key 0) groups.
+    
+    References:
+        [1] M. Ester, H. P. Kriegel, J. Sander, and X. Xu, “A Density-Based Algorithm
+            for Discovering Clusters in Large Spatial Databases with Noise”,
+            Proceedings of the 2nd International Conference on Knowledge Discovery
+            and Data Mining, pp. 226-231, 1996.
+    
+    """
+    
+    # perform clustering
+    clusters, = dbscan(data=data, min_samples=min_samples, eps=eps,
+                       metric=metric, metric_args=metric_args)
+    
+    # merge clusters
+    clusters = _merge_clusters(clusters)
+    
+    # separate templates
+    templates = {-1: data[clusters[-1]],
+                 0: data[clusters[0]],
+                 }
+    
+    # output
+    args = (clusters, templates)
+    names = ('clusters', 'templates')
+    
+    return utils.ReturnTuple(args, names)
+
+
+def outliers_dmean(data=None, alpha=0.5, beta=1.5, metric='euclidean', metric_args=None, max_idx=None):
+    """Perform outlier removal using the DMEAN algorithm [1].
+    
+    A sample is considered valid if it cumulatively verifies:
+        * distance to average template smaller than a (data derived) threshold 'T';
+        * sample minimum greater than a (data derived) threshold 'M';
+        * sample maximum smaller than a (data derived) threshold 'N';
+        * [optional] position of the sample maximum is the same as the given index.
+    
+    .. math::
+    
+        For a set of {X_1, ..., X_n} n samples,
+        Y = \\frac{1}{n} \\sum_{i=1}^{n}{X_i}
+        d_i = dist(X_i, Y)
+        D_m = \\frac{1}{n} \\sum_{i=1}^{n}{d_i}
+        D_s = \\sqrt{\frac{1}{n - 1} \\sum_{i=1}^{n}{(d_i - D_m)^2}}
+        T = D_m + \\alpha * D_s
+        M = \\beta * median({max(X_i), i=1, ..., n})
+        N = \\beta * median({min(X_i), i=1, ..., n})
+    
+    Args:
+        data (array): An m by n array of m data samples in an n-dimensional space.
+        
+        alpha (float): Parameter for the distance threshold (optional).
+        
+        beta (float): Parameter for the maximum and minimum thresholds (optional).
+        
+        metric (str): Distance metric (see scipy.spatial.distance) (optional).
+        
+        metric_args (dict): Additional keyword arguments to pass to the distance function (optional).
+        
+        max_idx (int): Index of the expected maximum (optional).
+    
+    Returns:
+        (ReturnTuple): containing:
+            clusters (dict): Dictionary with the sample indices (rows from
+                             'data') for the outliers (key -1) and the normal
+                             (key 0) groups.
+            
+            templates (dict): Elements from 'data' for the outliers (key -1) and
+                              the normal (key 0) groups.
+    
+    References:
+        [1] A. Lourenco, H. Silva, C. Carreiras, A. Fred, "Outlier Detection in
+            Non-intrusive ECG Biometric System", Image Analysis and Recognition,
+            vol. 7950, pp. 43-52, 2013.
+    
+    """
+    
+    # check inputs
+    if data is None:
+        raise TypeError("Please specify input data.")
+    
+    if metric_args is None:
+        metric_args = {}
+    
+    # distance to mean wave
+    mean_wave = np.mean(data, axis=0, keepdims=True)
+    dists = metrics.cdist(data, mean_wave, metric=metric, **metric_args)
+    dists = dists.flatten()
+    
+    # distance threshold
+    th = np.mean(dists) + alpha * np.std(dists, ddof=1)
+    
+    # median of max and min
+    M = np.median(np.max(data, 1)) * beta
+    m = np.median(np.min(data, 1)) * beta
+    
+    # search for outliers
+    outliers = []
+    for i, item in enumerate(data):
+        idx = np.argmax(item)
+        if (max_idx is not None) and (idx != max_idx):
+            outliers.append(i)
+        elif item[idx] > M:
+            outliers.append(i)
+        elif np.min(item) < m:
+            outliers.append(i)
+        elif dists[i] > th:
+            outliers.append(i)
+    
+    outliers = np.unique(outliers)
+    normal = np.setdiff1d(range(len(data)), outliers, assume_unique=True)
+    
+    # output
+    clusters = {-1: outliers,
+                0: normal,
+                }
+    
+    templates = {-1: data[outliers],
+                 0: data[normal],
+                 }
+    
+    args = (clusters, templates)
+    names = ('clusters', 'templates')
+    
+    return utils.ReturnTuple(args, names)
+
+
 def _life_time(Z, N):
     """Life-Time criterion for automatic selection of the number of clusters.
     
@@ -619,8 +779,9 @@ def _extract_clusters(labels):
         labels (array): Input cluster labels.
     
     Returns:
-        clusters (dict): Dictionary with the sample indices (rows from 'data') for each found cluster;
-                         outliers have key -1; clusters are assigned integer keys starting at 0.
+        clusters (dict): Dictionary with the sample indices for each found
+                         cluster; outliers have key -1; clusters are assigned
+                         integer keys starting at 0.
     
     """
     
@@ -647,7 +808,7 @@ def _extract_clusters(labels):
     return clusters
 
 
-def _mean_distance(data, metric='euclidean', **kwargs):
+def _mean_distance(data, metric='euclidean', metric_args=None):
     """Compute the sorted mean distance between the input samples.
     
     Args:
@@ -655,7 +816,7 @@ def _mean_distance(data, metric='euclidean', **kwargs):
         
         metric (str): Data distances metric (see scipy.spatial.distance).
         
-        **kwargs (dict): Additional keyword arguments are passed to the distance function.
+        metric_args (dict): Additional keyword arguments to pass to the distance function (optional).
     
     Returns:
         (tulpe): containing:
@@ -665,9 +826,12 @@ def _mean_distance(data, metric='euclidean', **kwargs):
     
     """
     
+    if metric_args is None:
+        metric_args = {}
+    
     # compute distances
-    D = ssd.pdist(data, metric=metric, **kwargs)
-    D = ssd.squareform(D)
+    D = metrics.pdist(data, metric=metric, **metric_args)
+    D = metrics.squareform(D)
     
     # compute mean
     mdist = np.mean(D, axis=0)
@@ -676,4 +840,32 @@ def _mean_distance(data, metric='euclidean', **kwargs):
     indices = np.argsort(mdist)
     
     return indices, mdist
+
+
+def _merge_clusters(clusters):
+    """Merge non-outlier clusters in a partition.
+    
+    Args:
+        clusters (dict): Dictionary with the sample indices for each found
+                         cluster; outliers have key -1.
+    
+    Returns:
+        res (dict): Merged clusters.
+    
+    """
+    
+    keys = clusters.keys()
+    
+    # outliers
+    if -1 in keys:
+        keys.remove(-1)
+        res = {-1: clusters[-1]}
+    else:
+        res = {-1: np.array([], dtype='int')}
+    
+    # normal clusters
+    aux = np.concatenate([clusters[k] for k in keys])
+    res[0] = np.unique(aux).astype('int')
+    
+    return res
 

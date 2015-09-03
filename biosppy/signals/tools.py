@@ -1103,8 +1103,14 @@ def find_intersection(x1=None, y1=None, x2=None, y2=None, alpha=1.5, xtol=1e-6, 
     x = np.linspace(x_min, x_max, npoints)
     
     # initial estimates
-    pd = np.abs(p1(x) - p2(x))
-    xi = x[pd < ytol]
+    pd = p1(x) - p2(x)
+    zerocs, = zero_cross(pd)
+    
+    pd_abs = np.abs(pd)
+    zeros = np.nonzero(pd_abs < ytol)[0]
+    
+    ind = np.unique(np.concatenate((zerocs, zeros)))
+    xi = x[ind]
     
     # search for solutions
     roots = set()
@@ -1115,7 +1121,9 @@ def find_intersection(x1=None, y1=None, x2=None, y2=None, alpha=1.5, xtol=1e-6, 
     
     if len(roots) == 0:
         # no solution was found => give the best from the initial estimates
-        roots.add(x[pd.argmin()])
+        aux = np.abs(pd)
+        bux = aux.min() * np.ones(npoints, dtype='float')
+        roots, _ = find_intersection(x, aux, x, bux, alpha=1., xtol=xtol, ytol=ytol)
     
     # compute values
     roots = list(roots)
@@ -1123,5 +1131,5 @@ def find_intersection(x1=None, y1=None, x2=None, y2=None, alpha=1.5, xtol=1e-6, 
     roots = np.array(roots)
     values = np.mean(np.vstack((p1(roots), p2(roots))), axis=0)
     
-    return utils.ReturnTuple((root, values), ('roots', 'values'))
+    return utils.ReturnTuple((roots, values), ('roots', 'values'))
 

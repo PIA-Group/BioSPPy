@@ -12,6 +12,7 @@
 # Imports
 # built-in
 import collections
+import copy
 import keyword
 import os
 
@@ -145,6 +146,46 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
         seats[i] = np.sum(tab == i)
     
     return seats.tolist()
+
+
+def random_fraction(indx, fraction, sort=True):
+    """Select a random fraction of an input list of elements.
+    
+    Args:
+        indx (list, array): Elements to partition.
+        
+        fraction (int, float): Fraction to select.
+        
+        sort (bool): If True, output lists will be sorted.
+    
+    Returns:
+        (tulpe): containing:
+            use (list, array): Selected elements.
+            
+            unuse (list, array): Remaining elements.
+    
+    """
+    
+    # number of elements to use
+    fraction = float(fraction)
+    nb = int(fraction * len(indx))
+    
+    # copy because shuffle works in place
+    aux = copy.deepcopy(indx)
+    
+    # shuffle
+    np.random.shuffle(indx)
+    
+    # select
+    use = aux[:nb]
+    unuse = aux[nb:]
+    
+    # sort
+    if sort:
+        use.sort()
+        unuse.sort()
+    
+    return use, unuse
 
 
 class ReturnTuple(tuple):
