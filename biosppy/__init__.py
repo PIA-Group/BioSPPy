@@ -2,9 +2,9 @@
 """
     biosppy
     -------
-    
+
     A toolbox for biosignal processing written in Python.
-    
+
     :copyright: (c) 2015 by Instituto de Telecomunicacoes
     :license: BSD 3-clause, see LICENSE for more details.
 """
@@ -13,3 +13,5 @@
 from .version import version as __version__
 
 # direct imports
+from . import signals
+from . import biometrics, clustering, metrics, plotting, storage, utils
