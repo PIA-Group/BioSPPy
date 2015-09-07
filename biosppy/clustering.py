@@ -11,8 +11,6 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 import scipy.cluster.hierarchy as sch
@@ -23,8 +21,6 @@ from sklearn.grid_search import ParameterGrid
 
 # local
 from . import metrics, utils
-
-# Globals
 
 
 def dbscan(data=None,
@@ -41,15 +37,12 @@ def dbscan(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        min_samples (int): Minimum number of samples in a cluster.
-
-        eps (float): Maximum distance between two samples in the same cluster.
-
-        metric (str): Distance metric (see scipy.spatial.distance).
-
-        metric_args (dict): Additional keyword arguments to pass to the
-            distance function (optional).
+        min_samples (int, optional): Minimum number of samples in a cluster.
+        eps (float, optional): Maximum distance between two samples in the
+            same cluster.
+        metric (str, optional): Distance metric (see scipy.spatial.distance).
+        metric_args (dict, optional): Additional keyword arguments to pass to
+            the distance function.
 
     Returns:
         (ReturnTuple): containing:
@@ -96,17 +89,13 @@ def hierarchical(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        k (int): Number of clusters to extract; if 0 uses the life-time
-            criterion (optional).
-
-        linkage (str): Linkage criterion; one of 'average', 'centroid',
-            'complete', 'median', 'single', 'ward', or 'weighted'.
-
-        metric (str): Data distances metric (see scipy.spatial.distance).
-
-        metric_args (dict): Additional keyword arguments to pass to the
-            distance function (optional).
+        k (int, optional): Number of clusters to extract; if 0 uses the
+            life-time criterion.
+        linkage (str, optional): Linkage criterion; one of 'average',
+            'centroid', 'complete', 'median', 'single', 'ward', or 'weighted'.
+        metric (str, optional): Distance metric (see scipy.spatial.distance).
+        metric_args (dict, optional): Additional keyword arguments to pass to
+            the distance function.
 
     Returns:
         (ReturnTuple): containing:
@@ -165,18 +154,13 @@ def kmeans(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
         k (int): Number of clusters to extract.
-
-        init (str, array): If string, one of 'random' or 'k-means++'; if array,
-            it should be of shape (n_clusters, n_features), specifying the
-            initial centers (optional).
-
-        max_iter (int): Maximum number of iterations (optional).
-
-        n_init (int): Number of initializations (optional).
-
-        tol (float): Relative tolerance to declare convergence (optional).
+        init (str, array, optional): If string, one of 'random' or 'k-means++';
+            if array, it should be of shape (n_clusters, n_features),
+            specifying the initial centers.
+        max_iter (int, optional): Maximum number of iterations.
+        n_init (int, optional): Number of initializations.
+        tol (float, optional): Relative tolerance to declare convergence.
 
     Returns:
         (ReturnTuple): containing:
@@ -212,18 +196,15 @@ def consensus(data=None, k=0, linkage='average', fcn=None, grid=None):
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        k (int): Number of clusters to extract; if 0 uses the life-time
-            criterion (optional).
-
-        linkage (str): Linkage criterion for final partition extraction;
-            one of 'average', 'centroid', 'complete', 'median', 'single',
-            'ward', or 'weighted'.
-
+        k (int, optional): Number of clusters to extract; if 0 uses the
+            life-time criterion.
+        linkage (str, optional): Linkage criterion for final partition
+            extraction; one of 'average', 'centroid', 'complete', 'median',
+            'single', 'ward', or 'weighted'.
         fcn (function): A clustering function.
-
-        grid (dict, list): A (list of) dictionary with parameters for each run
-            of the clustering method (see sklearn.grid_search.ParameterGrid).
+        grid (dict, list, optional): A (list of) dictionary with parameters for
+            each run of the clustering method
+            (see sklearn.grid_search.ParameterGrid).
 
     Returns:
         (ReturnTuple): containing:
@@ -266,20 +247,16 @@ def consensus_kmeans(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        k (int): Number of clusters to extract; if 0 uses the life-time
-            criterion (optional).
-
-        linkage (str): Linkage criterion for final partition extraction;
-            one of 'average', 'centroid', 'complete', 'median', 'single',
-            'ward', or 'weighted'.
-
-        nensemble (int): Number of partitions in the ensemble (optional).
-
-        kmin (int): Minimum k for the k-means partitions; defaults to
-            :math:`\\sqrt(m) / 2` (optional).
-
-        kmax (int): Maximum k for the k-means partitions: defaults to sqrt(m) (optional).
+        k (int, optional): Number of clusters to extract; if 0 uses the
+            life-time criterion.
+        linkage (str, optional): Linkage criterion for final partition
+            extraction; one of 'average', 'centroid', 'complete', 'median',
+            'single', 'ward', or 'weighted'.
+        nensemble (int, optional): Number of partitions in the ensemble.
+        kmin (int, optional): Minimum k for the k-means partitions; defaults to
+            :math:`\\sqrt(m) / 2`.
+        kmax (int, optional): Maximum k for the k-means partitions;
+            defaults to :math: `\\sqrt(m)`.
 
     Returns:
         (ReturnTuple): containing:
@@ -323,11 +300,10 @@ def create_ensemble(data=None, fcn=None, grid=None):
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
         fcn (function): A clustering function.
-
-        grid (dict, list): A (list of) dictionary with parameters for each run
-            of the clustering method (see sklearn.grid_search.ParameterGrid).
+        grid (dict, list, optional): A (list of) dictionary with parameters for
+            each run of the clustering method
+            (see sklearn.grid_search.ParameterGrid).
 
     Returns:
         (ReturnTuple): containing:
@@ -361,7 +337,6 @@ def create_coassoc(ensemble=None, N=None):
 
     Args:
         ensemble (list): Clustering ensemble partitions.
-
         N (int): Number of data samples.
 
     Returns:
@@ -414,13 +389,11 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
 
     Args:
         coassoc (array): Co-association matrix.
-
-        k (int): Number of clusters to extract; if 0 uses the life-time
-            criterion (optional).
-
-        linkage (str): Linkage criterion for final partition extraction;
-            one of 'average', 'centroid', 'complete', 'median', 'single',
-            'ward', or 'weighted'.
+        k (int, optional): Number of clusters to extract; if 0 uses the
+            life-time criterion.
+        linkage (str, optional): Linkage criterion for final partition
+            extraction; one of 'average', 'centroid', 'complete', 'median',
+            'single', 'ward', or 'weighted'.
 
     Returns:
         (ReturnTuple): containing:
@@ -480,16 +453,12 @@ def mdist_templates(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        clusters (dict): Dictionary with the sample indices (rows from 'data')
-            for each cluster (optional).
-
-        ntemplates (int): Number of templates to extract.
-
-        metric (str): Data distances metric (see scipy.spatial.distance).
-
-        metric_args (dict): Additional keyword arguments to pass to the
-            distance function (optional).
+        clusters (dict, optional): Dictionary with the sample indices
+            (rows from `data`) for each cluster.
+        ntemplates (int, optional): Number of templates to extract.
+        metric (str, optional): Distance metric (see scipy.spatial.distance).
+        metric_args (dict, optional): Additional keyword arguments to pass to
+            the distance function.
 
     Retrurns:
         (ReturnTuple): containing:
@@ -584,12 +553,10 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
         clusters (dict): Dictionary with the sample indices (rows from 'data')
             for each cluster.
-
-        ntemplates (int): Number of templates to extract; if more than 1,
-            k-means is used to obtain more templates.
+        ntemplates (int, optional): Number of templates to extract; if more
+            than 1, k-means is used to obtain more templates.
 
     Retrurns:
         (ReturnTuple): containing:
@@ -673,21 +640,17 @@ def outliers_dbscan(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        min_samples (int): Minimum number of samples in a cluster.
-
-        eps (float): Maximum distance between two samples in the same cluster.
-
-        metric (str): Distance metric (see scipy.spatial.distance).
-
-        metric_args (dict): Additional keyword arguments to pass to the
-            distance function (optional).
+        min_samples (int, optional): Minimum number of samples in a cluster.
+        eps (float, optional): Maximum distance between two samples in the
+            same cluster.
+        metric (str, optional): Distance metric (see scipy.spatial.distance).
+        metric_args (dict, optional): Additional keyword arguments to pass to
+            the distance function.
 
     Returns:
         (ReturnTuple): containing:
             clusters (dict): Dictionary with the sample indices (rows from
                 'data') for the outliers (key -1) and the normal (key 0) groups.
-
             templates (dict): Elements from 'data' for the outliers (key -1)
                 and the normal (key 0) groups.
 
@@ -732,8 +695,8 @@ def outliers_dmean(data=None,
           threshold 'T';
         * sample minimum greater than a (data derived) threshold 'M';
         * sample maximum smaller than a (data derived) threshold 'N';
-        * [optional] position of the sample maximum is the same as the
-          given index.
+        * position of the sample maximum is the same as the
+          given index [optional].
 
     .. math::
 
@@ -749,23 +712,17 @@ def outliers_dmean(data=None,
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        alpha (float): Parameter for the distance threshold (optional).
-
-        beta (float): Parameter for the maximum and minimum thresholds (optional).
-
-        metric (str): Distance metric (see scipy.spatial.distance) (optional).
-
-        metric_args (dict): Additional keyword arguments to pass to the
-            distance function (optional).
-
-        max_idx (int): Index of the expected maximum (optional).
+        alpha (float, optional): Parameter for the distance threshold.
+        beta (float, optional): Parameter for the maximum and minimum thresholds.
+        metric (str, optional): Distance metric (see scipy.spatial.distance).
+        metric_args (dict, optional): Additional keyword arguments to pass to
+            the distance function.
+        max_idx (int, optional): Index of the expected maximum.
 
     Returns:
         (ReturnTuple): containing:
             clusters (dict): Dictionary with the sample indices (rows from
                 'data') for the outliers (key -1) and the normal (key 0) groups.
-
             templates (dict): Elements from 'data' for the outliers (key -1)
                 and the normal (key 0) groups.
 
@@ -827,7 +784,6 @@ def _life_time(Z, N):
 
     Args:
         Z (array): The hierarchical clustering encoded as a linkage matrix.
-
         N (int): Number of data samples.
 
     Returns:
@@ -903,16 +859,13 @@ def _mean_distance(data, metric='euclidean', metric_args=None):
     Args:
         data (array): An m by n array of m data samples in an
             n-dimensional space.
-
-        metric (str): Data distances metric (see scipy.spatial.distance).
-
-        metric_args (dict): Additional keyword arguments to pass to the
-            distance function (optional).
+        metric (str, optional): Distance metric (see scipy.spatial.distance).
+        metric_args (dict, optional): Additional keyword arguments to pass to
+            the distance function.
 
     Returns:
         (tulpe): containing:
             indices (array): Indices that sort the computed mean distances.
-
             mdist (array): Mean distance characterizing each data sample.
 
     """

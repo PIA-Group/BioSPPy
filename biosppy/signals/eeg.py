@@ -11,16 +11,12 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 
 # local
 from . import tools as st
 from .. import plotting, utils
-
-# Globals
 
 
 def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
@@ -29,38 +25,26 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
 
     Args:
         signal (array): Raw EEG signal matrix; each column is one EEG channel.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        labels (list): Channel labels (optional).
-
-        show (bool): If True, show a summary plot (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        labels (list, optional): Channel labels.
+        show (bool, optional): If True, show a summary plot.
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Signal time axis reference (seconds).
-
             filtered (array): Filtered BVP signal.
-
             features_ts (array): Features time axis reference (seconds).
-
             theta (array): Average power in the 4 to 8 Hz frequency band;
                 each column is one EEG channel.
-
             alpha_low (array): Average power in the 8 to 10 Hz frequency band;
                 each column is one EEG channel.
-
             alpha_high (array): Average power in the 10 to 13 Hz frequency band;
                 each column is one EEG channel.
-
             beta (array): Average power in the 13 to 25 Hz frequency band;
                 each column is one EEG channel.
-
             gamma (array): Average power in the 25 to 40 Hz frequency band;
                 each column is one EEG channel.
-
             plf_pairs (list): PLF pair indices.
-
             plf (array): PLF matrix; each column is a channel pair.
 
     """
@@ -191,29 +175,21 @@ def get_power_features(signal=None,
     Args:
         signal (array): Filtered EEG signal matrix; each column is one
             EEG channel.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        size (float): Window size (seconds) (optional).
-
-        overlap (float): Window overlap (0 to 1) (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        size (float, optional): Window size (seconds).
+        overlap (float, optional): Window overlap (0 to 1).
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Features time axis reference (seconds).
-
             theta (array): Average power in the 4 to 8 Hz frequency band;
                 each column is one EEG channel.
-
             alpha_low (array): Average power in the 8 to 10 Hz frequency band;
                 each column is one EEG channel.
-
             alpha_high (array): Average power in the 10 to 13 Hz frequency band;
                 each column is one EEG channel.
-
             beta (array): Average power in the 13 to 25 Hz frequency band;
                 each column is one EEG channel.
-
             gamma (array): Average power in the 25 to 40 Hz frequency band;
                 each column is one EEG channel.
 
@@ -288,19 +264,14 @@ def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
     Args:
         signal (array): Filtered EEG signal matrix; each column is one
             EEG channel.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        size (float): Window size (seconds) (optional).
-
-        overlap (float): Window overlap (0 to 1) (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        size (float, optional): Window size (seconds).
+        overlap (float, optional): Window overlap (0 to 1).
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Features time axis reference (seconds).
-
             plf_pairs (list): PLF pair indices.
-
             plf (array): PLF matrix; each column is a channel pair.
 
     """
@@ -365,12 +336,10 @@ def _power_features(signal=None, sampling_rate=1000., bands=None, pad=0):
     Args:
         signal (array): Filtered EEG signal matrix; each column is one
             EEG channel.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
         bands (list): List of frequency pairs defining the bands.
-
-        pad (int): Padding for the Fourier Transform (number of zeros added) (optional).
+        pad (int, optional): Padding for the Fourier Transform (number of
+            zeros added).
 
     Returns:
         out (array): Average power for each band and EEG channel;
@@ -406,10 +375,8 @@ def _plf_features(signal=None, pairs=None, N=None):
     Args:
         signal (array): Filtered EEG signal matrix; each column is one
             EEG channel.
-
         pairs (iterable): List of signal channel pairs.
-
-        N (int): Number of Fourier components (optional).
+        N (int, optional): Number of Fourier components.
 
     Returns:
         out (array): PLF for each channel pair.

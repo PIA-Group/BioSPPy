@@ -10,16 +10,12 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 
 # local
 from . import tools as st
 from .. import plotting, utils
-
-# Globals
 
 
 def resp(signal=None, sampling_rate=1000., show=True):
@@ -28,21 +24,15 @@ def resp(signal=None, sampling_rate=1000., show=True):
 
     Args:
         signal (array): Raw Respiration signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        show (bool): If True, show a summary plot (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        show (bool, optional): If True, show a summary plot.
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Signal time axis reference (seconds).
-
             filtered (array): Filtered Respiration signal.
-
             zeros (array): Indices of Respiration zero crossings.
-
             resp_rate_ts (array): Respiration rate time axis reference (seconds).
-
             resp_rate (array): Instantaneous respiration rate (Hz).
 
     """

@@ -17,13 +17,12 @@ import zipfile
 
 # 3rd party
 import h5py
+import numpy as np
 import shortuuid
 from sklearn.externals import joblib
 
 # local
 from . import utils
-
-# Globals
 
 
 def serialize(data, path, compress=3):
@@ -31,10 +30,9 @@ def serialize(data, path, compress=3):
 
     Args:
         data (object): Object to serialize.
-
         path (str): Destination path.
-
-        compress (int): Compression level; from 0 to 9 (highest compression) (optional).
+        compress (int, optional): Compression level;
+            from 0 to 9 (highest compression).
 
     """
 
@@ -66,7 +64,6 @@ def dumpJSON(data, path):
 
     Args:
         data (dict): The JSON data to dump.
-
         path (str): Destination path.
 
     """
@@ -101,13 +98,10 @@ def zip_write(fid, files, recursive=True, root=None):
 
     Args:
         fid (file-like object): The zip file to write into.
-
         files (iterable): List of files or directories to pack.
-
-        recursive (bool): If True, sub-directories and sub-folders are
-                          also written to the archive.
-
-        root (str): Relative folder path.
+        recursive (bool, optional): If True, sub-directories and sub-folders
+            are also written to the archive.
+        root (str, optional): Relative folder path.
 
     Notes:
         * Ignores non-existent files and directories.
@@ -141,13 +135,10 @@ def pack_zip(files, path, recursive=True, forceExt=True):
 
     Args:
         files (iterable): List of files or directories to pack.
-
         path (str): Destination path.
-
-        recursive (bool): If True, sub-directories and sub-folders are
-                          also written to the archive.
-
-        forceExt (bool): Append default extension.
+        recursive (bool, optional): If True, sub-directories and sub-folders
+            are also written to the archive.
+        forceExt (bool, optional): Append default extension.
 
     Returns:
         zip_path (str): Full path to created zip archive.
@@ -172,7 +163,6 @@ def unpack_zip(zip_path, path):
 
     Args:
         zip_path (str): Path to zip archive.
-
         path (str): Destination path (directory).
 
     """
@@ -202,9 +192,7 @@ def store_h5(path, label, data):
 
     Args:
         path (str): Path to file.
-
         label (hashable): Data label.
-
         data (array): Data to store.
 
     """
@@ -228,7 +216,6 @@ def load_h5(path, label):
 
     Args:
         path (str): Path to file.
-
         label (hashable): Data label.
 
     Returns:
@@ -253,8 +240,7 @@ class HDF(object):
 
     Args:
         path (str): Path to the HDF5 file.
-
-        mode (str): File mode; one of:
+        mode (str, optional): File mode; one of:
             * 'a': read/write, creates file if it does not exist;
             * 'r+': read/write, file must exist;
             * 'r': read only, file must exist;
@@ -366,19 +352,15 @@ class HDF(object):
 
         Args:
             signal (array): Signal to add.
-
-            mdata (dict): Signal metadata.
-
-            group (str): Destination signal group.
-
-            name (str): Name of the dataset to create (optional).
-
-            compress (bool): If True, the signal will be compressed with gzip (optional).
+            mdata (dict, optional): Signal metadata.
+            group (str, optional): Destination signal group.
+            name (str, optional): Name of the dataset to create.
+            compress (bool, optional): If True, the signal will be compressed
+                with gzip.
 
         Returns:
             (ReturnTuple): containing:
                 group (str): Destination group.
-
                 name (str): Name of the created signal dataset.
 
         """
@@ -419,8 +401,7 @@ class HDF(object):
         """Retrieve a signal dataset from the file.
 
         Args:
-            group (str): Signal group.
-
+            group (str, optional): Signal group.
             name (str): Name of the signal dataset.
 
         Returns:
@@ -453,14 +434,12 @@ class HDF(object):
         """Retrieve a signal from the file.
 
         Args:
-            group (str): Signal group.
-
+            group (str, optional): Signal group.
             name (str): Name of the signal dataset.
 
         Returns:
             (ReturnTuple): containing:
                 signal (array): Retrieved signal.
-
                 mdata (dict): Signal metadata.
 
         Notes:
@@ -482,8 +461,7 @@ class HDF(object):
         """Delete a signal from the file.
 
         Args:
-            group (str): Signal group.
-
+            group (str, optional): Signal group.
             name (str): Name of the dataset.
 
         """
@@ -499,7 +477,7 @@ class HDF(object):
         """Delete all signals in a file group.
 
         Args:
-            group (str): Signal group.
+            group (str, optional): Signal group.
 
         """
 
@@ -530,9 +508,9 @@ class HDF(object):
         """List signals in the file.
 
         Args:
-            group (str): Signal group.
-
-            recursive (bool): It True, also lists signals in sub-groups (optional).
+            group (str, optional): Signal group.
+            recursive (bool, optional): It True, also lists signals in
+                sub-groups.
 
         Returns:
             (ReturnTuple): containing:
@@ -570,21 +548,16 @@ class HDF(object):
 
         Args:
             ts (array): Array of time stamps.
-
-            values (array): Array with data for each time stamp.
-
-            mdata (dict): Event metadata.
-
-            group (str): Destination event group.
-
-            name (str): Name of the dataset to create (optional).
-
-            compress (bool): If True, the data will be compressed with gzip (optional).
+            values (array, optional): Array with data for each time stamp.
+            mdata (dict, optional): Event metadata.
+            group (str, optional): Destination event group.
+            name (str, optional): Name of the dataset to create.
+            compress (bool, optional): If True, the data will be compressed
+                with gzip.
 
         Returns:
             (ReturnTuple): containing:
                 group (str): Destination group.
-
                 name (str): Name of the created event dataset.
 
         """
@@ -635,15 +608,12 @@ class HDF(object):
         """Retrieve event datasets from the file.
 
         Args:
-            group (str): Event group.
-
+            group (str, optional): Event group.
             name (str): Name of the event dataset.
 
         Returns:
             event (h5py.Group): HDF5 event group.
-
             ts (h5py.Dataset): HDF5 time stamps dataset.
-
             values (h5py.Dataset): HDF5 values dataset.
 
         """
@@ -683,16 +653,13 @@ class HDF(object):
         """Retrieve an event from the file.
 
         Args:
-            group (str): Event group.
-
+            group (str, optional): Event group.
             name (str): Name of the event dataset.
 
         Returns:
             (ReturnTuple): containing:
                 ts (array): Array of time stamps.
-
                 values (array): Array with data for each time stamp.
-
                 mdata (dict): Event metadata.
 
         Notes:
@@ -717,8 +684,7 @@ class HDF(object):
         """Delete an event from the file.
 
         Args:
-            group (str): Event group.
-
+            group (str, optional): Event group.
             name (str): Name of the event dataset.
 
         """
@@ -734,7 +700,7 @@ class HDF(object):
         """Delete all events in a file group.
 
         Args:
-            group (str): Event group.
+            group (str, optional): Event group.
 
         """
 
@@ -765,9 +731,9 @@ class HDF(object):
         """List events in the file.
 
         Args:
-            group (str): Event group.
-
-            recursive (bool): It True, also lists events in sub-groups (optional).
+            group (str, optional): Event group.
+            recursive (bool, optional): It True, also lists events in
+                sub-groups.
 
         Returns:
             (ReturnTuple): containing:

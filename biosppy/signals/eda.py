@@ -11,16 +11,12 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 
 # local
 from . import tools as st
 from .. import plotting, utils
-
-# Globals
 
 
 def eda(signal=None, sampling_rate=1000., show=True):
@@ -29,21 +25,15 @@ def eda(signal=None, sampling_rate=1000., show=True):
 
     Args:
         signal (array): Raw EDA signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        show (bool): If True, show a summary plot (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        show (bool, optional): If True, show a summary plot.
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Signal time axis reference (seconds).
-
             filtered (array): Filtered EDA signal.
-
             onsets (array): Indices of SCR pulse onsets.
-
             peaks (array): Indices of the SCR peaks.
-
             amplitudes (array): SCR pulse amplitudes.
 
     """
@@ -104,15 +94,12 @@ def basic_scr(signal=None, sampling_rate=1000.):
 
     Args:
         signal (array): Input filterd EDA signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
 
     Returns:
         (ReturnTuple): containing:
             onsets (array): Indices of the SCR onsets.
-
             peaks (array): Indices of the SRC peaks.
-
             amplitudes (array): SCR pulse amplitudes.
 
     """
@@ -162,15 +149,12 @@ def kbk_scr(signal=None, sampling_rate=1000.):
 
     Args:
         signal (array): Input filterd EDA signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
 
     Returns:
         (ReturnTuple): containing:
             onsets (array): Indices of the SCR onsets.
-
             peaks (array): Indices of the SRC peaks.
-
             amplitudes (array): SCR pulse amplitudes.
 
     References:

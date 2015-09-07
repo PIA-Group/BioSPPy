@@ -10,16 +10,12 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 
 # local
 from . import tools as st
 from .. import plotting, utils
-
-# Globals
 
 
 def bvp(signal=None, sampling_rate=1000., show=True):
@@ -28,21 +24,15 @@ def bvp(signal=None, sampling_rate=1000., show=True):
 
     Args:
         signal (array): Raw BVP signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        show (bool): If True, show a summary plot (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        show (bool, optional): If True, show a summary plot.
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Signal time axis reference (seconds).
-
             filtered (array): Filtered BVP signal.
-
             onsets (array): Indices of BVP pulse onsets.
-
             heart_rate_ts (array): Heart rate time axis reference (seconds).
-
             heart_rate (array): Instantaneous heart rate (bpm).
 
     """
@@ -104,8 +94,7 @@ def find_onsets(signal=None, sampling_rate=1000.):
 
     Args:
         signal (array): Input filtered BVP signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
 
     Returns:
         (ReturnTuple): containing:

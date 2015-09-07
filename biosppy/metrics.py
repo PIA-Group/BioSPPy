@@ -10,16 +10,10 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 import scipy.spatial.distance as ssd
 from scipy import linalg
-
-# local
-
-# Globals
 
 
 def pcosine(u, v):
@@ -35,7 +29,6 @@ def pcosine(u, v):
 
     Args:
         u (array): Input array.
-
         v (array): Input array.
 
     Returns:
@@ -60,21 +53,18 @@ def pdist(X, metric='euclidean', p=2, w=None, V=None, VI=None):
     Args:
         X (array): An m by n array of m original observations in an
         n-dimensional space.
-
-        metric (str, function): The distance metric to use; the distance can be
-            'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation',
-            'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'kulsinski',
-            'mahalanobis', 'matching', 'minkowski', 'pcosine',
-            'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener',
-            'sokalsneath', 'sqeuclidean', 'yule'.
-
-        w (array): The weight vector (for weighted Minkowski).
-
-        p (float): The p-norm to apply (for Minkowski, weighted and unweighted).
-
-        V (array): The variance vector (for standardized Euclidean).
-
-        VI (array): The inverse of the covariance matrix (for Mahalanobis).
+        metric (str, function, optional): The distance metric to use;
+            the distance can be 'braycurtis', 'canberra', 'chebyshev',
+            'cityblock', 'correlation', 'cosine', 'dice', 'euclidean',
+            'hamming', 'jaccard', 'kulsinski', 'mahalanobis', 'matching',
+            'minkowski', 'pcosine', 'rogerstanimoto', 'russellrao',
+            'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
+        p (float, optional): The p-norm to apply (for Minkowski, weighted and
+            unweighted).
+        w (array, optional): The weight vector (for weighted Minkowski).
+        V (array, optional): The variance vector (for standardized Euclidean).
+        VI (array, optional): The inverse of the covariance matrix
+            (for Mahalanobis).
 
     Returns:
         Y (array): Returns a condensed distance matrix Y.  For each :math:`i`
@@ -98,24 +88,20 @@ def cdist(XA, XB, metric='euclidean', p=2, V=None, VI=None, w=None):
     Args:
         XA (array): An :math:`m_A` by :math:`n` array of :math:`m_A` original
             observations in an :math:`n`-dimensional space.
-
         XB (array): An :math:`m_B` by :math:`n` array of :math:`m_B` original
             observations in an :math:`n`-dimensional space.
-
-        metric (str, function): The distance metric to use; the distance can be
-            'braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation',
-            'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', 'kulsinski',
-            'mahalanobis', 'matching', 'minkowski', 'pcosine',
-            'rogerstanimoto', 'russellrao', 'seuclidean', 'sokalmichener',
-            'sokalsneath', 'sqeuclidean', 'yule'.
-
-        w (array): The weight vector (for weighted Minkowski).
-
-        p (float): The p-norm to apply (for Minkowski, weighted and unweighted).
-
-        V (array): The variance vector (for standardized Euclidean).
-
-        VI (array): The inverse of the covariance matrix (for Mahalanobis).
+        metric (str, function, optional): The distance metric to use;
+            the distance can be 'braycurtis', 'canberra', 'chebyshev',
+            'cityblock', 'correlation', 'cosine', 'dice', 'euclidean',
+            'hamming', 'jaccard', 'kulsinski', 'mahalanobis', 'matching',
+            'minkowski', 'pcosine', 'rogerstanimoto', 'russellrao',
+            'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
+        p (float, optional): The p-norm to apply (for Minkowski, weighted and
+            unweighted).
+        w (array, optional): The weight vector (for weighted Minkowski).
+        V (array, optional): The variance vector (for standardized Euclidean).
+        VI (array, optional): The inverse of the covariance matrix
+            (for Mahalanobis).
 
     Returns:
         Y (array): A :math:`m_A` by :math:`m_B` distance matrix is returned.
@@ -140,16 +126,14 @@ def squareform(X, force="no", checks=True):
 
     Args:
         X (array): Either a condensed or redundant distance matrix.
-
-        force (str): As with MATLAB(TM), if force is equal to 'tovector' or
-            'tomatrix', the input will be treated as a distance matrix or
-            distance vector respectively.
-
-        checks (bool): If `checks` is set to False, no checks will be made for
-            matrix symmetry nor zero diagonals. This is useful if it is known
-            that ``X - X.T1`` is small and ``diag(X)`` is close to zero. These
-            values are ignored any way so they do not disrupt the squareform
-            transformation.
+        force (str, optional): As with MATLAB(TM), if force is equal to
+            'tovector' or 'tomatrix', the input will be treated as a distance
+            matrix or distance vector respectively.
+        checks (bool, optional): If `checks` is set to False, no checks will be
+            made for matrix symmetry nor zero diagonals. This is useful if it
+            is known that ``X - X.T1`` is small and ``diag(X)`` is close to
+            zero. These values are ignored any way so they do not disrupt the
+            squareform transformation.
 
     Returns:
         Y (array): If a condensed distance matrix is passed, a redundant one is

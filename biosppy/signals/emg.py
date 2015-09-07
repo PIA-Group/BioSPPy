@@ -10,16 +10,12 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 
 # local
 from . import tools as st
 from .. import plotting, utils
-
-# Globals
 
 
 def emg(signal=None, sampling_rate=1000., show=True):
@@ -28,17 +24,13 @@ def emg(signal=None, sampling_rate=1000., show=True):
 
     Args:
         signal (array): Raw EMG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        show (bool): If True, show a summary plot (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        show (bool, optional): If True, show a summary plot.
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Signal time axis reference (seconds).
-
             filtered (array): Filtered EMG signal.
-
             onsets (array): Indices of EMG pulse onsets.
 
     """
@@ -91,12 +83,9 @@ def find_onsets(signal=None, sampling_rate=1000., size=0.05, threshold=None):
 
     Args:
         signal (array): Input filtered BVP signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        size (float): Detection window size (seconds) (optional).
-
-        threshold (float): Detection threshold (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        size (float, optional): Detection window size (seconds).
+        threshold (float, optional): Detection threshold.
 
     Returns:
         (ReturnTuple): containing:

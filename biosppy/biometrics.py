@@ -15,8 +15,6 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 import shortuuid
@@ -26,8 +24,6 @@ from sklearn import svm as sksvm
 # local
 from . import metrics, plotting, storage, utils
 from .signals import tools
-
-# Globals
 
 
 class SubjectError(Exception):
@@ -63,7 +59,6 @@ class SubjectDict(bidict):
 
     Attributes:
         LEFT (hashable): Left default token.
-
         Right (hashable): Right default token.
 
     """
@@ -150,7 +145,6 @@ class BaseClassifier(object):
 
         Args:
             label (str): Internal classifier subject label.
-
             case (str): One of 'enroll' or 'dismiss'.
 
         Notes:
@@ -196,7 +190,6 @@ class BaseClassifier(object):
 
         Args:
             label (str): Internal classifier subject label.
-
             data (array): Subject data.
 
         """
@@ -280,11 +273,9 @@ class BaseClassifier(object):
 
         Args:
             data (array): Data to enroll.
-
             subject (hashable): Subject identity.
-
-            deferred (bool): If True, computations are delayed until flush is
-                called (optional).
+            deferred (bool, optional): If True, computations are delayed until
+                flush is called.
 
         Notes:
             * When using deferred calls, an enroll overrides a previous dismiss
@@ -328,9 +319,8 @@ class BaseClassifier(object):
 
         Args:
             subject (hashable): Subject identity.
-
-            deferred (bool): If True, computations are delayed until flush is
-                called (optional).
+            deferred (bool, optional): If True, computations are delayed until
+                flush is called (optional).
 
         Notes:
             * When using deferred calls, a dismiss overrides a previous enroll
@@ -362,9 +352,8 @@ class BaseClassifier(object):
         """Train the classifier in batch mode.
 
         Args:
-            data (dict): Dictionary holding training data for each subject.
-                         If the object for a subject is None,
-                         performs a 'dismiss'.
+            data (dict): Dictionary holding training data for each subject;
+                if the object for a subject is `None`, performs a `dismiss`.
 
         """
 
@@ -405,7 +394,8 @@ class BaseClassifier(object):
         """Update subject-specific thresholds based on the enrolled data.
 
         Args:
-            fraction (float): Fraction of samples to select from training data.
+            fraction (float, optional): Fraction of samples to select from
+                training data.
 
         """
 
@@ -437,10 +427,9 @@ class BaseClassifier(object):
 
         Args:
             subject (hashable): Subject identity.
-
             threshold (int, float): Threshold value.
-
-            ready (bool): If True, 'subject' is the internal classifier label.
+            ready (bool, optional): If True, `subject` is the internal
+                classifier label.
 
         """
 
@@ -459,8 +448,8 @@ class BaseClassifier(object):
 
         Args:
             subject (hashable): Subject identity.
-
-            ready (bool): If True, 'subject' is the internal classifier label.
+            ready (bool, optional): If True, `subject` is the internal
+                classifier label.
 
         Returns:
             threshold (int, float): Threshold value.
@@ -479,10 +468,9 @@ class BaseClassifier(object):
 
         Args:
             subject (hashable): Subject identity.
-
             threshold (int, float): Threshold value.
-
-            ready (bool): If True, 'subject' is the internal classifier label.
+            ready (bool, optional): If True, `subject` is the internal
+                classifier label.
 
         """
 
@@ -501,8 +489,8 @@ class BaseClassifier(object):
 
         Args:
             subject (hashable): Subject identity.
-
-            ready (bool): If True, 'subject' is the internal classifier label.
+            ready (bool, optional): If True, `subject` is the internal
+                classifier label.
 
         Returns:
             threshold (int, float): Threshold value.
@@ -520,7 +508,7 @@ class BaseClassifier(object):
         """Get an array of reasonable thresholds.
 
         Args:
-            force (bool): If True, forces generation of thresholds (optional).
+            force (bool, optional): If True, forces generation of thresholds.
 
         Returns:
             ths (array): Generated thresholds.
@@ -538,10 +526,8 @@ class BaseClassifier(object):
 
         Args:
             data (array): Input test data.
-
             subject (hashable): Subject identity.
-
-            threshold (int, float): Authentication threshold (optional).
+            threshold (int, float, optional): Authentication threshold.
 
         Returns:
             decision (array): Authentication decision for each input sample.
@@ -575,8 +561,7 @@ class BaseClassifier(object):
 
         Args:
             data (array): Input test data.
-
-            threshold (int, float): Identification threshold.
+            threshold (int, float, optional): Identification threshold.
 
         Returns:
             subjects (list): Identity of each input sample.
@@ -604,15 +589,12 @@ class BaseClassifier(object):
 
         Args:
             data (dict): Dictionary holding test data for each subject.
-
-            thresholds (array): Classifier thresholds to use.
-
-            show (bool): If True, show a summary plot (optional).
+            thresholds (array, optional): Classifier thresholds to use.
+            show (bool, optional): If True, show a summary plot.
 
         Returns:
             (ReturnTuple): containing:
                 classification (dict): Classification results.
-
                 assessment (dict): Biometric statistics.
 
         """
@@ -679,9 +661,7 @@ class BaseClassifier(object):
 
         Args:
             data (array): Input test data.
-
             label (str): Internal classifier subject label.
-
             threshold (int, float): Authentication threshold.
 
         Returns:
@@ -710,7 +690,6 @@ class BaseClassifier(object):
 
         Args:
             data (array): Input test data.
-
             threshold (int, float): Identification threshold.
 
         Returns:
@@ -727,8 +706,7 @@ class BaseClassifier(object):
 
         Args:
             data (array): Data to process.
-
-            targets (list, str): Target subject labels (optional).
+            targets (list, str, optional): Target subject labels.
 
         Returns:
             out (object): Processed data.
@@ -747,9 +725,8 @@ class BaseClassifier(object):
         """Train the classifier.
 
         Args:
-            enroll (list): Labels of new or updated subjects.
-
-            dismiss (list): Labels of deleted subjects.
+            enroll (list, optional): Labels of new or updated subjects.
+            dismiss (list, optional): Labels of deleted subjects.
 
         """
 
@@ -771,7 +748,6 @@ class BaseClassifier(object):
 
         Args:
             old (array): Existing data.
-
             new (array): New data.
 
         Returns:
@@ -786,12 +762,10 @@ class KNN(BaseClassifier):
     """K Nearest Neighbors (k-NN) biometric classifier.
 
     Args:
-        k (int): Number of neighbors.
-
-        metric (str): Distance metric (optional).
-
-        metric_args (dict): Additional keyword arguments are passed to the
-            distance function (optional).
+        k (int, optional): Number of neighbors.
+        metric (str, optional): Distance metric.
+        metric_args (dict, optional): Additional keyword arguments are passed
+            to the distance function.
 
     Attributes:
         EER_IDX (int): Reference index for the Equal Error Rate.
@@ -822,13 +796,11 @@ class KNN(BaseClassifier):
 
         Args:
             dists (array): Unsorted computed distances.
-
             train_labels (list): Unsorted target subject labels.
 
         Returns:
             (tuple): containing:
                 dists (array): Sorted computed distances.
-
                 train_labels (list): Sorted target subject labels.
 
         """
@@ -847,9 +819,7 @@ class KNN(BaseClassifier):
 
         Args:
             data (array): Input test data.
-
             label (str): Internal classifier subject label.
-
             threshold (int, float): Authentication threshold.
 
         Returns:
@@ -924,7 +894,6 @@ class KNN(BaseClassifier):
 
         Args:
             data (array): Input test data.
-
             threshold (int, float): Identification threshold.
 
         Returns:
@@ -970,13 +939,11 @@ class KNN(BaseClassifier):
 
         Args:
             data (array): Data to process.
-
-            targets (list, str): Target subject labels (optional).
+            targets (list, str, optional): Target subject labels.
 
         Returns:
             out (dict): Processed data containing:
                 dists (array): Computed distances.
-
                 train_labels (array): Target subject labels.
 
         """
@@ -1013,7 +980,6 @@ class KNN(BaseClassifier):
 
         Args:
             old (array): Existing data.
-
             new (array): New data.
 
         Returns:
@@ -1033,38 +999,25 @@ class SVM(BaseClassifier):
 
     Args:
         C (float, optional): Penalty parameter C of the error term.
-
         kernel (str, optional): Specifies the kernel type to be used in the
-                                algorithm. It must be one of ‘linear’, ‘poly’,
-                                ‘rbf’, ‘sigmoid’, ‘precomputed’ or a callable.
-                                If none is given, ‘rbf’ will be used. If a
-                                callable is given it is used to precompute the
-                                kernel matrix.
-
+            algorithm. It must be one of ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’,
+            ‘precomputed’ or a callable. If none is given, ‘rbf’ will be used.
+            If a callable is given it is used to precompute the kernel matrix.
         degree (int, optional): Degree of the polynomial kernel function
-                                (‘poly’). Ignored by all other kernels.
-
+            (‘poly’). Ignored by all other kernels.
         gamma (float, optional): Kernel coefficient for ‘rbf’, ‘poly’ and
-                                 ‘sigmoid’. If gamma is 0.0 then 1/n_features
-                                 will be used instead.
-
-        coef0 (float, optional): Independent term in kernel function. It is only
-                                 significant in ‘poly’ and ‘sigmoid’.
-
+            ‘sigmoid’. If gamma is 0.0 then 1/n_features will be used instead.
+        coef0 (float, optional): Independent term in kernel function. It is
+            only significant in ‘poly’ and ‘sigmoid’.
         shrinking (bool, optional): Whether to use the shrinking heuristic.
-
         tol (float, optional): Tolerance for stopping criterion.
-
         cache_size (float, optional): Specify the size of the kernel
-                                      cache (in MB).
-
+            cache (in MB).
         max_iter (int, optional): Hard limit on iterations within solver, or -1
-                                  for no limit.
-
-        random_state (int, RandomState, optional): The seed of the pseudo random
-                                                   number generator to use when
-                                                   shuffling the data for
-                                                   probability estimation.
+            for no limit.
+        random_state (int, RandomState, optional): The seed of the pseudo
+            random number generator to use when shuffling the data for
+            probability estimation.
 
     Attributes:
         EER_IDX (int): Reference index for the Equal Error Rate.
@@ -1104,7 +1057,6 @@ class SVM(BaseClassifier):
 
         Args:
             n1 (int): Number of samples in the first class.
-
             n2 (int): Number of samples in the second class.
 
         Returns:
@@ -1123,7 +1075,6 @@ class SVM(BaseClassifier):
 
         Args:
             X (array): Training data.
-
             label (str): Class label.
 
         """
@@ -1139,15 +1090,10 @@ class SVM(BaseClassifier):
 
         Args:
             X1 (array): Trainig data for the first class.
-
             X2 (array): Training data for the second class.
-
             n1 (int): Number of samples in the first class.
-
             n2 (int): Number of samples in the second class.
-
             label1 (str): Label for the first class.
-
             label2 (str): Label for the first class.
 
         """
@@ -1205,7 +1151,6 @@ class SVM(BaseClassifier):
 
         Args:
             pair (list, tuple): Label pair.
-
             X (array): Input data to classify.
 
         Returns:
@@ -1238,9 +1183,7 @@ class SVM(BaseClassifier):
 
         Args:
             data (array): Input test data.
-
             label (str): Internal classifier subject label.
-
             threshold (int, float): Authentication threshold.
 
         Returns:
@@ -1302,7 +1245,6 @@ class SVM(BaseClassifier):
 
         Args:
             data (array): Input test data.
-
             threshold (int, float): Identification threshold.
 
         Returns:
@@ -1351,14 +1293,12 @@ class SVM(BaseClassifier):
 
         Args:
             data (array): Data to process.
-
-            targets (list, str): Target subject labels (optional).
+            targets (list, str, optional): Target subject labels.
 
         Returns:
             out (dict): Processed data containing:
                 predictions (array): Predictions of each input sample for the
-                                     targeted classifier pairs.
-
+                    targeted classifier pairs.
                 pairs (list): Target label pairs.
 
         """
@@ -1391,9 +1331,8 @@ class SVM(BaseClassifier):
         """Train the classifier.
 
         Args:
-            enroll (list): Labels of new or updated subjects.
-
-            dismiss (list): Labels of deleted subjects.
+            enroll (list, optional): Labels of new or updated subjects.
+            dismiss (list, optional): Labels of deleted subjects.
 
         """
 
@@ -1446,7 +1385,6 @@ class SVM(BaseClassifier):
 
         Args:
             old (array): Existing data.
-
             new (array): New data.
 
         Returns:
@@ -1464,26 +1402,17 @@ def get_auth_rates(TP=None, FP=None, TN=None, FN=None, thresholds=None):
 
     Args:
         TP (array): True Positive counts for each classifier threshold.
-
         FP (array): False Positive counts for each classifier threshold.
-
         TN (array): True Negative counts for each classifier threshold.
-
         FN (array): False Negative counts for each classifier threshold.
-
         thresholds (array): Classifier thresholds.
 
     Returns:
         Acc (array): Accuracy at each classifier threshold.
-
         TAR (array): True Accept Rate at each classifier threshold.
-
         FAR (array): False Accept Rate at each classifier threshold.
-
         FRR (array): False Reject Rate at each classifier threshold.
-
         TRR (array): True Reject Rate at each classifier threshold.
-
         EER (array): Equal Error Rate points, with format (threshold, rate).
 
     """
@@ -1540,27 +1469,18 @@ def get_id_rates(H=None, M=None, R=None, N=None, thresholds=None):
 
     Args:
         H (array): Hit counts for each classifier threshold.
-
         M (array): Miss counts for each classifier threshold.
-
         R (array): Reject counts for each classifier threshold.
-
         N (int): Number of test samples.
-
         thresholds (array): Classifier thresholds.
 
     Returns:
         Acc (array): Accuracy at each classifier threshold.
-
         Err (array): Error rate at each classifier threshold.
-
         MR (array): Miss Rate at each classifier threshold.
-
         RR (array): Reject Rate at each classifier threshold.
-
         EID (array): Error of Identification points, with
             format (threshold, rate).
-
         EER (array): Equal Error Rate points, with format (threshold, rate).
 
     """
@@ -1611,15 +1531,10 @@ def get_subject_results(results=None, subject=None, thresholds=None,
 
     Args:
         results (dict): Classification results.
-
         subject (hashable): True subject label.
-
         thresholds (array): Classifier thresholds.
-
         subjects (list): Target subject classes.
-
         subject_dict (SubjectDict): Subject-label conversion dictionary.
-
         subject_idx (list): Subject index.
 
     Returns:
@@ -1734,7 +1649,6 @@ def assess_classification(results=None, thresholds=None):
 
     Args:
         results (dict): Classification results.
-
         thresholds (array): Classifier thresholds.
 
     Returns:
@@ -1836,7 +1750,6 @@ def assess_runs(results=None, subjects=None):
 
     Args:
         results (list): Classification results for each run.
-
         subjects (list): Common target subject classes.
 
     Returns:
@@ -1972,17 +1885,13 @@ def combination(results=None, weights=None):
 
     Args:
         results (dict): Results for each classifier.
-
-        weights (dict): Weight for each classifier (optional).
+        weights (dict, optional): Weight for each classifier.
 
     Returns:
         (ReturnTuple): containing:
             decision (object): Consensus decision.
-
             confidence (float): Confidence estimate of the decision.
-
             counts (array): Weight for each possible decision outcome.
-
             classes (array): List of possible decision outcomes.
 
     """
@@ -2043,14 +1952,12 @@ def majority_rule(labels=None, random=True):
 
     Args:
         labels (array, list): List of clas labels.
-
-        random (bool): If True, will choose randomly in case of tied classes,
-            otherwise the first element is chosen.
+        random (bool, optional): If True, will choose randomly in case of tied
+            classes, otherwise the first element is chosen.
 
     Returns:
         (ReturnTuple): containing:
             decision (object): Consensus decision.
-
             count (int): Number of elements of the consensus decision.
 
     """

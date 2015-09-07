@@ -11,8 +11,6 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 import scipy.signal as ss
@@ -22,16 +20,13 @@ from scipy.stats import stats
 # local
 from .. import utils
 
-# Globals
-
 
 def _norm_freq(frequency=None, sampling_rate=1000.):
     """Normalize frequency to Nyquist Frequency (Fs/2).
 
     Args:
         frequency (int, float, list, array): Frequencies to normalize.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
 
     Returns:
         wn (float, array): Normalized frequencies.
@@ -62,10 +57,8 @@ def _filter_init(b, a, alpha=1.):
 
     Args:
         b (array): Numerator coefficients.
-
         a (array): Denominator coefficients.
-
-        alpha (float): Scaling factor.
+        alpha (float, optional): Scaling factor.
 
     Returns:
         zi (array): Initial filter state.
@@ -82,22 +75,17 @@ def _filter_signal(b, a, signal, zi=None, check_phase=True, **kwargs):
 
     Args:
         b (array): Numerator coefficients.
-
         a (array): Denominator coefficients.
-
         signal (array): Signal to filter.
-
-        zi (array): Initial filter state (optional).
-
-        check_phase (bool): If True, use the forward-backward technique (optional).
-
-        **kwargs (dict): Additional keyword arguments are passed to the
-            underlying filtering function.
+        zi (array, optional): Initial filter state.
+        check_phase (bool, optional): If True, use the forward-backward
+            technique.
+        **kwargs (dict, optional): Additional keyword arguments are passed to
+            the underlying filtering function.
 
     Returns:
         (tulpe): containing:
             filtered (array): Filtered signal.
-
             zf (array): Final filter state.
 
     Notes:
@@ -125,18 +113,14 @@ def _filter_resp(b, a, sampling_rate=1000., nfreqs=512):
 
     Args:
         b (array): Numerator coefficients.
-
         a (array): Denominator coefficients.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        nfreqs (int): Number of frequency points to compute.
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        nfreqs (int, optional): Number of frequency points to compute.
 
     Returns:
         (tulpe): containing:
             freqs (array): Array of frequencies (Hz) at which the response
                 was computed.
-
             resp (array): Frequency response.
 
     """
@@ -154,11 +138,9 @@ def _get_window(kernel, size, **kwargs):
 
     Args:
         kernel (str): Type of window to create.
-
         size(int): Size of the window.
-
-        **kwargs (dict): Additional keyword arguments are passed to the
-            underlying scipy.signal.windows function.
+        **kwargs (dict, optional): Additional keyword arguments are passed to
+            the underlying scipy.signal.windows function.
 
     Returns:
         window (array): Created window.
@@ -229,29 +211,23 @@ def get_filter(ftype='FIR',
             * Chebyshev filters ('cheby1', 'cheby2');
             * Elliptic filter ('ellip');
             * Bessel filter ('bessel').
-
         band (str): Band type:
             * Low-pass filter ('lowpass');
             * High-pass filter ('highpass');
             * Band-pass filter ('bandpass');
             * Band-stop filter ('bandstop').
-
         order (int): Order of the filter.
-
         frequency (int, float, list, array): Cutoff frequencies; format depends
             on type of band:
             * 'lowpass' or 'bandpass': single frequency;
             * 'bandpass' or 'bandstop': pair of frequencies.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        **kwargs (dict): Additional keyword arguments are passed to the
-            underlying scipy.signal function.
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        **kwargs (dict, optional): Additional keyword arguments are passed to
+            the underlying scipy.signal function.
 
     Returns:
         (ReturnTuple): containing:
             b (array): Numerator coefficients.
-
             a (array): Denominator coefficients.
 
     See Also:
@@ -337,38 +313,30 @@ def filter_signal(signal=None,
 
     Args:
         signal (array): Signal to filter.
-
         ftype (str): Filter type:
             * Finite Impulse Response filter ('FIR');
             * Butterworth filter ('butter');
             * Chebyshev filters ('cheby1', 'cheby2');
             * Elliptic filter ('ellip');
             * Bessel filter ('bessel').
-
         band (str): Band type:
             * Low-pass filter ('lowpass');
             * High-pass filter ('highpass');
             * Band-pass filter ('bandpass');
             * Band-stop filter ('bandstop').
-
         order (int): Order of the filter.
-
         frequency (int, float, list, array): Cutoff frequencies; format depends
             on type of band:
             * 'lowpass' or 'bandpass': single frequency;
             * 'bandpass' or 'bandstop': pair of frequencies.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        **kwargs (dict): Additional keyword arguments are passed to the
-            underlying scipy.signal function.
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        **kwargs (dict, optional): Additional keyword arguments are passed to
+            the underlying scipy.signal function.
 
     Returns:
         (ReturnTuple): containing:
             signal (array): Filtered signal.
-
             sampling_rate (float): Sampling frequency (Hz).
-
             params (dict): Filter parameters.
 
     Notes:
@@ -419,22 +387,17 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
 
     Args:
         signal (array): Signal to smooth.
-
-        kernel (str, array): Type of kernel to use; if array, use directly
-            as the kernel.
-
-        size (int): Size of the kernel; ignored if kernel is an array.
-
-        mirror (bool): If True, signal edges are extended to avoid
+        kernel (str, array, optional): Type of kernel to use; if array, use
+            directly as the kernel.
+        size (int, optional): Size of the kernel; ignored if kernel is an array.
+        mirror (bool, optional): If True, signal edges are extended to avoid
             boundary effects (optional).
-
-        **kwargs (dict): Additional keyword arguments are passed to the
-            underlying scipy.signal.windows function.
+        **kwargs (dict, optional): Additional keyword arguments are passed to
+            the underlying scipy.signal.windows function.
 
     Returns:
         (ReturnTuple): containing:
             signal (array): Smoothed signal.
-
             params (dict): Smoother parameters.
 
     Notes:
@@ -533,13 +496,12 @@ def analytic_signal(signal=None, N=None):
 
     Args:
         signal (array): Input signal.
-
-        N (int): Number of Fourier components; default is len(signal) (optional).
+        N (int, optional): Number of Fourier components; default is
+            `len(signal)`.
 
     Returns:
         (ReturnTuple): containing:
             amplitude (array): Amplitude envelope of the analytic signal.
-
             phase (array): Instantaneous phase component of the analystic signal.
 
     """
@@ -565,10 +527,8 @@ def phase_locking(signal1=None, signal2=None, N=None):
 
     Args:
         signal1 (array): First input signal.
-
         signal2 (array): Second input signal.
-
-        N (int): Number of Fourier components (optional).
+        N (int, optional): Number of Fourier components.
 
     Returns:
         (ReturnTuple): containing:
@@ -608,22 +568,18 @@ def power_spectrum(signal=None,
 
     Args:
         signal (array): Input signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        pad (int): Padding for the Fourier Transform (number of zeros added) (optional).
-
-        pow2 (bool): If True, rounds the number of points
-            'N = len(signal) + pad' to the nearest power of 2 greater
-            than N (optional).
-
-        decibel (bool): If True, return the power in decibels (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        pad (int, optional): Padding for the Fourier Transform
+            (number of zeros added).
+        pow2 (bool, optional): If True, rounds the number of points
+            `N = len(signal) + pad` to the nearest power of 2 greater
+            than N.
+        decibel (bool, optional): If True, returns the power in decibels.
 
     Returns:
         (ReturnTuple): containing:
             freqs (array): Array of frequencies (Hz) at which the power
                 was computed.
-
             power (array): Power spectrum.
 
     """
@@ -667,12 +623,9 @@ def band_power(freqs=None, power=None, frequency=None, decibel=True):
     Args:
         freqs (array): Array of frequencies (Hz) at which the power
             was computed.
-
         power (array): Input power spectrum.
-
         frequency (list, array): Pair of frequencies defining the band.
-
-        decibel (bool): If True, input powerspectrum is in decibels.
+        decibel (bool, optional): If True, input power is in decibels.
 
     Returns:
         (ReturnTuple): containing:
@@ -730,19 +683,12 @@ def signal_stats(signal=None):
     Returns:
         (ReturnTuple): containing:
             mean (float): Mean of the signal.
-
             median (float): Median of the signal.
-
             max (float): Maximum signal amplitude.
-
             var (float): Signal variance (unbiased).
-
             std_dev (float): Standard signal deviation (unbiased).
-
             abs_dev (float): Absolute signal deviation.
-
             kurtosis (float): Signal kurtosis (unbiased).
-
             skew (float): Signal skewness (unbiased).
 
     """
@@ -816,8 +762,7 @@ def zero_cross(signal=None, detrend=False):
 
     Args:
         signal (array): Input signal.
-
-        detrend (bool): If True, remove signal mean before computation.
+        detrend (bool, optional): If True, remove signal mean before computation.
 
     Returns:
         (ReturnTuple): containing:
@@ -850,14 +795,12 @@ def find_extrema(signal=None, mode='both'):
 
     Args:
         signal (array): Input signal.
-
-        mode (str): Whether to find maxima ('max'), minima ('min'),
+        mode (str, optional): Whether to find maxima ('max'), minima ('min'),
             or both ('both').
 
     Returns:
         (ReturnTuple): containing:
             extrema (array): Indices of the extrama points.
-
             values (array): Signal values at the extrema points.
 
     """
@@ -900,27 +843,23 @@ def windower(signal=None,
 
     Args:
         signal (array): Input signal.
-
         size (int): Size of the signal window.
-
-        step (int): Size of window shift; if None, there is no overlap (optional).
-
+        step (int, optional): Size of window shift; if None, there is
+            no overlap.
         fcn (callable): Function to apply to each window.
-
-        fcn_kwargs (dict): Additional keyword arguments to pass to 'fcn' (optional).
-
-        kernel (str, array): Type of kernel to use; if array, use directly
-            as the kernel.
-
-        kernel_kwargs (dict): Additional keyword arguments to pass on window
-            creation; ignored if 'kernel' is an array.
+        fcn_kwargs (dict, optional): Additional keyword arguments to pass
+            to 'fcn'.
+        kernel (str, array, optional): Type of kernel to use; if array, use
+            directly as the kernel.
+        kernel_kwargs (dict, optional): Additional keyword arguments to pass on
+            window creation; ignored if 'kernel' is an array.
 
     Returns:
         (ReturnTuple): containing:
             index (array): Indices characterizing window locations
                 (start of the window).
-
-            values (array): Concatenated output of calling 'fcn' on each window.
+            values (array): Concatenated output of calling 'fcn' on
+                each window.
 
     """
 
@@ -990,7 +929,6 @@ def synchronize(signal1=None, signal2=None):
 
     Args:
         signal1 (array): First input signal.
-
         signal2 (array): Second input signal.
 
     Returns:
@@ -999,12 +937,9 @@ def synchronize(signal1=None, signal2=None):
                 'signal2'; if 'delay' < 0 , 'signal1' is ahead in relation
                 to 'signal2'; if 'delay' > 0 , 'signal1' is delayed in relation
                 to 'signal2'.
-
             corr (float): Value of maximum correlation.
-
             synch1 (array): Biggest possible portion of 'signal1' in
                 synchronization.
-
             synch2 (array): Biggest possible portion of 'signal2' in
                 synchronization.
 
@@ -1054,17 +989,15 @@ def get_heart_rate(beats=None, sampling_rate=1000., smooth=False, size=3):
 
     Args:
         beats (array): Beat location indices.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        smooth (bool): If True, perform smoothing on the resulting heart rate (optional).
-
-        size (int): Size of smoothing window; ignored if 'smooth' is False (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        smooth (bool, optional): If True, perform smoothing on the resulting
+            heart rate.
+        size (int, optional): Size of smoothing window; ignored if `smooth`
+            is False.
 
     Returns:
         (ReturnTuple): containing:
             index (array): Heart rate location indices.
-
             heart_rate (array): Instantaneous heart rate (bpm).
 
     Notes:
@@ -1102,9 +1035,7 @@ def _pdiff(x, p1, p2):
 
     Args:
         x (array): Array of x-coordinates.
-
         p1 (object): First interpolator.
-
         p2 (object): Second interpolator.
 
     Returns:
@@ -1129,24 +1060,17 @@ def find_intersection(x1=None,
 
     Args:
         x1 (array): Array of x-coordinates of the first line.
-
         y1 (array): Array of y-coordinates of the first line.
-
         x2 (array): Array of x-coordinates of the second line.
-
         y2 (array): Array of y-coordinates of the second line.
-
-        alpha (float): Resolution factor for the x-axis; fraction of total
-            number of x-coordinates (optional).
-
-        xtol (float): Tolerance for the x-axis (optional).
-
-        ytol (float): Tolerance for the y-axis (optional).
+        alpha (float, optional): Resolution factor for the x-axis; fraction of
+            total number of x-coordinates.
+        xtol (float, optional): Tolerance for the x-axis.
+        ytol (float, optional): Tolerance for the y-axis.
 
     Returns:
         (ReturnTuple): containing:
             roots (array): Array of x-coordinates of found intersection points.
-
             values (array): Array of y-coordinates of found intersection points.
 
     Notes:

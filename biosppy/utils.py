@@ -19,10 +19,6 @@ import os
 # 3rd party
 import numpy as np
 
-# local
-
-# Globals
-
 
 def normpath(path):
     """Normalize a path.
@@ -50,13 +46,11 @@ def remainderAllocator(votes, k, reverse=True, check=False):
 
     Args:
         votes (list): Number of votes for each class/party/cardinal.
-
         k (int): Total number o seats to allocate.
-
-        reverse (bool): If True, allocates remaining seats largest quota first (optional).
-
-        check (bool): If True, limits the number of seats to the total number
-            of votes (optional).
+        reverse (bool, optional): If True, allocates remaining seats largest
+            quota first.
+        check (bool, optional): If True, limits the number of seats to the
+            total number of votes.
 
     Returns:
         seats (list): Number of seats for each class/party/cardinal.
@@ -95,14 +89,11 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
 
     Args:
         votes (list): Number of votes for each class/party/cardinal.
-
         k (int): Total number o seats to allocate.
-
-        divisor (str): Divisor method; one of 'dHondt', 'Huntington-Hill',
-            'Sainte-Lague', 'Imperiali', or 'Danish'.
-
-        check (bool): If True, limits the number of seats to the total number
-            of votes (optional).
+        divisor (str, optional): Divisor method; one of 'dHondt',
+            'Huntington-Hill', 'Sainte-Lague', 'Imperiali', or 'Danish'.
+        check (bool, optional): If True, limits the number of seats to the
+            total number of votes.
 
     Returns:
         seats (list): Number of seats for each class/party/cardinal.
@@ -153,15 +144,12 @@ def random_fraction(indx, fraction, sort=True):
 
     Args:
         indx (list, array): Elements to partition.
-
         fraction (int, float): Fraction to select.
-
-        sort (bool): If True, output lists will be sorted.
+        sort (bool, optional): If True, output lists will be sorted.
 
     Returns:
         (tulpe): containing:
             use (list, array): Selected elements.
-
             unuse (list, array): Remaining elements.
 
     """
@@ -193,8 +181,7 @@ class ReturnTuple(tuple):
 
     Args:
         values (iterable): Return values.
-
-        names (iterable): Names for return values (optional).
+        names (iterable, optional): Names for return values.
 
     Raises:
         ValueError: If the number of values differs from the number of names.

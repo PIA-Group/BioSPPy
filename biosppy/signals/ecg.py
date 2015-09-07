@@ -11,8 +11,6 @@
 """
 
 # Imports
-# built-in
-
 # 3rd party
 import numpy as np
 import scipy.signal as ss
@@ -21,8 +19,6 @@ import scipy.signal as ss
 from . import tools as st
 from .. import plotting, utils
 
-# Globals
-
 
 def ecg(signal=None, sampling_rate=1000., show=True):
     """Process a raw ECG signal and extract relevant signal features using
@@ -30,25 +26,17 @@ def ecg(signal=None, sampling_rate=1000., show=True):
 
     Args:
         signal (array): Raw ECG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        show (bool): If True, show a summary plot (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        show (bool, optional): If True, show a summary plot.
 
     Returns:
         (ReturnTuple): containing:
             ts (array): Signal time axis reference (seconds).
-
             filtered (array): Filtered ECG signal.
-
             rpeaks (array): R-peak location indices.
-
             templates_ts (array): Templates time axis reference (seconds).
-
             templates (array): Extracted heartbeat templates.
-
             heart_rate_ts (array): Heart rate time axis reference (seconds).
-
             heart_rate (array): Instantaneous heart rate (bpm).
 
     """
@@ -121,17 +109,13 @@ def _extract_heartbeats(signal=None, rpeaks=None, before=200, after=400):
 
     Args:
         signal (array): Input ECG signal.
-
         rpeaks (array): R-peak location indices.
-
-        before (int): Number of samples to include before the R peak.
-
-        after (int): Number of samples to include after the R peak.
+        before (int, optional): Number of samples to include before the R peak.
+        after (int, optional): Number of samples to include after the R peak.
 
     Returns:
         (tuple): containing:
             templates (array): Extracted heartbeat templates.
-
             rpeaks (array): Corresponding R-peak location indices of the
                 extracted heartbeat templates.
 
@@ -165,19 +149,16 @@ def extract_heartbeats(signal=None, rpeaks=None, sampling_rate=1000.,
 
     Args:
         signal (array): Input ECG signal.
-
         rpeaks (array): R-peak location indices.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        before (float): Window size to include before the R peak (seconds).
-
-        after (int): Window size to include after the R peak (seconds).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        before (float, optional): Window size to include before
+            the R peak (seconds).
+        after (int, optional): Window size to include after
+            the R peak (seconds).
 
     Returns:
         (ReturnTuple): containing:
             templates (array): Extracted heartbeat templates.
-
             rpeaks (array): Corresponding R-peak location indices of the
                 extracted heartbeat templates.
 
@@ -215,49 +196,32 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
 
     Args:
         reference (array): Reference R-peak location indices.
-
         test (array): Test R-peak location indices.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        offset (int): Constant a priori offset (number of samples) between
-            reference and test R-peak locations.
-
-        minRR (float): Minimum admissible RR interval (seconds) (optional).
-
-        tol (float): Tolerance between corresponding reference and test R-peak
-            locations (seconds) (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        offset (int, optional): Constant a priori offset (number of samples)
+            between reference and test R-peak locations.
+        minRR (float, optional): Minimum admissible RR interval (seconds).
+        tol (float, optional): Tolerance between corresponding reference and
+            test R-peak locations (seconds) (optional).
 
     Returns:
         (ReturnTuple): containing:
             TP (int): Number of true positive R-peaks.
-
             FP (int): Number of false positive R-peaks.
-
             performance (float): Test performance; TP / len(reference).
-
             acc (float): Accuracy rate; TP / (TP + FP).
-
             err (float): Error rate; FP / (TP + FP).
-
             match (list): Indices of the elements of 'test' that match to an
                 R-peak from 'reference'.
-
             deviation (array): Absolute errors of the matched R-peaks (seconds).
-
             mean_deviation (float): Mean error (seconds).
-
             std_deviation (float): Standard deviation of error (seconds).
-
             mean_ref_ibi (float): Mean of the reference interbeat
                 intervals (seconds).
-
             std_ref_ibi (float): Standard deviation of the reference interbeat
                 intervals (seconds).
-
             mean_test_ibi (float): Mean of the test interbeat
                 intervals (seconds).
-
             std_test_ibi (float): Standard deviation of the test interbeat
                 intervals (seconds).
 
@@ -383,14 +347,12 @@ def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
 
     Args:
         signal (array): Input filtered ECG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        threshold (float): SSF threshold.
-
-        before (flaot): Search window size before R-peak candidate (seconds) (optional).
-
-        after (float): Search window size after R-peak candidate (seconds) (optional).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        threshold (float, optional): SSF threshold.
+        before (flaot, optional): Search window size before
+            R-peak candidate (seconds).
+        after (float, optional): Search window size after
+            R-peak candidate (seconds).
 
     Returns:
         (ReturnTuple): containing:
@@ -445,8 +407,7 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
 
     Args:
         signal (array): Input filtered ECG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
 
     Returns:
         (ReturnTuple): containing:
@@ -605,10 +566,8 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
 
     Args:
         signal (array): Input filtered ECG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        threshold (float): Detection threshold.
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        threshold (float, optional): Detection threshold.
 
     Returns:
         (ReturnTuple): containing:
@@ -749,10 +708,8 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
 
     Args:
         signal (array): Input filtered ECG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
-
-        tol (float): Tolerance parameter.
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        tol (float, optional): Tolerance parameter.
 
     Returns:
         (ReturnTuple): containing:
@@ -804,8 +761,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
 
     Args:
         signal (array): Input filtered ECG signal.
-
-        sampling_rate (int, float): Sampling frequency (Hz).
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
 
     Returns:
         (ReturnTuple): containing:
