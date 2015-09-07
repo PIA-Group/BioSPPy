@@ -11,6 +11,7 @@
 
 # Imports
 # built-in
+import datetime
 import json
 import os
 import zipfile
@@ -233,6 +234,120 @@ def load_h5(path, label):
             return fid[label][...]
         except KeyError:
             return None
+
+
+def store_txt(path, data, sampling_rate=1000., resolution=None, date=None,
+              precision=6):
+    """Store data to a simple text file.
+
+    Args:
+        path (str): Path to file.
+        data (array): Data to store.
+        sampling_rate (int, float, optional): Sampling frequency (Hz).
+        resolution (int, optional): Sampling resolution.
+        date (datetime, str, optional): Datetime object, or an ISO 8601
+            formatted date-time string.
+        precision (int, optional): Precision for string conversion.
+
+    """
+
+    # ensure numpy
+    data = np.array(data)
+
+    # build header
+    header = "Simple Text Format\n"
+    header += "Sampling Rate (Hz): %0.2f\n" % sampling_rate
+    if resolution is not None:
+        header += "Resolution: %d\n" % resolution
+    if date is not None:
+        if isinstance(date, basestring):
+            header += "Date: %s\n" % date
+        elif isinstance(date, datetime.datetime):
+            header += "Date: %s\n" % date.isoformat()
+    else:
+        ct = datetime.datetime.utcnow().isoformat()
+        header += "Date: %s\n" % ct
+
+    # data type
+    header += "Data Type: %s" % data.dtype
+
+    # normalize path
+    path = utils.normpath(path)
+
+    # data format
+    p = '%d' % precision
+    if np.issubdtype(data.dtype, np.integer):
+        fmt = '%d'
+    elif np.issubdtype(data.dtype, np.float):
+        fmt = '%%.%sf' % p
+    elif np.issubdtype(data.dtype, np.bool_):
+        fmt = '%d'
+    else:
+        fmt = '%%.%se' % p
+
+    # store
+    np.savetxt(path, data, header=header, fmt=fmt, delimiter='\t')
+
+
+def load_txt(path):
+    """Load data from a text file.
+
+    Args:
+        path (str): Path to file.
+
+    Returns:
+        (tuple): containing:
+            data (array): Loaded data.
+            mdata (dict): Metadata.
+
+    """
+
+    # normalize path
+    path = utils.normpath(path)
+
+    with open(path, 'r') as fid:
+        lines = fid.readlines()
+
+    # extract header
+    mdata_tmp = {}
+    fields = ['Sampling Rate', 'Resolution', 'Date', 'Data Type']
+    values = []
+    for item in lines:
+        if '#' in item:
+            # parse comment
+            for f in fields:
+                if f in item:
+                    mdata_tmp[f] = item.split(': ')[1].strip()
+                    fields.remove(f)
+                    break
+        else:
+            values.append(item)
+
+    # convert mdata
+    mdata = {}
+    df = '%Y-%m-%dT%H:%M:%S.%f'
+    try:
+        mdata['sampling_rate'] = float(mdata_tmp['Sampling Rate'])
+    except KeyError:
+        pass
+    try:
+        mdata['resolution'] = int(mdata_tmp['Resolution'])
+    except KeyError:
+        pass
+    try:
+        dtype = mdata_tmp['Data Type']
+    except KeyError:
+        dtype = None
+    try:
+        d = datetime.datetime.strptime(mdata_tmp['Date'], df)
+        mdata['date'] = d
+    except (KeyError, ValueError):
+        pass
+
+    # load array
+    data = np.genfromtxt(values, dtype=dtype, delimiter='\t')
+
+    return data, mdata
 
 
 class HDF(object):
