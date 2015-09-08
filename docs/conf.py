@@ -26,10 +26,14 @@ class Mock(MagicMock):
             return Mock()
 
 
-MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot', 'scipy.signal', 'scipy.interpolate',
-'scipy.optimize', 'scipy.stats', 'scipy.cluster', 'scipy.cluster.hierarchy', 'scipy.cluster.vq', 'scipy.sparse',
-'scipy.spatial', 'scipy.spatial.distance', 'sklearn', 'sklearn.cluster', 'sklearn.grid_search', 'sklearn.externals',
-'matplotlib.gridspec', 'h5py', 'shortuuid', 'bidict', 'svm', 'sksvm']
+MOCK_MODULES = ['numpy', 'scipy', 'matplotlib', 'matplotlib.pyplot',
+                'scipy.signal', 'scipy.interpolate', 'scipy.optimize',
+                'scipy.stats', 'scipy.cluster', 'scipy.cluster.hierarchy',
+                'scipy.cluster.vq', 'scipy.sparse', 'scipy.spatial',
+                'scipy.spatial.distance', 'sklearn', 'sklearn.cluster',
+                'sklearn.grid_search', 'sklearn.externals',
+                'matplotlib.gridspec', 'h5py', 'shortuuid', 'bidict', 'svm',
+                'sksvm']
 
 sys.modules.update((mod_name, Mock()) for mod_name in MOCK_MODULES)
 

@@ -15,10 +15,14 @@
 """
 
 # Imports
+# built-in
+import collections
+
 # 3rd party
 import numpy as np
 import shortuuid
 from bidict import bidict
+from sklearn import cross_validation as skcv
 from sklearn import svm as sksvm
 
 # local
@@ -612,9 +616,10 @@ class BaseClassifier(object):
         if len(subjects) == 0:
             raise ValueError("No enrolled subjects in test set.")
 
-        results = {'subjectList': subjects,
-                   'subjectDict': self._subject2label,
-                   }
+        results = {
+            'subjectList': subjects,
+            'subjectDict': self._subject2label,
+        }
 
         for subject in subjects:
             # prepare data
@@ -654,6 +659,66 @@ class BaseClassifier(object):
             plotting.plot_biometrics(assess, self.EER_IDX, show=True)
 
         return out
+
+    @classmethod
+    def cross_validation(cls, data, labels, cv, thresholds=None, **kwargs):
+        """Perform Cross Validation (CV) on a data set.
+
+        Args:
+            data (array): An m by n array of m data samples in an
+                n-dimensional space.
+            labels (list, array): A list of m class labels.
+            cv (CV iterator): A sklearn.cross_validation iterator.
+            thresholds (array, optional): Classifier thresholds to use.
+            **kwargs (dict, optional): Classifier parameters.
+
+        Returns:
+            (ReturnTuple): containing:
+                runs (list): Evaluation results for each CV run.
+                assessment (dict): Final CV biometric statistics.
+
+        """
+
+        runs = []
+        aux = []
+        for train, test in cv:
+            # train data set
+            train_idx = collections.defaultdict(list)
+            for item in train:
+                lbl = labels[item]
+                train_idx[lbl].append(item)
+
+            train_data = {sub: data[idx] for sub, idx in train_idx.iteritems()}
+
+            # test data set
+            test_idx = collections.defaultdict(list)
+            for item in test:
+                lbl = labels[item]
+                test_idx[lbl].append(item)
+
+            test_data = {sub: data[idx] for sub, idx in test_idx.iteritems()}
+
+            # instantiate classifier
+            clf = cls(**kwargs)
+            clf.batch_train(train_data)
+            res = clf.evaluate(test_data, thresholds=thresholds)
+            del clf
+
+            aux.append(res['assessment'])
+            runs.append(res)
+
+        # assess runs
+        if len(runs) > 0:
+            subjects = runs[0]['classification']['subjectList']
+            assess, = assess_runs(results=aux, subjects=subjects)
+        else:
+            raise ValueError("CV iterator empty or exhausted.")
+
+        # output
+        args = (runs, assess)
+        names = ('runs', 'assessment')
+
+        return utils.ReturnTuple(args, names)
 
     def _authenticate(self, data, label, threshold):
         """Authenticate a set of feature vectors, allegedly belonging to the
@@ -959,8 +1024,8 @@ class KNN(BaseClassifier):
 
         for label in targets:
             # compute distances
-            D = metrics.cdist(data, self.io_load(label), metric=self.metric,
-                              **self.metric_args)
+            D = metrics.cdist(data, self.io_load(label),
+                              metric=self.metric, **self.metric_args)
 
             dists.append(D)
             train_labels.append(np.tile(label, D.shape))
@@ -1026,25 +1091,34 @@ class SVM(BaseClassifier):
 
     EER_IDX = -1
 
-    def __init__(self, C=1.0, kernel='linear', degree=3, gamma=0.0, coef0=0.0,
-                 shrinking=True, tol=0.001, cache_size=200, max_iter=-1,
+    def __init__(self,
+                 C=1.0,
+                 kernel='linear',
+                 degree=3,
+                 gamma=0.0,
+                 coef0=0.0,
+                 shrinking=True,
+                 tol=0.001,
+                 cache_size=200,
+                 max_iter=-1,
                  random_state=None):
         # parent __init__
         super(SVM, self).__init__()
 
         # algorithm self things
         self._models = {}
-        self._clf_kwargs = {'C': C,
-                            'kernel': kernel,
-                            'degree': degree,
-                            'gamma': gamma,
-                            'coef0': coef0,
-                            'shrinking': shrinking,
-                            'tol': tol,
-                            'cache_size': cache_size,
-                            'max_iter': max_iter,
-                            'random_state': random_state,
-                            }
+        self._clf_kwargs = {
+            'C': C,
+            'kernel': kernel,
+            'degree': degree,
+            'gamma': gamma,
+            'coef0': coef0,
+            'shrinking': shrinking,
+            'tol': tol,
+            'cache_size': cache_size,
+            'max_iter': max_iter,
+            'random_state': random_state,
+        }
 
         # minimum threshold
         self.min_thr = 10 * np.finfo('float').eps
@@ -1310,7 +1384,8 @@ class SVM(BaseClassifier):
             if targets is None:
                 pairs = self._models.keys()
             elif isinstance(targets, basestring):
-                labels = list(set(self._subject2label.values()) - set([targets]))
+                labels = list(
+                    set(self._subject2label.values()) - set([targets]))
                 pairs = [[targets, lbl] for lbl in labels]
             else:
                 pairs = []
@@ -1321,9 +1396,7 @@ class SVM(BaseClassifier):
         # predict
         predictions = np.array([self._predict(p, data) for p in pairs])
 
-        out = {'predictions': predictions,
-               'pairs': pairs,
-               }
+        out = {'predictions': predictions, 'pairs': pairs}
 
         return out
 
@@ -1524,8 +1597,12 @@ def get_id_rates(H=None, M=None, R=None, N=None, thresholds=None):
     return utils.ReturnTuple(args, names)
 
 
-def get_subject_results(results=None, subject=None, thresholds=None,
-                        subjects=None, subject_dict=None, subject_idx=None):
+def get_subject_results(results=None,
+                        subject=None,
+                        thresholds=None,
+                        subjects=None,
+                        subject_dict=None,
+                        subject_idx=None):
     """Compute authentication and identification performance metrics for a
     given subject.
 
@@ -1613,7 +1690,10 @@ def get_subject_results(results=None, subject=None, thresholds=None,
         nrejects = np.sum(rejects)
         misses = np.logical_not(np.logical_or(hits, rejects))
         nmisses = ns - (nhits + nrejects)
-        missCounts = {subject_dict[:ms]: np.sum(res == ms) for ms in np.unique(res[misses])}
+        missCounts = {
+            subject_dict[:ms]: np.sum(res == ms)
+            for ms in np.unique(res[misses])
+        }
 
         # appends
         H[i] = nhits
@@ -1625,23 +1705,18 @@ def get_subject_results(results=None, subject=None, thresholds=None,
     auth_rates = get_auth_rates(TP, FP, TN, FN, thresholds).as_dict()
     id_rates = get_id_rates(H, M, R, ns, thresholds).as_dict()
 
-    output = {'authentication': {'confusionMatrix': {'TP': TP,
-                                                     'FP': FP,
-                                                     'TN': TN,
-                                                     'FN': FN,
-                                                     },
-                                 'rates': auth_rates,
-                                 },
-              'identification': {'confusionMatrix': {'H': H,
-                                                     'M': M,
-                                                     'R': R,
-                                                     'CM': CM,
-                                                     },
-                                 'rates': id_rates,
-                                 },
-              }
+    output = {
+        'authentication': {
+            'confusionMatrix': {'TP': TP, 'FP': FP, 'TN': TN, 'FN': FN},
+            'rates': auth_rates,
+        },
+        'identification': {
+            'confusionMatrix': {'H': H, 'M': M, 'R': R, 'CM': CM},
+            'rates': id_rates,
+        },
+    }
 
-    return utils.ReturnTuple((output, ), ('assessment', ))
+    return utils.ReturnTuple((output,), ('assessment',))
 
 
 def assess_classification(results=None, thresholds=None):
@@ -1670,21 +1745,18 @@ def assess_classification(results=None, thresholds=None):
     subjects = [subParent[item] for item in subIdx]
 
     # output object
-    output = {'global': {'authentication': {'confusionMatrix': {'TP': 0.,
-                                                                'TN': 0.,
-                                                                'FP': 0.,
-                                                                'FN': 0.,
-                                                                },
-                                            },
-                         'identification': {'confusionMatrix': {'H': 0.,
-                                                                'M': 0.,
-                                                                'R': 0.,
-                                                                },
-                                            },
-                         },
-              'subject': {},
-              'thresholds': thresholds,
-              }
+    output = {
+        'global': {
+            'authentication': {
+                'confusionMatrix': {'TP': 0., 'TN': 0., 'FP': 0., 'FN': 0.},
+            },
+            'identification': {
+                'confusionMatrix': {'H': 0., 'M': 0., 'R': 0.},
+            },
+        },
+        'subject': {},
+        'thresholds': thresholds,
+    }
 
     nth = len(thresholds)
     C = np.zeros((nth, len(subjects)), dtype='float')
@@ -1726,14 +1798,12 @@ def assess_classification(results=None, thresholds=None):
 
     # update subjects
     for k, sub in enumerate(subjects):
-        output['subject'][sub]['identification']['confusionMatrix']['C'] = C[:, k]
+        output['subject'][sub]['identification']['confusionMatrix']['C'] = C[:,
+                                                                             k]
         output['subject'][sub]['identification']['rates']['CR'] = CR[:, k]
 
     # compute global rates
-    aux = get_auth_rates(auth['TP'],
-                         auth['FP'],
-                         auth['TN'],
-                         auth['FN'],
+    aux = get_auth_rates(auth['TP'], auth['FP'], auth['TN'], auth['FN'],
                          thresholds)
     output['global']['authentication']['rates'] = aux.as_dict()
 
@@ -1742,7 +1812,7 @@ def assess_classification(results=None, thresholds=None):
     aux = get_id_rates(iden['H'], iden['M'], iden['R'], Ns, thresholds)
     output['global']['identification']['rates'] = aux.as_dict()
 
-    return utils.ReturnTuple((output, ), ('assessment', ))
+    return utils.ReturnTuple((output,), ('assessment',))
 
 
 def assess_runs(results=None, subjects=None):
@@ -1767,24 +1837,21 @@ def assess_runs(results=None, subjects=None):
     if nb == 0:
         raise ValueError("Please provide at least one classification run.")
     elif nb == 1:
-        return utils.ReturnTuple((results[0], ), ('assessment', ))
+        return utils.ReturnTuple((results[0],), ('assessment',))
 
     # output
-    output = {'global': {'authentication': {'confusionMatrix': {'TP': 0.,
-                                                                'TN': 0.,
-                                                                'FP': 0.,
-                                                                'FN': 0.,
-                                                                },
-                                            },
-                         'identification': {'confusionMatrix': {'H': 0.,
-                                                                'M': 0.,
-                                                                'R': 0.,
-                                                                },
-                                            },
-                         },
-              'subject': {},
-              'thresholds': None,
-              }
+    output = {
+        'global': {
+            'authentication': {
+                'confusionMatrix': {'TP': 0., 'TN': 0., 'FP': 0., 'FN': 0.},
+            },
+            'identification': {
+                'confusionMatrix': {'H': 0., 'M': 0., 'R': 0.},
+            },
+        },
+        'subject': {},
+        'thresholds': None,
+    }
 
     thresholds = output['thresholds'] = results[0]['thresholds']
 
@@ -1797,21 +1864,16 @@ def assess_runs(results=None, subjects=None):
 
     for sub in subjects:
         # create subject confusion matrix, rates
-        output['subject'][sub] = {'authentication': {'confusionMatrix': {'TP': 0.,
-                                                                         'TN': 0.,
-                                                                         'FP': 0.,
-                                                                         'FN': 0.,
-                                                                         },
-                                                     'rates': {},
-                                                     },
-                                  'identification': {'confusionMatrix': {'H': 0.,
-                                                                         'M': 0.,
-                                                                         'R': 0.,
-                                                                         'C': 0.,
-                                                                         },
-                                                     'rates': {},
-                                                     },
-                                  }
+        output['subject'][sub] = {
+            'authentication': {
+                'confusionMatrix': {'TP': 0., 'TN': 0., 'FP': 0., 'FN': 0.},
+                'rates': {},
+            },
+            'identification': {
+                'confusionMatrix': {'H': 0., 'M': 0., 'R': 0., 'C': 0.},
+                'rates': {},
+            },
+        }
 
         # subject helpers
         authS = output['subject'][sub]['authentication']['confusionMatrix']
@@ -1842,11 +1904,8 @@ def assess_runs(results=None, subjects=None):
             idenS[m] /= float(nb)
 
         # compute subject rates
-        aux = get_auth_rates(authS['TP'],
-                             authS['FP'],
-                             authS['TN'],
-                             authS['FN'],
-                             thresholds)
+        aux = get_auth_rates(authS['TP'], authS['FP'], authS['TN'],
+                             authS['FN'], thresholds)
         output['subject'][sub]['authentication']['rates'] = aux.as_dict()
 
         Ns = idenS['H'] + idenS['M'] + idenS['R']
@@ -1866,10 +1925,7 @@ def assess_runs(results=None, subjects=None):
         iden[m] /= float(nb)
 
     # compute rates
-    aux = get_auth_rates(auth['TP'],
-                         auth['FP'],
-                         auth['TN'],
-                         auth['FN'],
+    aux = get_auth_rates(auth['TP'], auth['FP'], auth['TN'], auth['FN'],
                          thresholds)
     output['global']['authentication']['rates'] = aux.as_dict()
 
@@ -1877,7 +1933,7 @@ def assess_runs(results=None, subjects=None):
     aux = get_id_rates(iden['H'], iden['M'], iden['R'], Ns, thresholds)
     output['global']['identification']['rates'] = aux.as_dict()
 
-    return utils.ReturnTuple((output, ), ('assessment', ))
+    return utils.ReturnTuple((output,), ('assessment',))
 
 
 def combination(results=None, weights=None):
@@ -1989,3 +2045,41 @@ def majority_rule(labels=None, random=True):
     out = utils.ReturnTuple((decision, cnt), ('decision', 'count'))
 
     return out
+
+
+def cross_validation(labels,
+                     n_iter=10,
+                     test_size=0.1,
+                     train_size=None,
+                     random_state=None):
+    """Return a Cross Validation (CV) iterator.
+
+    Wraps the StratifiedShuffleSplit iterator from sklearn.cross_validation.
+    This iterator returns stratified randomized folds, which preserve the
+    percentage of samples for each class.
+
+    Args:
+        labels (list, array): List of class labels for each data sample.
+        n_iter (int, optional): Number of splitting iterations.
+        test_size (float, int, optional): If float, represents the proportion
+            of the dataset to include in the test split; if int, represents the
+            absolute number of test samples.
+        train_size (float, int, optional): If float, represents the proportion
+            of the dataset to include in the train split; if int, represents
+            the absolute number of train samples.
+        random_state (int, RandomState, optional): The seed of the pseudo
+            random number generator to use when shuffling the data.
+
+    Returns:
+        (ReturnTuple): containing:
+            cv (CV iterator): Cross Validation iterator.
+
+    """
+
+    cv = skcv.StratifiedShuffleSplit(labels,
+                                     n_iter=n_iter,
+                                     test_size=test_size,
+                                     train_size=train_size,
+                                     random_state=random_state)
+
+    return utils.ReturnTuple((cv,), ('cv',))
