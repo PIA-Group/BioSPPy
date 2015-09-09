@@ -404,9 +404,11 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
         * When the kernel is 'median', mirror is ignored.
 
     References:
-        [1] Wikipedia, "Moving Average". http://en.wikipedia.org/wiki/Moving_average
-        [2] S. W. Smith, "Moving Average Filters - Implementation by Convolution",
-            http://www.dspguide.com/ch15/1.htm
+        [1] Wikipedia, "Moving Average",
+        http://en.wikipedia.org/wiki/Moving_average
+
+        [2] S. W. Smith, "Moving Average Filters - Implementation by
+        Convolution", http://www.dspguide.com/ch15/1.htm
 
     """
 

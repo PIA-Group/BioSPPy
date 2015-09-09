@@ -159,8 +159,8 @@ def kbk_scr(signal=None, sampling_rate=1000.):
 
     References:
         [1] K.H. Kim, S.W. Bang, and S.R. Kim, "Emotion recognition system
-            using short-term monitoring of physiological signals",
-            Med. Biol. Eng. Comput., 2004, 42, 419-427
+        using short-term monitoring of physiological signals", Med. Biol. Eng.
+        Comput., 2004, 42, 419-427
 
     """
 

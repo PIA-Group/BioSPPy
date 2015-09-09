@@ -52,9 +52,9 @@ def dbscan(data=None,
 
     References:
         [1] M. Ester, H. P. Kriegel, J. Sander, and X. Xu, “A Density-Based
-            Algorithm for Discovering Clusters in Large Spatial Databases with
-            Noise”, Proceedings of the 2nd International Conference on
-            Knowledge Discovery and Data Mining, pp. 226-231, 1996.
+        Algorithm for Discovering Clusters in Large Spatial Databases with
+        Noise”, Proceedings of the 2nd International Conference on Knowledge
+        Discovery and Data Mining, pp. 226-231, 1996.
 
     """
 
@@ -254,9 +254,9 @@ def consensus_kmeans(data=None,
             'single', 'ward', or 'weighted'.
         nensemble (int, optional): Number of partitions in the ensemble.
         kmin (int, optional): Minimum k for the k-means partitions; defaults to
-            :math:`\\sqrt(m) / 2`.
+            :math:`\\sqrt{m} / 2`.
         kmax (int, optional): Maximum k for the k-means partitions;
-            defaults to :math: `\\sqrt(m)`.
+            defaults to :math:`\\sqrt{m}`.
 
     Returns:
         (ReturnTuple): containing:
@@ -460,18 +460,17 @@ def mdist_templates(data=None,
         metric_args (dict, optional): Additional keyword arguments to pass to
             the distance function.
 
-    Retrurns:
+    Returns:
         (ReturnTuple): containing:
             templates (array): Selected templates from the input data.
 
     References:
         [1]  U. Uludag, A. Ross, A. Jain, "Biometric template selection and
-             update: a case study in fingerprints", Pattern Recognition 37,
-             2004.
+         update: a case study in fingerprints", Pattern Recognition 37, 2004.
 
-        [2] A. Lourenco, C. Carreiras, H. Silva, A. Fred, "ECG biometrics:
-            A template selection approach", 2014 IEEE International Symposium
-            on Medical Measurements and Applications (MeMeA).
+        [2] A. Lourenco, C. Carreiras, H. Silva, A. Fred, "ECG biometrics: A
+        template selection approach", 2014 IEEE International Symposium on
+        Medical Measurements and Applications (MeMeA).
 
     """
 
@@ -558,7 +557,7 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
         ntemplates (int, optional): Number of templates to extract; if more
             than 1, k-means is used to obtain more templates.
 
-    Retrurns:
+    Returns:
         (ReturnTuple): containing:
             templates (array): Selected templates from the input data.
 
@@ -656,9 +655,9 @@ def outliers_dbscan(data=None,
 
     References:
         [1] M. Ester, H. P. Kriegel, J. Sander, and X. Xu, “A Density-Based
-            Algorithm for Discovering Clusters in Large Spatial Databases with
-            Noise”, Proceedings of the 2nd International Conference on
-            Knowledge Discovery and Data Mining, pp. 226-231, 1996.
+        Algorithm for Discovering Clusters in Large Spatial Databases with
+        Noise”, Proceedings of the 2nd International Conference on Knowledge
+        Discovery and Data Mining, pp. 226-231, 1996.
 
     """
 
@@ -698,16 +697,23 @@ def outliers_dmean(data=None,
         * position of the sample maximum is the same as the
           given index [optional].
 
+    For a set of :math:`\\{X_1, ..., X_n\\}` :math:`n` samples:
+
     .. math::
 
-        For a set of {X_1, ..., X_n} n samples,
-        Y = \\frac{1}{n} \\sum_{i=1}^{n}{X_i}
-        d_i = dist(X_i, Y)
+        \\widetilde{X} = \\frac{1}{n} \\sum_{i=1}^{n}{X_i}
+
+        d_i = dist(X_i, \\widetilde{X})
+
         D_m = \\frac{1}{n} \\sum_{i=1}^{n}{d_i}
-        D_s = \\sqrt{\frac{1}{n - 1} \\sum_{i=1}^{n}{(d_i - D_m)^2}}
+
+        D_s = \\sqrt{\\frac{1}{n - 1} \\sum_{i=1}^{n}{(d_i - D_m)^2}}
+
         T = D_m + \\alpha * D_s
-        M = \\beta * median({max(X_i), i=1, ..., n})
-        N = \\beta * median({min(X_i), i=1, ..., n})
+
+        M = \\beta * median(\\{\\max{X_i}, i=1, ..., n \\})
+
+        N = \\beta * median(\\{\\min{X_i}, i=1, ..., n \\})
 
     Args:
         data (array): An m by n array of m data samples in an
@@ -728,8 +734,8 @@ def outliers_dmean(data=None,
 
     References:
         [1] A. Lourenco, H. Silva, C. Carreiras, A. Fred, "Outlier Detection in
-            Non-intrusive ECG Biometric System", Image Analysis and Recognition,
-            vol. 7950, pp. 43-52, 2013.
+        Non-intrusive ECG Biometric System", Image Analysis and Recognition,
+        vol. 7950, pp. 43-52, 2013.
 
     """
 

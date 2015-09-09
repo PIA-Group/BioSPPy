@@ -7,16 +7,16 @@ recognition methods geared torwards the analysis of biosignals.
 
 Highlights:
 
--  Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration;
--  Signal analysis primitives: filtering, frequency analysis;
--  Clustering;
--  Biometrics.
+-  Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration
+-  Signal analysis primitives: filtering, frequency analysis
+-  Clustering
+-  Biometrics
 
 Contents:
 
 .. toctree::
    :maxdepth: 1
-   
+
    tutorial
    biosppy
 

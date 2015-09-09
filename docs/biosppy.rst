@@ -8,13 +8,23 @@ Packages
 
 .. toctree::
    :maxdepth: 1
-   
+
    biosppy.signals
 
 Modules
 -------
 
+.. automodule:: biosppy.biometrics
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: biosppy.clustering
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: biosppy.metrics
     :members:
     :undoc-members:
     :show-inheritance:

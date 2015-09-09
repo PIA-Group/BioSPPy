@@ -415,8 +415,8 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
 
     References:
         [1] Ivaylo I Christov, "Real time electrocardiogram QRS detection using
-            combined adaptive threshold", BioMedical Engineering OnLine 2004,
-            vol. 3:28
+        combined adaptive threshold", BioMedical Engineering OnLine 2004,
+        vol. 3:28
 
     """
 
@@ -575,8 +575,8 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
 
     References:
         [1] Andre Lourenco, Hugo Silva, Paulo Leite, Renato Lourenco and
-            Ana Fred, "Real Time Electrocardiogram Segmentation for Finger
-            Based ECG Biometrics", BIOSIGNALS 2012, 49-54
+        Ana Fred, "Real Time Electrocardiogram Segmentation for Finger Based
+        ECG Biometrics", BIOSIGNALS 2012, 49-54
 
     """
 
@@ -769,7 +769,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
 
     References:
         [1] P.S. Hamilton, "Open Source ECG Analysis Software Documentation",
-            E.P.Limited
+        E.P.Limited
 
     """
 

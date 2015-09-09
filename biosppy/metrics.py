@@ -23,7 +23,7 @@ def pcosine(u, v):
 
     .. math::
 
-        1 - \\abs(\\frac{u \\cdot v}{||v||_2 ||v||_2})
+        d(u, v) = 1 - abs \\left( \\frac{u \\cdot v}{||u||_2 ||v||_2} \\right)
 
     where :math:`u \\cdot v` is the dot product of :math:`u` and :math:`v`.
 

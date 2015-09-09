@@ -8,10 +8,12 @@ recognition methods geared towards the analysis of biosignals.
 
 Highlights:
 
--  Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration;
+-  Support for various biosignals: BVP, ECG, EDA, EEG, EMG, Respiration
 -  Signal analysis primitives: filtering, frequency analysis
 -  Clustering
--  Biometrics (to do)
+-  Biometrics
+
+Documentation can be found at: http://biosppy.readthedocs.org/
 
 Installation
 ------------
@@ -43,13 +45,13 @@ rate.
 Dependencies
 ------------
 
--  numpy
--  matplotlib
--  scipy
--  scikit-learn
--  h5py
--  shortuuid
 -  bidict
+-  h5py
+-  matplotlib
+-  numpy
+-  scikit-learn
+-  scipy
+-  shortuuid
 
 License
 -------
