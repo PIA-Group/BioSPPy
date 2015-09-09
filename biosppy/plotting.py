@@ -25,6 +25,7 @@ from biosppy.signals import tools as st
 # Globals
 MAJOR_LW = 2.5
 MINOR_LW = 1.5
+MAX_ROWS = 10
 
 
 def _plot_filter(b, a, sampling_rate=1000., nfreqs=512, ax=None):
@@ -116,6 +117,9 @@ def plot_filter(ftype='FIR',
     # plot
     fig = _plot_filter(b, a, sampling_rate)
 
+    # make layout tight
+    fig.tight_layout()
+
     # save to file
     if path is not None:
         path = utils.normpath(path)
@@ -158,6 +162,9 @@ def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power (dB)')
     ax.grid()
+
+    # make layout tight
+    fig.tight_layout()
 
     # save to file
     if path is not None:
@@ -240,6 +247,9 @@ def plot_bvp(ts=None,
     ax3.set_ylabel('Heart Rate (bmp)')
     ax3.legend()
     ax3.grid()
+
+    # make layout tight
+    fig.tight_layout()
 
     # save to file
     if path is not None:
@@ -327,6 +337,9 @@ def plot_eda(ts=None,
     ax3.legend()
     ax3.grid()
 
+    # make layout tight
+    fig.tight_layout()
+
     # save to file
     if path is not None:
         path = utils.normpath(path)
@@ -395,6 +408,9 @@ def plot_emg(ts=None,
     ax2.set_ylabel('Amplitude')
     ax2.legend()
     ax2.grid()
+
+    # make layout tight
+    fig.tight_layout()
 
     # save to file
     if path is not None:
@@ -480,6 +496,9 @@ def plot_resp(ts=None,
     ax3.legend()
     ax3.grid()
 
+    # make layout tight
+    fig.tight_layout()
+
     # save to file
     if path is not None:
         path = utils.normpath(path)
@@ -538,7 +557,7 @@ def plot_eeg(ts=None,
 
     """
 
-    nrows = 10
+    nrows = MAX_ROWS
     alpha = 2.
 
     figs = []
@@ -674,7 +693,6 @@ def _plot_multichannel(ts=None,
     if labels is None:
         labels = ['Ch. %d' % i for i in xrange(nch)]
 
-    nrows = 10
     if nch < nrows:
         nrows = nch
 
@@ -735,6 +753,9 @@ def _plot_multichannel(ts=None,
         a = nrows / 2
         ax = axs[(a, 0)]
         ax.set_ylabel(ylabel)
+
+    # make layout tight
+    gs.tight_layout(fig)
 
     return fig
 
@@ -817,6 +838,9 @@ def plot_ecg(ts=None,
     ax4.set_ylabel('Amplitude')
     ax4.set_title('Templates')
     ax4.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
 
     # save to file
     if path is not None:
@@ -916,9 +940,8 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
 
     # subject results
     for sub in assessment['subject'].iterkeys():
-        _ = _plot_rates(ths,
-                        assessment['subject'][sub]['authentication']['rates'],
-                        ['FAR', 'FRR'],
+        auth_rates = assessment['subject'][sub]['authentication']['rates']
+        _ = _plot_rates(ths, auth_rates, ['FAR', 'FRR'],
                         lw=MINOR_LW,
                         colors=c_sub,
                         alpha=0.4,
@@ -926,9 +949,8 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
                         labels=False,
                         ax=auth_ax)
 
-        _ = _plot_rates(ths,
-                        assessment['subject'][sub]['identification']['rates'],
-                        ['MR', 'RR'],
+        id_rates = assessment['subject'][sub]['identification']['rates']
+        _ = _plot_rates(ths, id_rates, ['MR', 'RR'],
                         lw=MINOR_LW,
                         colors=c_sub,
                         alpha=0.4,
@@ -937,9 +959,8 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
                         ax=id_ax)
 
     # global results
-    _ = _plot_rates(ths,
-                    assessment['global']['authentication']['rates'],
-                    ['FAR', 'FRR'],
+    auth_rates = assessment['global']['authentication']['rates']
+    _ = _plot_rates(ths, auth_rates, ['FAR', 'FRR'],
                     lw=MAJOR_LW,
                     colors=c_global,
                     alpha=1,
@@ -947,9 +968,8 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
                     labels=True,
                     ax=auth_ax)
 
-    _ = _plot_rates(ths,
-                    assessment['global']['identification']['rates'],
-                    ['MR', 'RR'],
+    id_rates = assessment['global']['identification']['rates']
+    _ = _plot_rates(ths, id_rates, ['MR', 'RR'],
                     lw=MAJOR_LW,
                     colors=c_global,
                     alpha=1,
@@ -967,6 +987,98 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
     id_ax.set_ylabel('Identification')
     id_ax.grid()
     id_ax.legend()
+
+    # make layout tight
+    fig.tight_layout()
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+
+    # close
+    plt.close(fig)
+
+
+def plot_clustering(data=None, clusters=None, path=None, show=False):
+    """Create a summary plot of a data clustering.
+
+    Args:
+        data (array): An m by n array of m data samples in an
+            n-dimensional space.
+        clusters (dict): Dictionary with the sample indices
+            (rows from `data`) for each cluster.
+        path (str, optional): If provided, the plot will be saved to the
+            specified file.
+        show (bool, optional): If True, show the plot immediately.
+
+    """
+
+    fig = plt.figure()
+    fig.suptitle('Clustering Summary')
+
+    # determine number of clusters
+    keys = clusters.keys()
+    nc = len(keys)
+
+    if nc <= 4:
+        nrows = 2
+        ncols = 4
+    else:
+        area = nc + 4
+
+        # try to fit to a square
+        nrows = int(np.ceil(np.sqrt(area)))
+
+        if nrows > MAX_ROWS:
+            # prefer to increase number of columns
+            nrows = MAX_ROWS
+
+        ncols = int(np.ceil(area / float(nrows)))
+
+    # plot grid
+    gs = gridspec.GridSpec(nrows, ncols, hspace=0.2, wspace=0.2)
+
+    # global axes
+    ax_global = fig.add_subplot(gs[:2, :2])
+
+    # cluster axes
+    c_grid = np.ones((nrows, ncols), dtype='bool')
+    c_grid[:2, :2] = False
+    c_rows, c_cols = np.nonzero(c_grid)
+
+    # generate color map
+    x = np.linspace(0., 1., nc)
+    cmap = plt.get_cmap('rainbow')
+
+    for i, k in enumerate(keys):
+        aux = data[clusters[k]].T
+        color = cmap(x[i])
+        label = 'Cluster %s' % k
+
+        # global
+        ax_global.plot(aux, color=color, lw=MINOR_LW, alpha=0.7)
+
+        # cluster
+        ax = fig.add_subplot(gs[c_rows[i], c_cols[i]], sharex=ax_global)
+        ax.plot(aux, color=color, lw=MAJOR_LW)
+        ax.set_title(label)
+        ax.grid()
+
+    ax_global.set_title('All Clusters')
+    ax_global.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
 
     # save to file
     if path is not None:
