@@ -1,10 +1,14 @@
 biosppy.signals
 ===============
 
-This package provides methods to process common physiological signals (biosignals).
+This sub-package provides methods to process common physiological signals
+(biosignals).
 
 Modules
 -------
+
+.. contents::
+   :local:
 
 .. automodule:: biosppy.signals.bvp
     :members:

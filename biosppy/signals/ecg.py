@@ -403,7 +403,9 @@ def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
 
 
 def christov_segmenter(signal=None, sampling_rate=1000.):
-    """ECG R-peak segmentation based on Christov's algorithm.
+    """ECG R-peak segmentation algorithm.
+
+    Follows the approach by Christov [Chri04]_.
 
     Args:
         signal (array): Input filtered ECG signal.
@@ -414,9 +416,9 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
             rpeaks (array): R-peak location indices.
 
     References:
-        [1] Ivaylo I Christov, "Real time electrocardiogram QRS detection using
-        combined adaptive threshold", BioMedical Engineering OnLine 2004,
-        vol. 3:28
+        .. [Chri04] Ivaylo I. Christov, "Real time electrocardiogram QRS
+           detection using combined adaptive threshold", BioMedical Engineering
+           OnLine 2004, vol. 3:28, 2004
 
     """
 
@@ -562,7 +564,10 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
 
 
 def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
-    """ECG R-peak segmentation based on adapted Engelse and Zeelenberg algorithm.
+    """ECG R-peak segmentation algorithm.
+
+    Follows the approach by Engelse and Zeelenberg [EnZe79]_ with the
+    modifications by Lourenco *et al.* [LSLL12]_.
 
     Args:
         signal (array): Input filtered ECG signal.
@@ -574,9 +579,12 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
             rpeaks (array): R-peak location indices.
 
     References:
-        [1] Andre Lourenco, Hugo Silva, Paulo Leite, Renato Lourenco and
-        Ana Fred, "Real Time Electrocardiogram Segmentation for Finger Based
-        ECG Biometrics", BIOSIGNALS 2012, 49-54
+        .. [EnZe79] W. Engelse and C. Zeelenberg, "A single scan algorithm for
+           QRS detection and feature extraction", IEEE Comp. in Cardiology,
+           vol. 6, pp. 37-42, 1979
+        .. [LSLL12] Andre Lourenco, Hugo Silva, Paulo Leite, Renato Lourenco
+           and Ana Fred, "Real Time Electrocardiogram Segmentation for Finger
+           Based ECG Biometrics", BIOSIGNALS 2012, pp. 49-54, 2012
 
     """
 
@@ -704,7 +712,9 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
 
 
 def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
-    """ECG R-peak segmentation based on Gamboa's algorithm.
+    """ECG R-peak segmentation algorithm.
+
+    Follows the approach by Gamboa.
 
     Args:
         signal (array): Input filtered ECG signal.
@@ -757,7 +767,9 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
 
 
 def hamilton_segmenter(signal=None, sampling_rate=1000.):
-    """ECG R-peak segmentation based on Hamilton's algorithm.
+    """ECG R-peak segmentation algorithm.
+
+    Follows the approach by Hamilton [Hami02]_.
 
     Args:
         signal (array): Input filtered ECG signal.
@@ -768,8 +780,8 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
             rpeaks (array): R-peak location indices.
 
     References:
-        [1] P.S. Hamilton, "Open Source ECG Analysis Software Documentation",
-        E.P.Limited
+        .. [Hami02] P.S. Hamilton, "Open Source ECG Analysis Software
+           Documentation", E.P.Limited, 2002
 
     """
 

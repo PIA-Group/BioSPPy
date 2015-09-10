@@ -28,7 +28,7 @@ def dbscan(data=None,
            eps=0.5,
            metric='euclidean',
            metric_args=None):
-    """Perform clustering using the DBSCAN algorithm [1].
+    """Perform clustering using the DBSCAN algorithm [EKSX96]_.
 
     The algorithm works by grouping data points that are closely packed
     together (with many nearby neighbors), marking as outliers points that lie
@@ -51,10 +51,10 @@ def dbscan(data=None,
                 are assigned integer keys starting at 0.
 
     References:
-        [1] M. Ester, H. P. Kriegel, J. Sander, and X. Xu, “A Density-Based
-        Algorithm for Discovering Clusters in Large Spatial Databases with
-        Noise”, Proceedings of the 2nd International Conference on Knowledge
-        Discovery and Data Mining, pp. 226-231, 1996.
+        .. [EKSX96] M. Ester, H. P. Kriegel, J. Sander, and X. Xu,
+           “A Density-Based Algorithm for Discovering Clusters in Large Spatial
+           Databases with Noise”, Proceedings of the 2nd International
+           Conf. on Knowledge Discovery and Data Mining, pp. 226-231, 1996.
 
     """
 
@@ -444,11 +444,11 @@ def mdist_templates(data=None,
                     ntemplates=1,
                     metric='euclidean',
                     metric_args=None):
-    """Template selection based on the MDIST method [1].
+    """Template selection based on the MDIST method [UlRJ04]_.
 
     Extends the original method with the option of also providing a data
     clustering, in which case the MDIST criterion is applied for
-    each cluster [2].
+    each cluster [LCSF14]_.
 
     Args:
         data (array): An m by n array of m data samples in an
@@ -465,12 +465,14 @@ def mdist_templates(data=None,
             templates (array): Selected templates from the input data.
 
     References:
-        [1]  U. Uludag, A. Ross, A. Jain, "Biometric template selection and
-         update: a case study in fingerprints", Pattern Recognition 37, 2004.
+        .. [UlRJ04]  U. Uludag, A. Ross, A. Jain, "Biometric template selection
+           and update: a case study in fingerprints",
+           Pattern Recognition 37, 2004
 
-        [2] A. Lourenco, C. Carreiras, H. Silva, A. Fred, "ECG biometrics: A
-        template selection approach", 2014 IEEE International Symposium on
-        Medical Measurements and Applications (MeMeA).
+        .. [LCSF14] A. Lourenco, C. Carreiras, H. Silva, A. Fred,
+           "ECG biometrics: A template selection approach", 2014 IEEE
+           International Symposium on Medical Measurements and
+           Applications (MeMeA), 2014
 
     """
 
@@ -634,7 +636,7 @@ def outliers_dbscan(data=None,
                     eps=0.5,
                     metric='euclidean',
                     metric_args=None):
-    """Perform outlier removal using the DBSCAN algorithm [1].
+    """Perform outlier removal using the DBSCAN algorithm.
 
     Args:
         data (array): An m by n array of m data samples in an
@@ -652,12 +654,6 @@ def outliers_dbscan(data=None,
                 'data') for the outliers (key -1) and the normal (key 0) groups.
             templates (dict): Elements from 'data' for the outliers (key -1)
                 and the normal (key 0) groups.
-
-    References:
-        [1] M. Ester, H. P. Kriegel, J. Sander, and X. Xu, “A Density-Based
-        Algorithm for Discovering Clusters in Large Spatial Databases with
-        Noise”, Proceedings of the 2nd International Conference on Knowledge
-        Discovery and Data Mining, pp. 226-231, 1996.
 
     """
 
@@ -687,7 +683,7 @@ def outliers_dmean(data=None,
                    metric='euclidean',
                    metric_args=None,
                    max_idx=None):
-    """Perform outlier removal using the DMEAN algorithm [1].
+    """Perform outlier removal using the DMEAN algorithm [LCSF13]_.
 
     A sample is considered valid if it cumulatively verifies:
         * distance to average template smaller than a (data derived)
@@ -733,9 +729,9 @@ def outliers_dmean(data=None,
                 and the normal (key 0) groups.
 
     References:
-        [1] A. Lourenco, H. Silva, C. Carreiras, A. Fred, "Outlier Detection in
-        Non-intrusive ECG Biometric System", Image Analysis and Recognition,
-        vol. 7950, pp. 43-52, 2013.
+        .. [LCSF13] A. Lourenco, H. Silva, C. Carreiras, A. Fred, "Outlier
+           Detection in Non-intrusive ECG Biometric System", Image Analysis
+           and Recognition, vol. 7950, pp. 43-52, 2013
 
     """
 

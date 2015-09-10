@@ -375,10 +375,10 @@ def filter_signal(signal=None,
 
 
 def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
-    """Smooth a signal using an N-point moving average filter.
+    """Smooth a signal using an N-point moving average [MAvg]_ filter.
 
     This implementation uses the convolution of a filter kernel with the input
-    signal to compute the smoothed signal.
+    signal to compute the smoothed signal [Smit97]_.
 
     Availabel kernels: median, boxzen, boxcar, triang, blackman, hamming, hann,
     bartlett, flattop, parzen, bohman, blackmanharris, nuttall, barthann,
@@ -404,11 +404,10 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
         * When the kernel is 'median', mirror is ignored.
 
     References:
-        [1] Wikipedia, "Moving Average",
-        http://en.wikipedia.org/wiki/Moving_average
-
-        [2] S. W. Smith, "Moving Average Filters - Implementation by
-        Convolution", http://www.dspguide.com/ch15/1.htm
+        .. [MAvg] Wikipedia, "Moving Average",
+           http://en.wikipedia.org/wiki/Moving_average
+        .. [Smit97] S. W. Smith, "Moving Average Filters - Implementation by
+           Convolution", http://www.dspguide.com/ch15/1.htm, 1997
 
     """
 

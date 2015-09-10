@@ -14,6 +14,9 @@ Packages
 Modules
 -------
 
+.. contents::
+   :local:
+
 .. automodule:: biosppy.biometrics
     :members:
     :undoc-members:

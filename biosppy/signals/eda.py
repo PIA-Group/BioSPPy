@@ -147,6 +147,8 @@ def kbk_scr(signal=None, sampling_rate=1000.):
     """KBK method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
 
+    Follows the approach by Kim *et al.* [KiBK04]_.
+
     Args:
         signal (array): Input filterd EDA signal.
         sampling_rate (int, float, optional): Sampling frequency (Hz).
@@ -158,9 +160,9 @@ def kbk_scr(signal=None, sampling_rate=1000.):
             amplitudes (array): SCR pulse amplitudes.
 
     References:
-        [1] K.H. Kim, S.W. Bang, and S.R. Kim, "Emotion recognition system
-        using short-term monitoring of physiological signals", Med. Biol. Eng.
-        Comput., 2004, 42, 419-427
+        .. [KiBK04] K.H. Kim, S.W. Bang, and S.R. Kim, "Emotion recognition
+           system using short-term monitoring of physiological signals",
+           Med. Biol. Eng. Comput., vol. 42, pp. 419-427, 2004
 
     """
 
