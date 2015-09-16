@@ -11,7 +11,3 @@
 
 # get version
 from .version import version as __version__
-
-# direct imports
-from . import signals
-from . import biometrics, clustering, metrics, plotting, storage, utils

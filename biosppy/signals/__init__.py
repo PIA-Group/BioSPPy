@@ -15,6 +15,3 @@
     :copyright: (c) 2015 by Instituto de Telecomunicacoes
     :license: BSD 3-clause, see LICENSE for more details.
 """
-
-# direct imports
-from . import bvp, ecg, eda, eeg, emg, resp, tools
