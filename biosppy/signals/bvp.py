@@ -22,18 +22,27 @@ def bvp(signal=None, sampling_rate=1000., show=True):
     """Process a raw BVP signal and extract relevant signal features using
     default parameters.
 
-    Args:
-        signal (array): Raw BVP signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        show (bool, optional): If True, show a summary plot.
+    Parameters
+    ----------
+    signal : array
+        Raw BVP signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    show : bool, optional
+        If True, show a summary plot.
 
-    Returns:
-        (ReturnTuple): containing:
-            ts (array): Signal time axis reference (seconds).
-            filtered (array): Filtered BVP signal.
-            onsets (array): Indices of BVP pulse onsets.
-            heart_rate_ts (array): Heart rate time axis reference (seconds).
-            heart_rate (array): Instantaneous heart rate (bpm).
+    Returns
+    -------
+    ts : array
+        Signal time axis reference (seconds).
+    filtered : array
+        Filtered BVP signal.
+    onsets : array
+        Indices of BVP pulse onsets.
+    heart_rate_ts : array
+     Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
 
     """
 
@@ -92,13 +101,17 @@ def find_onsets(signal=None, sampling_rate=1000.):
 
     Skips corrupted signal parts.
 
-    Args:
-        signal (array): Input filtered BVP signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
+    Parameters
+    ----------
+    signal : array
+        Input filtered BVP signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
 
-    Returns:
-        (ReturnTuple): containing:
-            onsets (array): Indices of BVP pulse onsets.
+    Returns
+    -------
+    onsets : array
+        Indices of BVP pulse onsets.
 
     """
 

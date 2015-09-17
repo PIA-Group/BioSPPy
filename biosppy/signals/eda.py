@@ -23,18 +23,27 @@ def eda(signal=None, sampling_rate=1000., show=True):
     """Process a raw EDA signal and extract relevant signal features using
     default parameters.
 
-    Args:
-        signal (array): Raw EDA signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        show (bool, optional): If True, show a summary plot.
+    Parameters
+    ----------
+    signal : array
+        Raw EDA signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    show : bool, optional
+        If True, show a summary plot.
 
-    Returns:
-        (ReturnTuple): containing:
-            ts (array): Signal time axis reference (seconds).
-            filtered (array): Filtered EDA signal.
-            onsets (array): Indices of SCR pulse onsets.
-            peaks (array): Indices of the SCR peaks.
-            amplitudes (array): SCR pulse amplitudes.
+    Returns
+    -------
+    ts : array
+        Signal time axis reference (seconds).
+    filtered : array
+        Filtered EDA signal.
+    onsets : array
+        Indices of SCR pulse onsets.
+    peaks : array
+        Indices of the SCR peaks.
+    amplitudes : array
+        SCR pulse amplitudes.
 
     """
 
@@ -92,15 +101,21 @@ def basic_scr(signal=None, sampling_rate=1000.):
     """Basic method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
 
-    Args:
-        signal (array): Input filterd EDA signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
+    Parameters
+    ----------
+    signal : array
+        Input filterd EDA signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
 
-    Returns:
-        (ReturnTuple): containing:
-            onsets (array): Indices of the SCR onsets.
-            peaks (array): Indices of the SRC peaks.
-            amplitudes (array): SCR pulse amplitudes.
+    Returns
+    -------
+    onsets : array
+        Indices of the SCR onsets.
+    peaks : array
+        Indices of the SRC peaks.
+    amplitudes : array
+        SCR pulse amplitudes.
 
     """
 
@@ -149,20 +164,27 @@ def kbk_scr(signal=None, sampling_rate=1000.):
 
     Follows the approach by Kim *et al.* [KiBK04]_.
 
-    Args:
-        signal (array): Input filterd EDA signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
+    Parameters
+    ----------
+    signal : array
+        Input filterd EDA signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
 
-    Returns:
-        (ReturnTuple): containing:
-            onsets (array): Indices of the SCR onsets.
-            peaks (array): Indices of the SRC peaks.
-            amplitudes (array): SCR pulse amplitudes.
+    Returns
+    -------
+    onsets : array
+        Indices of the SCR onsets.
+    peaks : array
+        Indices of the SRC peaks.
+    amplitudes : array
+        SCR pulse amplitudes.
 
-    References:
-        .. [KiBK04] K.H. Kim, S.W. Bang, and S.R. Kim, "Emotion recognition
-           system using short-term monitoring of physiological signals",
-           Med. Biol. Eng. Comput., vol. 42, pp. 419-427, 2004
+    References
+    ----------
+    .. [KiBK04] K.H. Kim, S.W. Bang, and S.R. Kim, "Emotion recognition
+       system using short-term monitoring of physiological signals",
+       Med. Biol. Eng. Comput., vol. 42, pp. 419-427, 2004
 
     """
 

@@ -31,15 +31,23 @@ MAX_ROWS = 10
 def _plot_filter(b, a, sampling_rate=1000., nfreqs=512, ax=None):
     """Compute and plot the frequency response of a digital filter.
 
-    Args:
-        b (array): Numerator coefficients.
-        a (array): Denominator coefficients.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        nfreqs (int, optional): Number of frequency points to compute.
-        ax (axis, optional): Plot Axis to use.
+    Parameters
+    ----------
+    b : array
+        Numerator coefficients.
+    a : array
+        Denominator coefficients.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    nfreqs : int, optional
+        Number of frequency points to compute.
+    ax : axis, optional
+        Plot Axis to use.
 
-    Returns:
-        fig (Figure): Figure object.
+    Returns
+    -------
+    fig : Figure
+        Figure object.
 
     """
 
@@ -81,29 +89,36 @@ def plot_filter(ftype='FIR',
     """Plot the frequency response of the filter specified with the given
     parameters.
 
-    Args:
-        ftype (str): Filter type:
+    Parameters
+    ----------
+    ftype : str
+        Filter type:
             * Finite Impulse Response filter ('FIR');
             * Butterworth filter ('butter');
             * Chebyshev filters ('cheby1', 'cheby2');
             * Elliptic filter ('ellip');
             * Bessel filter ('bessel').
-        band (str): Band type:
+    band : str
+        Band type:
             * Low-pass filter ('lowpass');
             * High-pass filter ('highpass');
             * Band-pass filter ('bandpass');
             * Band-stop filter ('bandstop').
-        order (int): Order of the filter.
-        frequency (int, float, list, array): Cutoff frequencies; format depends
-            on type of band:
-                * 'lowpass' or 'bandpass': single frequency;
-                * 'bandpass' or 'bandstop': pair of frequencies.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
-        **kwargs (dict, optional): Additional keyword arguments are passed to
-            the underlying scipy.signal function.
+    order : int
+        Order of the filter.
+    frequency : int, float, list, array
+        Cutoff frequencies; format depends on type of band:
+            * 'lowpass' or 'bandpass': single frequency;
+            * 'bandpass' or 'bandstop': pair of frequencies.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+    ``**kwargs`` : dict, optional
+        Additional keyword arguments are passed to the underlying
+        scipy.signal function.
 
     """
 
@@ -141,12 +156,16 @@ def plot_filter(ftype='FIR',
 def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
     """Plot the power spectrum of a signal (one-sided).
 
-    Args:
-        signal (array): Input signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -194,16 +213,24 @@ def plot_bvp(ts=None,
              show=False):
     """Create a summary plot from the output of signals.bvp.bvp.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        raw (array): Raw BVP signal.
-        filtered (array): Filtered BVP signal.
-        onsets (array): Indices of BVP pulse onsets.
-        heart_rate_ts (array): Heart rate time axis reference (seconds).
-        heart_rate (array): Instantaneous heart rate (bpm).
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw BVP signal.
+    filtered : array
+        Filtered BVP signal.
+    onsets : array
+        Indices of BVP pulse onsets.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -279,16 +306,24 @@ def plot_eda(ts=None,
              show=False):
     """Create a summary plot from the output of signals.eda.eda.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        raw (array): Raw EDA signal.
-        filtered (array): Filtered EDA signal.
-        onsets (array): Indices of SCR pulse onsets.
-        peaks (array): Indices of the SCR peaks.
-        amplitudes (array): SCR pulse amplitudes.
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw EDA signal.
+    filtered : array
+        Filtered EDA signal.
+    onsets : array
+        Indices of SCR pulse onsets.
+    peaks : array
+        Indices of the SCR peaks.
+    amplitudes : array
+        SCR pulse amplitudes.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -366,14 +401,20 @@ def plot_emg(ts=None,
              show=False):
     """Create a summary plot from the output of signals.emg.emg.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        raw (array): Raw EMG signal.
-        filtered (array): Filtered EMG signal.
-        onsets (array): Indices of EMG pulse onsets.
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw EMG signal.
+    filtered : array
+        Filtered EMG signal.
+    onsets : array
+        Indices of EMG pulse onsets.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -440,16 +481,24 @@ def plot_resp(ts=None,
               show=False):
     """Create a summary plot from the output of signals.bvp.bvp.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        raw (array): Raw BVP signal.
-        filtered (array): Filtered BVP signal.
-        zeros (array): Indices of Respiration zero crossings.
-        resp_rate_ts (array): Respiration rate time axis reference (seconds).
-        resp_rate (array): Instantaneous respiration rate (Hz).
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw Resp signal.
+    filtered : array
+        Filtered Resp signal.
+    zeros : array
+        Indices of Respiration zero crossings.
+    resp_rate_ts : array
+        Respiration rate time axis reference (seconds).
+    resp_rate : array
+        Instantaneous respiration rate (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -533,27 +582,41 @@ def plot_eeg(ts=None,
              show=False):
     """Create a summary plot from the output of signals.eeg.eeg.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        raw (array): Raw EEG signal.
-        filtered (array): Filtered EEG signal.
-        labels (list): Channel labels.
-        features_ts (array): Features time axis reference (seconds).
-        theta (array): Average power in the 4 to 8 Hz frequency band;
-            each column is one EEG channel.
-        alpha_low (array): Average power in the 8 to 10 Hz frequency band;
-            each column is one EEG channel.
-        alpha_high (array): Average power in the 10 to 13 Hz frequency band;
-            each column is one EEG channel.
-        beta (array): Average power in the 13 to 25 Hz frequency band;
-            each column is one EEG channel.
-        gamma (array): Average power in the 25 to 40 Hz frequency band;
-            each column is one EEG channel.
-        plf_pairs (list): PLF pair indices.
-        plf (array): PLF matrix; each column is a channel pair.
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw EEG signal.
+    filtered : array
+        Filtered EEG signal.
+    labels : list
+        Channel labels.
+    features_ts : array
+        Features time axis reference (seconds).
+    theta : array
+        Average power in the 4 to 8 Hz frequency band; each column is one
+        EEG channel.
+    alpha_low : array
+        Average power in the 8 to 10 Hz frequency band; each column is one
+        EEG channel.
+    alpha_high : array
+        Average power in the 10 to 13 Hz frequency band; each column is one
+        EEG channel.
+    beta : array
+        Average power in the 13 to 25 Hz frequency band; each column is one
+        EEG channel.
+    gamma : array
+        Average power in the 25 to 40 Hz frequency band; each column is one
+        EEG channel.
+    plf_pairs : list
+        PLF pair indices.
+    plf : array
+        PLF matrix; each column is a channel pair.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -635,14 +698,19 @@ def plot_eeg(ts=None,
 def _yscaling(signal=None, alpha=1.5):
     """Get y axis limits for a signal with scaling.
 
-    Args:
-        signal (array): Input signal.
-        alpha (float, optional): Scaling factor.
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    alpha : float, optional
+        Scaling factor.
 
-    Returns:
-        (tulpe): containing:
-            ymin (float): Minimum y value.
-            ymax (float): Maximum y value.
+    Returns
+    -------
+    ymin : float
+        Minimum y value.
+    ymax : float
+        Maximum y value.
 
     """
 
@@ -670,18 +738,29 @@ def _plot_multichannel(ts=None,
                        ylabel=None):
     """Plot a multi-channel signal.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        signal (array): Multi-channel signal; each column is one channel.
-        labels (list, optional): Channel labels.
-        nrows (int, optional): Maximum number of rows to use.
-        alpha (float, optional): Scaling factor for y axis.
-        title (str, optional): Plot title.
-        xlabel (str, optional): Label for x axis.
-        ylabel (str, optional): Label for y axis.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    signal : array
+        Multi-channel signal; each column is one channel.
+    labels : list, optional
+        Channel labels.
+    nrows : int, optional
+        Maximum number of rows to use.
+    alpha : float, optional
+        Scaling factor for y axis.
+    title : str, optional
+        Plot title.
+    xlabel : str, optional
+        Label for x axis.
+    ylabel : str, optional
+        Label for y axis.
 
-    Returns:
-        fig (Figure): Figure object.
+    Returns
+    -------
+    fig : Figure
+        Figure object.
 
     """
 
@@ -772,18 +851,28 @@ def plot_ecg(ts=None,
              show=False):
     """Create a summary plot from the output of signals.ecg.ecg.
 
-    Args:
-        ts (array): Signal time axis reference (seconds).
-        raw (array): Raw BVP signal.
-        filtered (array): Filtered BVP signal.
-        rpeaks (array): R-peak location indices.
-        templates_ts (array): Templates time axis reference (seconds).
-        templates (array): Extracted heartbeat templates.
-        heart_rate_ts (array): Heart rate time axis reference (seconds).
-        heart_rate (array): Instantaneous heart rate (bpm).
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw ECG signal.
+    filtered : array
+        Filtered ECG signal.
+    rpeaks : array
+        R-peak location indices.
+    templates_ts : array
+        Templates time axis reference (seconds).
+    templates : array
+        Extracted heartbeat templates.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -869,20 +958,31 @@ def _plot_rates(thresholds, rates, variables,
                 ax=None):
     """Plot biometric rates.
 
-    Args:
-        thresholds (array):
-        rates (dict): Dictionary of rates.
-        variables (list): Keys from 'rates' to plot.
-        lw (int, float, optional): Plot linewidth.
-        colors (list, optional): Plot line color for each variable.
-        alpha (float, optional): Plot line alpha value.
-        eer_idx (int, optional): Classifier reference index for the
-            Equal Error Rate.
-        labels (bool, optional): If True, will show plot labels.
-        ax (axis, optional): Plot Axis to use.
+    Parameters
+    ----------
+    thresholds : array
+        Classifier thresholds.
+    rates : dict
+        Dictionary of rates.
+    variables : list
+        Keys from 'rates' to plot.
+    lw : int, float, optional
+        Plot linewidth.
+    colors : list, optional
+        Plot line color for each variable.
+    alpha : float, optional
+        Plot line alpha value.
+    eer_idx : int, optional
+        Classifier reference index for the Equal Error Rate.
+    labels : bool, optional
+        If True, will show plot labels.
+    ax : axis, optional
+        Plot Axis to use.
 
-    Returns:
-        fig (Figure): Figure object.
+    Returns
+    -------
+    fig : Figure
+        Figure object.
 
     """
 
@@ -917,13 +1017,16 @@ def _plot_rates(thresholds, rates, variables,
 def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
     """Create a summary plot of a biometrics test run.
 
-    Args:
-        assessment (dict): Classification assessment results.
-        eer_idx (int, optional): Classifier reference index for the
-            Equal Error Rate.
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    assessment : dict
+        Classification assessment results.
+    eer_idx : int, optional
+        Classifier reference index for the Equal Error Rate.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 
@@ -1012,14 +1115,16 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
 def plot_clustering(data=None, clusters=None, path=None, show=False):
     """Create a summary plot of a data clustering.
 
-    Args:
-        data (array): An m by n array of m data samples in an
-            n-dimensional space.
-        clusters (dict): Dictionary with the sample indices
-            (rows from `data`) for each cluster.
-        path (str, optional): If provided, the plot will be saved to the
-            specified file.
-        show (bool, optional): If True, show the plot immediately.
+    Parameters
+    ----------
+    data : array
+        An m by n array of m data samples in an n-dimensional space.
+    clusters : dict
+        Dictionary with the sample indices (rows from `data`) for each cluster.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
 
     """
 

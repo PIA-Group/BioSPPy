@@ -8,6 +8,7 @@
 
     :copyright: (c) 2015 by Instituto de Telecomunicacoes
     :license: BSD 3-clause, see LICENSE for more details.
+
 """
 
 # Imports
@@ -24,20 +25,31 @@ def ecg(signal=None, sampling_rate=1000., show=True):
     """Process a raw ECG signal and extract relevant signal features using
     default parameters.
 
-    Args:
-        signal (array): Raw ECG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        show (bool, optional): If True, show a summary plot.
+    Parameters
+    ----------
+    signal : array
+        Raw ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    show : bool, optional
+        If True, show a summary plot.
 
-    Returns:
-        (ReturnTuple): containing:
-            ts (array): Signal time axis reference (seconds).
-            filtered (array): Filtered ECG signal.
-            rpeaks (array): R-peak location indices.
-            templates_ts (array): Templates time axis reference (seconds).
-            templates (array): Extracted heartbeat templates.
-            heart_rate_ts (array): Heart rate time axis reference (seconds).
-            heart_rate (array): Instantaneous heart rate (bpm).
+    Returns
+    -------
+    ts : array
+        Signal time axis reference (seconds).
+    filtered : array
+        Filtered ECG signal.
+    rpeaks : array
+        R-peak location indices.
+    templates_ts : array
+        Templates time axis reference (seconds).
+    templates : array
+        Extracted heartbeat templates.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
 
     """
 
@@ -107,17 +119,24 @@ def _extract_heartbeats(signal=None, rpeaks=None, before=200, after=400):
     """Extract heartbeat templates from an ECG signal, given a list of
     R-peak locations.
 
-    Args:
-        signal (array): Input ECG signal.
-        rpeaks (array): R-peak location indices.
-        before (int, optional): Number of samples to include before the R peak.
-        after (int, optional): Number of samples to include after the R peak.
+    Parameters
+    ----------
+    signal : array
+        Input ECG signal.
+    rpeaks : array
+        R-peak location indices.
+    before : int, optional
+        Number of samples to include before the R peak.
+    after : int, optional
+        Number of samples to include after the R peak.
 
-    Returns:
-        (tuple): containing:
-            templates (array): Extracted heartbeat templates.
-            rpeaks (array): Corresponding R-peak location indices of the
-                extracted heartbeat templates.
+    Returns
+    -------
+    templates : array
+        Extracted heartbeat templates.
+    rpeaks : array
+        Corresponding R-peak location indices of the extracted heartbeat
+        templates.
 
     """
 
@@ -147,20 +166,26 @@ def extract_heartbeats(signal=None, rpeaks=None, sampling_rate=1000.,
     """Extract heartbeat templates from an ECG signal, given a list of
     R-peak locations.
 
-    Args:
-        signal (array): Input ECG signal.
-        rpeaks (array): R-peak location indices.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        before (float, optional): Window size to include before
-            the R peak (seconds).
-        after (int, optional): Window size to include after
-            the R peak (seconds).
+    Parameters
+    ----------
+    signal : array
+        Input ECG signal.
+    rpeaks : array
+        R-peak location indices.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    before : float, optional
+        Window size to include before the R peak (seconds).
+    after : int, optional
+        Window size to include after the R peak (seconds).
 
-    Returns:
-        (ReturnTuple): containing:
-            templates (array): Extracted heartbeat templates.
-            rpeaks (array): Corresponding R-peak location indices of the
-                extracted heartbeat templates.
+    Returns
+    -------
+    templates : array
+        Extracted heartbeat templates.
+    rpeaks : array
+        Corresponding R-peak location indices of the extracted heartbeat
+        templates.
 
     """
 
@@ -194,36 +219,52 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
     """Compare the segmentation performance of a list of R-peak positions
     against a reference list.
 
-    Args:
-        reference (array): Reference R-peak location indices.
-        test (array): Test R-peak location indices.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        offset (int, optional): Constant a priori offset (number of samples)
-            between reference and test R-peak locations.
-        minRR (float, optional): Minimum admissible RR interval (seconds).
-        tol (float, optional): Tolerance between corresponding reference and
-            test R-peak locations (seconds) (optional).
+    Parameters
+    ----------
+    reference : array
+        Reference R-peak location indices.
+    test : array
+        Test R-peak location indices.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    offset : int, optional
+        Constant a priori offset (number of samples) between reference and
+        test R-peak locations.
+    minRR : float, optional
+        Minimum admissible RR interval (seconds).
+    tol : float, optional
+        Tolerance between corresponding reference and test R-peak
+        locations (seconds).
 
-    Returns:
-        (ReturnTuple): containing:
-            TP (int): Number of true positive R-peaks.
-            FP (int): Number of false positive R-peaks.
-            performance (float): Test performance; TP / len(reference).
-            acc (float): Accuracy rate; TP / (TP + FP).
-            err (float): Error rate; FP / (TP + FP).
-            match (list): Indices of the elements of 'test' that match to an
-                R-peak from 'reference'.
-            deviation (array): Absolute errors of the matched R-peaks (seconds).
-            mean_deviation (float): Mean error (seconds).
-            std_deviation (float): Standard deviation of error (seconds).
-            mean_ref_ibi (float): Mean of the reference interbeat
-                intervals (seconds).
-            std_ref_ibi (float): Standard deviation of the reference interbeat
-                intervals (seconds).
-            mean_test_ibi (float): Mean of the test interbeat
-                intervals (seconds).
-            std_test_ibi (float): Standard deviation of the test interbeat
-                intervals (seconds).
+    Returns
+    -------
+    TP : int
+        Number of true positive R-peaks.
+    FP : int
+        Number of false positive R-peaks.
+    performance : float
+        Test performance; TP / len(reference).
+    acc : float
+        Accuracy rate; TP / (TP + FP).
+    err : float
+        Error rate; FP / (TP + FP).
+    match : list
+        Indices of the elements of 'test' that match to an R-peak
+        from 'reference'.
+    deviation : array
+        Absolute errors of the matched R-peaks (seconds).
+    mean_deviation : float
+        Mean error (seconds).
+    std_deviation : float
+        Standard deviation of error (seconds).
+    mean_ref_ibi : float
+        Mean of the reference interbeat intervals (seconds).
+    std_ref_ibi : float
+        Standard deviation of the reference interbeat intervals (seconds).
+    mean_test_ibi : float
+        Mean of the test interbeat intervals (seconds).
+    std_test_ibi : float
+        Standard deviation of the test interbeat intervals (seconds).
 
     """
 
@@ -345,18 +386,23 @@ def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
                   after=0.01):
     """ECG R-peak segmentation based on the Slope Sum Function (SSF).
 
-    Args:
-        signal (array): Input filtered ECG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        threshold (float, optional): SSF threshold.
-        before (flaot, optional): Search window size before
-            R-peak candidate (seconds).
-        after (float, optional): Search window size after
-            R-peak candidate (seconds).
+    Parameters
+    ----------
+    signal : array
+        Input filtered ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    threshold : float, optional
+        SSF threshold.
+    before : float, optional
+        Search window size before R-peak candidate (seconds).
+    after : float, optional
+        Search window size after R-peak candidate (seconds).
 
-    Returns:
-        (ReturnTuple): containing:
-            rpeaks (array): R-peak location indices.
+    Returns
+    -------
+    rpeaks : array
+        R-peak location indices.
 
     """
 
@@ -407,18 +453,23 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
 
     Follows the approach by Christov [Chri04]_.
 
-    Args:
-        signal (array): Input filtered ECG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
+    Parameters
+    ----------
+    signal : array
+        Input filtered ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
 
-    Returns:
-        (ReturnTuple): containing:
-            rpeaks (array): R-peak location indices.
+    Returns
+    -------
+    rpeaks : array
+        R-peak location indices.
 
-    References:
-        .. [Chri04] Ivaylo I. Christov, "Real time electrocardiogram QRS
-           detection using combined adaptive threshold", BioMedical Engineering
-           OnLine 2004, vol. 3:28, 2004
+    References
+    ----------
+    .. [Chri04] Ivaylo I. Christov, "Real time electrocardiogram QRS
+       detection using combined adaptive threshold", BioMedical Engineering
+       OnLine 2004, vol. 3:28, 2004
 
     """
 
@@ -569,22 +620,28 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
     Follows the approach by Engelse and Zeelenberg [EnZe79]_ with the
     modifications by Lourenco *et al.* [LSLL12]_.
 
-    Args:
-        signal (array): Input filtered ECG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        threshold (float, optional): Detection threshold.
+    Parameters
+    ----------
+    signal : array
+        Input filtered ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    threshold : float, optional
+        Detection threshold.
 
-    Returns:
-        (ReturnTuple): containing:
-            rpeaks (array): R-peak location indices.
+    Returns
+    -------
+    rpeaks : array
+        R-peak location indices.
 
-    References:
-        .. [EnZe79] W. Engelse and C. Zeelenberg, "A single scan algorithm for
-           QRS detection and feature extraction", IEEE Comp. in Cardiology,
-           vol. 6, pp. 37-42, 1979
-        .. [LSLL12] Andre Lourenco, Hugo Silva, Paulo Leite, Renato Lourenco
-           and Ana Fred, "Real Time Electrocardiogram Segmentation for Finger
-           Based ECG Biometrics", BIOSIGNALS 2012, pp. 49-54, 2012
+    References
+    ----------
+    .. [EnZe79] W. Engelse and C. Zeelenberg, "A single scan algorithm for
+       QRS detection and feature extraction", IEEE Comp. in Cardiology,
+       vol. 6, pp. 37-42, 1979
+    .. [LSLL12] A. Lourenco, H. Silva, P. Leite, R. Lourenco and A. Fred,
+       "Real Time Electrocardiogram Segmentation for Finger Based ECG
+       Biometrics", BIOSIGNALS 2012, pp. 49-54, 2012
 
     """
 
@@ -716,14 +773,19 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
 
     Follows the approach by Gamboa.
 
-    Args:
-        signal (array): Input filtered ECG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        tol (float, optional): Tolerance parameter.
+    Parameters
+    ----------
+    signal : array
+        Input filtered ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    tol : float, optional
+        Tolerance parameter.
 
-    Returns:
-        (ReturnTuple): containing:
-            rpeaks (array): R-peak location indices.
+    Returns
+    -------
+    rpeaks : array
+        R-peak location indices.
 
     """
 
@@ -771,17 +833,22 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
 
     Follows the approach by Hamilton [Hami02]_.
 
-    Args:
-        signal (array): Input filtered ECG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
+    Parameters
+    ----------
+    signal : array
+        Input filtered ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
 
-    Returns:
-        (ReturnTuple): containing:
-            rpeaks (array): R-peak location indices.
+    Returns
+    -------
+    rpeaks : array
+        R-peak location indices.
 
-    References:
-        .. [Hami02] P.S. Hamilton, "Open Source ECG Analysis Software
-           Documentation", E.P.Limited, 2002
+    References
+    ----------
+    .. [Hami02] P.S. Hamilton, "Open Source ECG Analysis Software
+       Documentation", E.P.Limited, 2002
 
     """
 

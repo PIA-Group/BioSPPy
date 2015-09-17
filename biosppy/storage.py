@@ -29,11 +29,14 @@ from . import utils
 def serialize(data, path, compress=3):
     """Serialize data and save to a file using sklearn's joblib.
 
-    Args:
-        data (object): Object to serialize.
-        path (str): Destination path.
-        compress (int, optional): Compression level;
-            from 0 to 9 (highest compression).
+    Parameters
+    ----------
+    data : object
+        Object to serialize.
+    path : str
+        Destination path.
+    compress : int, optional
+        Compression level; from 0 to 9 (highest compression).
 
     """
 
@@ -46,11 +49,15 @@ def serialize(data, path, compress=3):
 def deserialize(path):
     """Deserialize data from a file using sklearn's joblib.
 
-    Args:
-        path (str): Source path.
+    Parameters
+    ----------
+    path : str
+        Source path.
 
-    Returns:
-        data (object): Deserialized object.
+    Returns
+    -------
+    data : object
+        Deserialized object.
 
     """
 
@@ -63,9 +70,12 @@ def deserialize(path):
 def dumpJSON(data, path):
     """Save JSON data to a file.
 
-    Args:
-        data (dict): The JSON data to dump.
-        path (str): Destination path.
+    Parameters
+    ----------
+    data : dict
+        The JSON data to dump.
+    path : str
+        Destination path.
 
     """
 
@@ -79,11 +89,15 @@ def dumpJSON(data, path):
 def loadJSON(path):
     """Load JSON data from a file.
 
-    Args:
-        path (str): Source path.
+    Parameters
+    ----------
+    path : str
+        Source path.
 
-    Returns:
-        data (dict): The loaded JSON data.
+    Returns
+    -------
+    data : dict
+        The loaded JSON data.
 
     """
 
@@ -97,15 +111,21 @@ def loadJSON(path):
 def zip_write(fid, files, recursive=True, root=None):
     """Write files to zip archive.
 
-    Args:
-        fid (file-like object): The zip file to write into.
-        files (iterable): List of files or directories to pack.
-        recursive (bool, optional): If True, sub-directories and sub-folders
-            are also written to the archive.
-        root (str, optional): Relative folder path.
+    Parameters
+    ----------
+    fid : file-like object
+        The zip file to write into.
+    files : iterable
+        List of files or directories to pack.
+    recursive : bool, optional
+        If True, sub-directories and sub-folders are also written to the
+        archive.
+    root : str, optional
+        Relative folder path.
 
-    Notes:
-        * Ignores non-existent files and directories.
+    Notes
+    -----
+    * Ignores non-existent files and directories.
 
     """
 
@@ -134,15 +154,22 @@ def zip_write(fid, files, recursive=True, root=None):
 def pack_zip(files, path, recursive=True, forceExt=True):
     """Pack files into a zip archive.
 
-    Args:
-        files (iterable): List of files or directories to pack.
-        path (str): Destination path.
-        recursive (bool, optional): If True, sub-directories and sub-folders
-            are also written to the archive.
-        forceExt (bool, optional): Append default extension.
+    Parameters
+    ----------
+    files : iterable
+        List of files or directories to pack.
+    path : str
+        Destination path.
+    recursive : bool, optional
+        If True, sub-directories and sub-folders are also written to the
+        archive.
+    forceExt : bool, optional
+        Append default extension.
 
-    Returns:
-        zip_path (str): Full path to created zip archive.
+    Returns
+    -------
+    zip_path : str
+        Full path to created zip archive.
 
     """
 
@@ -162,9 +189,12 @@ def pack_zip(files, path, recursive=True, forceExt=True):
 def unpack_zip(zip_path, path):
     """Unpack a zip archive.
 
-    Args:
-        zip_path (str): Path to zip archive.
-        path (str): Destination path (directory).
+    Parameters
+    ----------
+    zip_path : str
+        Path to zip archive.
+    path : str
+        Destination path (directory).
 
     """
 
@@ -176,8 +206,10 @@ def unpack_zip(zip_path, path):
 def alloc_h5(path):
     """Prepare an HDF5 file.
 
-    Args:
-        path (str): Path to file.
+    Parameters
+    ----------
+    path : str
+        Path to file.
 
     """
 
@@ -191,10 +223,14 @@ def alloc_h5(path):
 def store_h5(path, label, data):
     """Store data to HDF5 file.
 
-    Args:
-        path (str): Path to file.
-        label (hashable): Data label.
-        data (array): Data to store.
+    Parameters
+    ----------
+    path : str
+        Path to file.
+    label : hashable
+        Data label.
+    data : array
+        Data to store.
 
     """
 
@@ -215,12 +251,17 @@ def store_h5(path, label, data):
 def load_h5(path, label):
     """Load data from an HDF5 file.
 
-    Args:
-        path (str): Path to file.
-        label (hashable): Data label.
+    Parameters
+    ----------
+    path : str
+        Path to file.
+    label : hashable
+        Data label.
 
-    Returns:
-        data (array): Loaded data.
+    Returns
+    -------
+    data : array
+        Loaded data.
 
     """
 
@@ -240,14 +281,20 @@ def store_txt(path, data, sampling_rate=1000., resolution=None, date=None,
               precision=6):
     """Store data to a simple text file.
 
-    Args:
-        path (str): Path to file.
-        data (array): Data to store.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        resolution (int, optional): Sampling resolution.
-        date (datetime, str, optional): Datetime object, or an ISO 8601
-            formatted date-time string.
-        precision (int, optional): Precision for string conversion.
+    Parameters
+    ----------
+    path : str
+        Path to file.
+    data : array
+        Data to store.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    resolution : int, optional
+        Sampling resolution.
+    date : datetime, str, optional
+        Datetime object, or an ISO 8601 formatted date-time string.
+    precision : int, optional
+        Precision for string conversion.
 
     """
 
@@ -292,13 +339,17 @@ def store_txt(path, data, sampling_rate=1000., resolution=None, date=None,
 def load_txt(path):
     """Load data from a text file.
 
-    Args:
-        path (str): Path to file.
+    Parameters
+    ----------
+    path : str
+        Path to file.
 
-    Returns:
-        (tuple): containing:
-            data (array): Loaded data.
-            mdata (dict): Metadata.
+    Returns
+    -------
+    data : array
+        Loaded data.
+    mdata : dict
+        Metadata.
 
     """
 
@@ -353,14 +404,18 @@ def load_txt(path):
 class HDF(object):
     """Wrapper class to operate on BioSPPy HDF5 files.
 
-    Args:
-        path (str): Path to the HDF5 file.
-        mode (str, optional): File mode; one of:
-            * 'a': read/write, creates file if it does not exist;
-            * 'r+': read/write, file must exist;
-            * 'r': read only, file must exist;
-            * 'w': create file, truncate if it already exists;
-            * 'w-': create file, fails if it already esists.
+    Parameters
+    ----------
+    path : str
+        Path to the HDF5 file.
+    mode : str, optional
+        File mode; one of:
+
+        * 'a': read/write, creates file if it does not exist;
+        * 'r+': read/write, file must exist;
+        * 'r': read only, file must exist;
+        * 'w': create file, truncate if it already exists;
+        * 'w-': create file, fails if it already esists.
 
     """
 
@@ -401,11 +456,15 @@ class HDF(object):
     def _join_group(self, *args):
         """Join group elements.
 
-        Args:
-            *args (list): Group elements to joined.
+        Parameters
+        ----------
+        ``*args`` : list
+            Group elements to join.
 
-        Returns:
-            weg (str): Joined group path.
+        Returns
+        -------
+        weg : str
+            Joined group path.
 
         """
 
@@ -430,8 +489,10 @@ class HDF(object):
     def add_header(self, header=None):
         """Add header metadata.
 
-        Args:
-            header (dict): Header metadata.
+        Parameters
+        ----------
+        header : dict
+            Header metadata.
 
         """
 
@@ -444,9 +505,10 @@ class HDF(object):
     def get_header(self):
         """Retrieve header metadata.
 
-        Returns:
-            (ReturnTuple): containing:
-                header (dict): Header metadata.
+        Returns
+        -------
+        header : dict
+            Header metadata.
 
         """
 
@@ -465,18 +527,25 @@ class HDF(object):
                    compress=False):
         """Add a signal to the file.
 
-        Args:
-            signal (array): Signal to add.
-            mdata (dict, optional): Signal metadata.
-            group (str, optional): Destination signal group.
-            name (str, optional): Name of the dataset to create.
-            compress (bool, optional): If True, the signal will be compressed
-                with gzip.
+        Parameters
+        ----------
+        signal : array
+            Signal to add.
+        mdata : dict, optional
+            Signal metadata.
+        group : str, optional
+            Destination signal group.
+        name : str, optional
+            Name of the dataset to create.
+        compress : bool, optional
+            If True, the signal will be compressed with gzip.
 
-        Returns:
-            (ReturnTuple): containing:
-                group (str): Destination group.
-                name (str): Name of the created signal dataset.
+        Returns
+        -------
+        group : str
+            Destination group.
+        name : str
+            Name of the created signal dataset.
 
         """
 
@@ -515,13 +584,17 @@ class HDF(object):
     def _get_signal(self, group='', name=None):
         """Retrieve a signal dataset from the file.
 
-        Args:
-            group (str, optional): Signal group.
-            name (str): Name of the signal dataset.
+        Parameters
+        ----------
+        group : str, optional
+            Signal group.
+        name : str
+            Name of the signal dataset.
 
-        Returns:
-            (ReturnTuple): containing:
-                dataset (h5py.Dataset): HDF5 dataset.
+        Returns
+        -------
+        dataset : h5py.Dataset
+            HDF5 dataset.
 
         """
 
@@ -548,17 +621,23 @@ class HDF(object):
     def get_signal(self, group='', name=None):
         """Retrieve a signal from the file.
 
-        Args:
-            group (str, optional): Signal group.
-            name (str): Name of the signal dataset.
+        Parameters
+        ----------
+        group : str, optional
+            Signal group.
+        name : str
+            Name of the signal dataset.
 
-        Returns:
-            (ReturnTuple): containing:
-                signal (array): Retrieved signal.
-                mdata (dict): Signal metadata.
+        Returns
+        -------
+        signal : array
+            Retrieved signal.
+        mdata : dict
+            Signal metadata.
 
-        Notes:
-            * Loads the entire signal data into memory.
+        Notes
+        -----
+        * Loads the entire signal data into memory.
 
         """
 
@@ -575,9 +654,12 @@ class HDF(object):
     def del_signal(self, group='', name=None):
         """Delete a signal from the file.
 
-        Args:
-            group (str, optional): Signal group.
-            name (str): Name of the dataset.
+        Parameters
+        ----------
+        group : str, optional
+            Signal group.
+        name : str
+            Name of the dataset.
 
         """
 
@@ -591,8 +673,10 @@ class HDF(object):
     def del_signal_group(self, group=''):
         """Delete all signals in a file group.
 
-        Args:
-            group (str, optional): Signal group.
+        Parameters
+        ----------
+        group : str, optional
+            Signal group.
 
         """
 
@@ -622,15 +706,17 @@ class HDF(object):
     def list_signals(self, group='', recursive=False):
         """List signals in the file.
 
-        Args:
-            group (str, optional): Signal group.
-            recursive (bool, optional): It True, also lists signals in
-                sub-groups.
+        Parameters
+        ----------
+        group : str, optional
+            Signal group.
+        recursive : bool, optional
+            It True, also lists signals in sub-groups.
 
-        Returns:
-            (ReturnTuple): containing:
-                signals (list): List of (group, name) tuples of the
-                    found signals.
+        Returns
+        -------
+        signals : list
+            List of (group, name) tuples of the found signals.
 
         """
 
@@ -661,19 +747,27 @@ class HDF(object):
                   compress=False):
         """Add an event to the file.
 
-        Args:
-            ts (array): Array of time stamps.
-            values (array, optional): Array with data for each time stamp.
-            mdata (dict, optional): Event metadata.
-            group (str, optional): Destination event group.
-            name (str, optional): Name of the dataset to create.
-            compress (bool, optional): If True, the data will be compressed
-                with gzip.
+        Parameters
+        ----------
+        ts : array
+            Array of time stamps.
+        values : array, optional
+            Array with data for each time stamp.
+        mdata : dict, optional
+            Event metadata.
+        group : str, optional
+            Destination event group.
+        name : str, optional
+            Name of the dataset to create.
+        compress : bool, optional
+            If True, the data will be compressed with gzip.
 
-        Returns:
-            (ReturnTuple): containing:
-                group (str): Destination group.
-                name (str): Name of the created event dataset.
+        Returns
+        -------
+        group : str
+            Destination group.
+        name : str
+            Name of the created event dataset.
 
         """
 
@@ -722,14 +816,21 @@ class HDF(object):
     def _get_event(self, group='', name=None):
         """Retrieve event datasets from the file.
 
-        Args:
-            group (str, optional): Event group.
-            name (str): Name of the event dataset.
+        Parameters
+        ----------
+        group : str, optional
+            Event group.
+        name : str
+            Name of the event dataset.
 
-        Returns:
-            event (h5py.Group): HDF5 event group.
-            ts (h5py.Dataset): HDF5 time stamps dataset.
-            values (h5py.Dataset): HDF5 values dataset.
+        Returns
+        -------
+        event : h5py.Group
+            HDF5 event group.
+        ts : h5py.Dataset
+            HDF5 time stamps dataset.
+        values : h5py.Dataset
+            HDF5 values dataset.
 
         """
 
@@ -767,18 +868,25 @@ class HDF(object):
     def get_event(self, group='', name=None):
         """Retrieve an event from the file.
 
-        Args:
-            group (str, optional): Event group.
-            name (str): Name of the event dataset.
+        Parameters
+        ----------
+        group : str, optional
+            Event group.
+        name : str
+            Name of the event dataset.
 
-        Returns:
-            (ReturnTuple): containing:
-                ts (array): Array of time stamps.
-                values (array): Array with data for each time stamp.
-                mdata (dict): Event metadata.
+        Returns
+        -------
+        ts : array
+            Array of time stamps.
+        values : array
+            Array with data for each time stamp.
+        mdata : dict
+            Event metadata.
 
-        Notes:
-            * Loads the entire event data into memory.
+        Notes
+        -----
+        Loads the entire event data into memory.
 
         """
 
@@ -798,9 +906,12 @@ class HDF(object):
     def del_event(self, group='', name=None):
         """Delete an event from the file.
 
-        Args:
-            group (str, optional): Event group.
-            name (str): Name of the event dataset.
+        Parameters
+        ----------
+        group : str, optional
+            Event group.
+        name : str
+            Name of the event dataset.
 
         """
 
@@ -814,8 +925,10 @@ class HDF(object):
     def del_event_group(self, group=''):
         """Delete all events in a file group.
 
-        Args:
-            group (str, optional): Event group.
+        Parameters
+        ----------
+        group  str, optional
+            Event group.
 
         """
 
@@ -845,14 +958,17 @@ class HDF(object):
     def list_events(self, group='', recursive=False):
         """List events in the file.
 
-        Args:
-            group (str, optional): Event group.
-            recursive (bool, optional): It True, also lists events in
-                sub-groups.
+        Parameters
+        ----------
+        group : str, optional
+            Event group.
+        recursive : bool, optional
+            It True, also lists events in sub-groups.
 
-        Returns:
-            (ReturnTuple): containing:
-                events (list): List of (group, name) tuples of the found events.
+        Returns
+        -------
+        events : list
+            List of (group, name) tuples of the found events.
 
         """
 

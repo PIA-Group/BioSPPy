@@ -22,16 +22,23 @@ def emg(signal=None, sampling_rate=1000., show=True):
     """Process a raw EMG signal and extract relevant signal features using
     default parameters.
 
-    Args:
-        signal (array): Raw EMG signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        show (bool, optional): If True, show a summary plot.
+    Parameters
+    ----------
+    signal : array
+        Raw EMG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    show : bool, optional
+        If True, show a summary plot.
 
-    Returns:
-        (ReturnTuple): containing:
-            ts (array): Signal time axis reference (seconds).
-            filtered (array): Filtered EMG signal.
-            onsets (array): Indices of EMG pulse onsets.
+    Returns
+    -------
+    ts : array
+        Signal time axis reference (seconds).
+    filtered : array
+        Filtered EMG signal.
+    onsets : array
+        Indices of EMG pulse onsets.
 
     """
 
@@ -81,15 +88,21 @@ def find_onsets(signal=None, sampling_rate=1000., size=0.05, threshold=None):
 
     Skips corrupted signal parts.
 
-    Args:
-        signal (array): Input filtered BVP signal.
-        sampling_rate (int, float, optional): Sampling frequency (Hz).
-        size (float, optional): Detection window size (seconds).
-        threshold (float, optional): Detection threshold.
+    Parameters
+    ----------
+    signal : array
+        Input filtered BVP signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    size : float, optional
+        Detection window size (seconds).
+    threshold : float, optional
+        Detection threshold.
 
-    Returns:
-        (ReturnTuple): containing:
-            onsets (array): Indices of BVP pulse onsets.
+    Returns
+    -------
+    onsets : array
+        Indices of BVP pulse onsets.
 
     """
 

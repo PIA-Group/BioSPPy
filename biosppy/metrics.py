@@ -27,12 +27,17 @@ def pcosine(u, v):
 
     where :math:`u \\cdot v` is the dot product of :math:`u` and :math:`v`.
 
-    Args:
-        u (array): Input array.
-        v (array): Input array.
+    Parameters
+    ----------
+    u : array
+        Input array.
+    v : array
+        Input array.
 
-    Returns:
-        cosine (float): Cosine distance between `u` and `v`.
+    Returns
+    -------
+    cosine : float
+        Cosine distance between `u` and `v`.
 
     """
 
@@ -50,26 +55,31 @@ def pdist(X, metric='euclidean', p=2, w=None, V=None, VI=None):
 
     Wraps scipy.spatial.distance.pdist.
 
-    Args:
-        X (array): An m by n array of m original observations in an
-        n-dimensional space.
-        metric (str, function, optional): The distance metric to use;
-            the distance can be 'braycurtis', 'canberra', 'chebyshev',
-            'cityblock', 'correlation', 'cosine', 'dice', 'euclidean',
-            'hamming', 'jaccard', 'kulsinski', 'mahalanobis', 'matching',
-            'minkowski', 'pcosine', 'rogerstanimoto', 'russellrao',
-            'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
-        p (float, optional): The p-norm to apply (for Minkowski, weighted and
-            unweighted).
-        w (array, optional): The weight vector (for weighted Minkowski).
-        V (array, optional): The variance vector (for standardized Euclidean).
-        VI (array, optional): The inverse of the covariance matrix
-            (for Mahalanobis).
+    Parameters
+    ----------
+    X : array
+        An m by n array of m original observations in an n-dimensional space.
+    metric : str, function, optional
+        The distance metric to use; the distance can be 'braycurtis',
+        'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice',
+        'euclidean', 'hamming', 'jaccard', 'kulsinski', 'mahalanobis',
+        'matching', 'minkowski', 'pcosine', 'rogerstanimoto', 'russellrao',
+        'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
+    p : float, optional
+        The p-norm to apply (for Minkowski, weighted and unweighted).
+    w : array, optional
+        The weight vector (for weighted Minkowski).
+    V : array, optional
+        The variance vector (for standardized Euclidean).
+    VI : array, optional
+        The inverse of the covariance matrix (for Mahalanobis).
 
-    Returns:
-        Y (array): Returns a condensed distance matrix Y.  For each :math:`i`
-            and :math:`j` (where :math:`i<j<n`), the metric
-            ``dist(u=X[i], v=X[j])`` is computed and stored in entry ``ij``.
+    Returns
+    -------
+    Y : array
+        Returns a condensed distance matrix Y.  For each :math:`i` and
+        :math:`j` (where :math:`i<j<n`), the metric ``dist(u=X[i], v=X[j])``
+        is computed and stored in entry ``ij``.
 
     """
 
@@ -85,29 +95,35 @@ def cdist(XA, XB, metric='euclidean', p=2, V=None, VI=None, w=None):
 
     Wraps scipy.spatial.distance.cdist.
 
-    Args:
-        XA (array): An :math:`m_A` by :math:`n` array of :math:`m_A` original
-            observations in an :math:`n`-dimensional space.
-        XB (array): An :math:`m_B` by :math:`n` array of :math:`m_B` original
-            observations in an :math:`n`-dimensional space.
-        metric (str, function, optional): The distance metric to use;
-            the distance can be 'braycurtis', 'canberra', 'chebyshev',
-            'cityblock', 'correlation', 'cosine', 'dice', 'euclidean',
-            'hamming', 'jaccard', 'kulsinski', 'mahalanobis', 'matching',
-            'minkowski', 'pcosine', 'rogerstanimoto', 'russellrao',
-            'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
-        p (float, optional): The p-norm to apply (for Minkowski, weighted and
-            unweighted).
-        w (array, optional): The weight vector (for weighted Minkowski).
-        V (array, optional): The variance vector (for standardized Euclidean).
-        VI (array, optional): The inverse of the covariance matrix
-            (for Mahalanobis).
+    Parameters
+    ----------
+    XA : array
+        An :math:`m_A` by :math:`n` array of :math:`m_A` original observations
+        in an :math:`n`-dimensional space.
+    XB : array
+        An :math:`m_B` by :math:`n` array of :math:`m_B` original observations
+        in an :math:`n`-dimensional space.
+    metric : str, function, optional
+        The distance metric to use; the distance can be 'braycurtis',
+        'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice',
+        'euclidean', 'hamming', 'jaccard', 'kulsinski', 'mahalanobis',
+        'matching', 'minkowski', 'pcosine', 'rogerstanimoto', 'russellrao',
+        'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule'.
+    p : float, optional
+        The p-norm to apply (for Minkowski, weighted and unweighted).
+    w : array, optional
+        The weight vector (for weighted Minkowski).
+    V : array, optional
+        The variance vector (for standardized Euclidean).
+    VI : array, optional
+        The inverse of the covariance matrix (for Mahalanobis).
 
-    Returns:
-        Y (array): A :math:`m_A` by :math:`m_B` distance matrix is returned.
-            For each :math:`i` and :math:`j`, the metric
-            ``dist(u=XA[i], v=XB[j])`` is computed and stored in
-            the :math:`ij` th entry.
+    Returns
+    -------
+    Y : array
+        An :math:`m_A` by :math:`m_B` distance matrix is returned. For each
+        :math:`i` and :math:`j`, the metric ``dist(u=XA[i], v=XB[j])``
+        is computed and stored in the :math:`ij` th entry.
 
     """
 
@@ -124,21 +140,27 @@ def squareform(X, force="no", checks=True):
 
     Wraps scipy.spatial.distance.squareform.
 
-    Args:
-        X (array): Either a condensed or redundant distance matrix.
-        force (str, optional): As with MATLAB(TM), if force is equal to
-            'tovector' or 'tomatrix', the input will be treated as a distance
-            matrix or distance vector respectively.
-        checks (bool, optional): If `checks` is set to False, no checks will be
-            made for matrix symmetry nor zero diagonals. This is useful if it
-            is known that ``X - X.T1`` is small and ``diag(X)`` is close to
-            zero. These values are ignored any way so they do not disrupt the
-            squareform transformation.
+    Parameters
+    ----------
+    X : array
+        Either a condensed or redundant distance matrix.
+    force : str, optional
+        As with MATLAB(TM), if force is equal to 'tovector' or 'tomatrix', the
+        input will be treated as a distance matrix or distance vector
+        respectively.
+    checks : bool, optional
+        If `checks` is set to False, no checks will be made for matrix
+        symmetry nor zero diagonals. This is useful if it is known that
+        ``X - X.T1`` is small and ``diag(X)`` is close to zero. These values
+        are ignored any way so they do not disrupt the squareform
+        transformation.
 
-    Returns:
-        Y (array): If a condensed distance matrix is passed, a redundant one is
-            returned, or if a redundant one is passed, a condensed distance
-            matrix is returned.
+    Returns
+    -------
+    Y : array
+        If a condensed distance matrix is passed, a redundant one is returned,
+        or if a redundant one is passed, a condensed distance matrix is
+        returned.
 
     """
 

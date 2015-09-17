@@ -23,11 +23,15 @@ import numpy as np
 def normpath(path):
     """Normalize a path.
 
-    Args:
-        path (str): The path to normalize.
+    Parameters
+    ----------
+    path : str
+        The path to normalize.
 
-    Returns:
-        npath (str): The normalized path.
+    Returns
+    -------
+    npath : str
+        The normalized path.
 
     """
 
@@ -44,16 +48,21 @@ def remainderAllocator(votes, k, reverse=True, check=False):
 
     Also known as Hare-Niemeyer Method. Uses the Hare quota.
 
-    Args:
-        votes (list): Number of votes for each class/party/cardinal.
-        k (int): Total number o seats to allocate.
-        reverse (bool, optional): If True, allocates remaining seats largest
-            quota first.
-        check (bool, optional): If True, limits the number of seats to the
-            total number of votes.
+    Parameters
+    ----------
+    votes : list
+        Number of votes for each class/party/cardinal.
+    k : int
+        Total number o seats to allocate.
+    reverse : bool, optional
+        If True, allocates remaining seats largest quota first.
+    check : bool, optional
+        If True, limits the number of seats to the total number of votes.
 
-    Returns:
-        seats (list): Number of seats for each class/party/cardinal.
+    Returns
+    -------
+    seats : list
+        Number of seats for each class/party/cardinal.
 
     """
 
@@ -87,16 +96,22 @@ def remainderAllocator(votes, k, reverse=True, check=False):
 def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
     """Allocate k seats proportionally using the Highest Averages Method.
 
-    Args:
-        votes (list): Number of votes for each class/party/cardinal.
-        k (int): Total number o seats to allocate.
-        divisor (str, optional): Divisor method; one of 'dHondt',
-            'Huntington-Hill', 'Sainte-Lague', 'Imperiali', or 'Danish'.
-        check (bool, optional): If True, limits the number of seats to the
-            total number of votes.
+    Parameters
+    ----------
+    votes : list
+        Number of votes for each class/party/cardinal.
+    k : int
+        Total number o seats to allocate.
+    divisor : str, optional
+        Divisor method; one of 'dHondt', 'Huntington-Hill', 'Sainte-Lague',
+        'Imperiali', or 'Danish'.
+    check : bool, optional
+        If True, limits the number of seats to the total number of votes.
 
-    Returns:
-        seats (list): Number of seats for each class/party/cardinal.
+    Returns
+    -------
+    seats : list
+        Number of seats for each class/party/cardinal.
 
     """
 
@@ -142,15 +157,21 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
 def random_fraction(indx, fraction, sort=True):
     """Select a random fraction of an input list of elements.
 
-    Args:
-        indx (list, array): Elements to partition.
-        fraction (int, float): Fraction to select.
-        sort (bool, optional): If True, output lists will be sorted.
+    Parameters
+    ----------
+    indx : list, array
+        Elements to partition.
+    fraction : int, float
+        Fraction to select.
+    sort : bool, optional
+        If True, output lists will be sorted.
 
-    Returns:
-        (tulpe): containing:
-            use (list, array): Selected elements.
-            unuse (list, array): Remaining elements.
+    Returns
+    -------
+    use : list, array
+        Selected elements.
+    unuse : list, array
+        Remaining elements.
 
     """
 
@@ -179,17 +200,23 @@ def random_fraction(indx, fraction, sort=True):
 class ReturnTuple(tuple):
     """A named tuple to use as a hybrid tuple-dict return object.
 
-    Args:
-        values (iterable): Return values.
-        names (iterable, optional): Names for return values.
+    Parameters
+    ----------
+    values : iterable
+        Return values.
+    names : iterable, optional
+        Names for return values.
 
-    Raises:
-        ValueError: If the number of values differs from the number of names.
-        ValueError: If any of the items in names:
-            * contain non-alphanumeric characters;
-            * are Python keywords;
-            * start with a number;
-            * are duplicates.
+    Raises
+    ------
+    ValueError
+        If the number of values differs from the number of names.
+    ValueError
+        If any of the items in names:
+        * contain non-alphanumeric characters;
+        * are Python keywords;
+        * start with a number;
+        * are duplicates.
 
     """
 
@@ -236,9 +263,10 @@ class ReturnTuple(tuple):
     def as_dict(self):
         """Convert to an ordered dictionary.
 
-        Returns:
-            out (collection.OrderedDict): An OrderedDict representing the
-                return values.
+        Returns
+        -------
+        out : OrderedDict
+            An OrderedDict representing the return values.
 
         """
 
@@ -249,13 +277,17 @@ class ReturnTuple(tuple):
     def __getitem__(self, key):
         """Get item as an index or keyword.
 
-        Returns:
-            out (object): The object corresponding to the key, if it exists.
+        Returns
+        -------
+        out : object
+            The object corresponding to the key, if it exists.
 
-        Raises:
-            KeyError: If the key is a string and it does not exist in the
-                mapping.
-            IndexError: If the key is an int and it is out of range.
+        Raises
+        ------
+        KeyError
+            If the key is a string and it does not exist in the mapping.
+        IndexError
+            If the key is an int and it is out of range.
 
         """
 
@@ -284,8 +316,10 @@ class ReturnTuple(tuple):
     def keys(self):
         """Return the value names.
 
-        Returns:
-            out (list): The keys in the mapping.
+        Returns
+        -------
+        out : list
+            The keys in the mapping.
 
         """
 

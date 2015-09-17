@@ -5,10 +5,10 @@
 
     This module provides classifier interfaces for identity recognition
     (biometrics) applications. The core API methods are:
-        * enroll: add a new subject;
-        * dismiss: remove an existing subject;
-        * identify: determine the identity of collected biometric dataset;
-        * authenticate: verify the identity of collected biometric dataset.
+    * enroll: add a new subject;
+    * dismiss: remove an existing subject;
+    * identify: determine the identity of collected biometric dataset;
+    * authenticate: verify the identity of collected biometric dataset.
 
     :copyright: (c) 2015 by Instituto de Telecomunicacoes
     :license: BSD 3-clause, see LICENSE for more details.
@@ -61,9 +61,12 @@ class SubjectDict(bidict):
     """Adaptation of bidirectional dictionary to return default values
     on KeyError.
 
-    Attributes:
-        LEFT (hashable): Left default token.
-        Right (hashable): Right default token.
+    Attributes
+    ----------
+    LEFT : hashable
+        Left default token.
+    Right : hashable
+        Right default token.
 
     """
 
@@ -109,16 +112,19 @@ class BaseClassifier(object):
     This class is a skeleton for actual classifier classes.
     The following methods must be overridden or adapted to build a
     new classifier:
-        * __init__
-        * _authenticate
-        * _get_thresholds
-        * _identify
-        * _prepare
-        * _train
-        * _update
+    
+    * __init__
+    * _authenticate
+    * _get_thresholds
+    * _identify
+    * _prepare
+    * _train
+    * _update
 
-    Attributes:
-        EER_IDX (int): Reference index for the Equal Error Rate.
+    Attributes
+    ----------
+    EER_IDX : int
+        Reference index for the Equal Error Rate.
 
     """
 
@@ -147,13 +153,17 @@ class BaseClassifier(object):
     def _defer(self, label, case):
         """Add deferred task.
 
-        Args:
-            label (str): Internal classifier subject label.
-            case (str): One of 'enroll' or 'dismiss'.
+        Parameters
+        ----------
+        label : str
+            Internal classifier subject label.
+        case : str
+            One of 'enroll' or 'dismiss'.
 
-        Notes:
-            * An enroll overrides a previous dismiss for the same subject.
-            * A dismiss overrides a previous enroll for the same subject.
+        Notes
+        -----
+        * An enroll overrides a previous dismiss for the same subject.
+        * A dismiss overrides a previous enroll for the same subject.
 
         """
 
@@ -179,11 +189,15 @@ class BaseClassifier(object):
     def io_load(self, label):
         """Load enrolled subject data.
 
-        Args:
-            label (str): Internal classifier subject label.
+        Parameters
+        ----------
+        label : str
+            Internal classifier subject label.
 
-        Returns:
-            data (array): Subject data.
+        Returns
+        -------
+        data : array
+            Subject data.
 
         """
 
@@ -192,9 +206,12 @@ class BaseClassifier(object):
     def io_save(self, label, data):
         """Save subject data.
 
-        Args:
-            label (str): Internal classifier subject label.
-            data (array): Subject data.
+        Parameters
+        ----------
+        label : str
+            Internal classifier subject label.
+        data : array
+            Subject data.
 
         """
 
@@ -203,8 +220,10 @@ class BaseClassifier(object):
     def io_del(self, label):
         """Delete subject data.
 
-        Args:
-            label (str): Internal classifier subject label.
+        Parameters
+        ----------
+        label : str
+            Internal classifier subject label.
 
         """
 
@@ -213,8 +232,10 @@ class BaseClassifier(object):
     def save(self, path):
         """Save classifier instance to a file.
 
-        Args:
-            path (str): Destination file path.
+        Parameters
+        ----------
+        path : str
+            Destination file path.
 
         """
 
@@ -224,11 +245,15 @@ class BaseClassifier(object):
     def load(cls, path):
         """Load classifier instance from a file.
 
-        Args:
-            path (str): Source file path.
+        Parameters
+        ----------
+        path : str
+            Source file path.
 
-        Returns:
-            clf (object): Loaded classifier instance.
+        Returns
+        -------
+        clf : object
+            Loaded classifier instance.
 
         """
 
@@ -244,11 +269,15 @@ class BaseClassifier(object):
     def check_subject(self, subject):
         """Check if a subject is enrolled.
 
-        Args:
-            subject (hashable): Subject identity.
+        Parameters
+        ----------
+        subject : hashable
+            Subject identity.
 
-        Returns:
-            check (bool): If True, the subject is enrolled.
+        Returns
+        -------
+        check : bool
+            If True, the subject is enrolled.
 
         """
 
@@ -260,8 +289,10 @@ class BaseClassifier(object):
     def list_subjects(self):
         """List all the enrolled subjects.
 
-        Returns:
-            subjects (list): Enrolled subjects.
+        Returns
+        -------
+        subjects : list
+            Enrolled subjects.
 
         """
 
@@ -275,15 +306,19 @@ class BaseClassifier(object):
         If the subject is already enrolled, new data is combined with
         existing data.
 
-        Args:
-            data (array): Data to enroll.
-            subject (hashable): Subject identity.
-            deferred (bool, optional): If True, computations are delayed until
-                flush is called.
+        Parameters
+        ----------
+        data : array
+            Data to enroll.
+        subject : hashable
+            Subject identity.
+        deferred : bool, optional
+            If True, computations are delayed until `flush` is called.
 
-        Notes:
-            * When using deferred calls, an enroll overrides a previous dismiss
-              for the same subject.
+        Notes
+        -----
+        * When using deferred calls, an enroll overrides a previous dismiss
+          for the same subject.
 
         """
 
@@ -321,14 +356,17 @@ class BaseClassifier(object):
     def dismiss(self, subject=None, deferred=False):
         """Remove a subject.
 
-        Args:
-            subject (hashable): Subject identity.
-            deferred (bool, optional): If True, computations are delayed until
-                flush is called (optional).
+        Parameters
+        ----------
+        subject : hashable
+            Subject identity.
+        deferred : bool, optional
+            If True, computations are delayed until `flush` is called.
 
-        Notes:
-            * When using deferred calls, a dismiss overrides a previous enroll
-              for the same subject.
+        Notes
+        -----
+        * When using deferred calls, a dismiss overrides a previous enroll
+          for the same subject.
 
         """
 
@@ -355,9 +393,11 @@ class BaseClassifier(object):
     def batch_train(self, data=None):
         """Train the classifier in batch mode.
 
-        Args:
-            data (dict): Dictionary holding training data for each subject;
-                if the object for a subject is `None`, performs a `dismiss`.
+        Parameters
+        ----------
+        data : dict
+            Dictionary holding training data for each subject; if the object
+            for a subject is `None`, performs a `dismiss`.
 
         """
 
@@ -397,9 +437,10 @@ class BaseClassifier(object):
     def update_thresholds(self, fraction=1.):
         """Update subject-specific thresholds based on the enrolled data.
 
-        Args:
-            fraction (float, optional): Fraction of samples to select from
-                training data.
+        Parameters
+        ----------
+        fraction : float, optional
+            Fraction of samples to select from training data.
 
         """
 
@@ -429,11 +470,14 @@ class BaseClassifier(object):
     def set_auth_thr(self, subject, threshold, ready=False):
         """Set the authentication threshold of a subject.
 
-        Args:
-            subject (hashable): Subject identity.
-            threshold (int, float): Threshold value.
-            ready (bool, optional): If True, `subject` is the internal
-                classifier label.
+        Parameters
+        ----------
+        subject : hashable
+            Subject identity.
+        threshold : int, float
+            Threshold value.
+        ready : bool, optional
+            If True, `subject` is the internal classifier label.
 
         """
 
@@ -450,13 +494,17 @@ class BaseClassifier(object):
     def get_auth_thr(self, subject, ready=False):
         """Get the authentication threshold of a subject.
 
-        Args:
-            subject (hashable): Subject identity.
-            ready (bool, optional): If True, `subject` is the internal
-                classifier label.
+        Parameters
+        ----------
+        subject : hashable
+            Subject identity.
+        ready : bool, optional
+            If True, `subject` is the internal classifier label.
 
-        Returns:
-            threshold (int, float): Threshold value.
+        Returns
+        -------
+        threshold : int, float
+            Threshold value.
 
         """
 
@@ -470,11 +518,14 @@ class BaseClassifier(object):
     def set_id_thr(self, subject, threshold, ready=False):
         """Set the identification threshold of a subject.
 
-        Args:
-            subject (hashable): Subject identity.
-            threshold (int, float): Threshold value.
-            ready (bool, optional): If True, `subject` is the internal
-                classifier label.
+        Parameters
+        ----------
+        subject : hashable
+            Subject identity.
+        threshold : int, float
+            Threshold value.
+        ready : bool, optional
+            If True, `subject` is the internal classifier label.
 
         """
 
@@ -491,13 +542,17 @@ class BaseClassifier(object):
     def get_id_thr(self, subject, ready=False):
         """Get the identification threshold of a subject.
 
-        Args:
-            subject (hashable): Subject identity.
-            ready (bool, optional): If True, `subject` is the internal
-                classifier label.
+        Parameters
+        ----------
+        subject : hashable
+            Subject identity.
+        ready : bool, optional
+            If True, `subject` is the internal classifier label.
 
-        Returns:
-            threshold (int, float): Threshold value.
+        Returns
+        -------
+        threshold : int, float
+            Threshold value.
 
         """
 
@@ -511,11 +566,15 @@ class BaseClassifier(object):
     def get_thresholds(self, force=False):
         """Get an array of reasonable thresholds.
 
-        Args:
-            force (bool, optional): If True, forces generation of thresholds.
+        Parameters
+        ----------
+        force : bool, optional
+            If True, forces generation of thresholds.
 
-        Returns:
-            ths (array): Generated thresholds.
+        Returns
+        -------
+        ths : array
+            Generated thresholds.
 
         """
 
@@ -528,13 +587,19 @@ class BaseClassifier(object):
         """Authenticate a set of feature vectors, allegedly belonging to the
         given subject.
 
-        Args:
-            data (array): Input test data.
-            subject (hashable): Subject identity.
-            threshold (int, float, optional): Authentication threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        subject : hashable
+            Subject identity.
+        threshold : int, float, optional
+            Authentication threshold.
 
-        Returns:
-            decision (array): Authentication decision for each input sample.
+        Returns
+        -------
+        decision : array
+            Authentication decision for each input sample.
 
         """
 
@@ -563,12 +628,17 @@ class BaseClassifier(object):
     def identify(self, data, threshold=None):
         """Identify a set of feature vectors.
 
-        Args:
-            data (array): Input test data.
-            threshold (int, float, optional): Identification threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        threshold : int, float, optional
+            Identification threshold.
 
-        Returns:
-            subjects (list): Identity of each input sample.
+        Returns
+        -------
+        subjects : list
+            Identity of each input sample.
 
         """
 
@@ -591,15 +661,21 @@ class BaseClassifier(object):
         """Assess the performance of the classifier in both authentication and
         identification scenarios.
 
-        Args:
-            data (dict): Dictionary holding test data for each subject.
-            thresholds (array, optional): Classifier thresholds to use.
-            show (bool, optional): If True, show a summary plot.
+        Parameters
+        ----------
+        data : dict
+            Dictionary holding test data for each subject.
+        thresholds : array, optional
+            Classifier thresholds to use.
+        show : bool, optional
+            If True, show a summary plot.
 
-        Returns:
-            (ReturnTuple): containing:
-                classification (dict): Classification results.
-                assessment (dict): Biometric statistics.
+        Returns
+        -------
+        classification : dict
+            Classification results.
+        assessment : dict
+            Biometric statistics.
 
         """
 
@@ -664,18 +740,25 @@ class BaseClassifier(object):
     def cross_validation(cls, data, labels, cv, thresholds=None, **kwargs):
         """Perform Cross Validation (CV) on a data set.
 
-        Args:
-            data (array): An m by n array of m data samples in an
-                n-dimensional space.
-            labels (list, array): A list of m class labels.
-            cv (CV iterator): A sklearn.cross_validation iterator.
-            thresholds (array, optional): Classifier thresholds to use.
-            **kwargs (dict, optional): Classifier parameters.
+        Parameters
+        ----------
+        data : array
+            An m by n array of m data samples in an n-dimensional space.
+        labels : list, array
+            A list of m class labels.
+        cv : CV iterator
+            A `sklearn.cross_validation` iterator.
+        thresholds : array, optional
+            Classifier thresholds to use.
+        ``**kwargs`` : dict, optional
+            Classifier parameters.
 
-        Returns:
-            (ReturnTuple): containing:
-                runs (list): Evaluation results for each CV run.
-                assessment (dict): Final CV biometric statistics.
+        Returns
+        -------
+        runs : list
+            Evaluation results for each CV run.
+        assessment : dict
+            Final CV biometric statistics.
 
         """
 
@@ -724,13 +807,19 @@ class BaseClassifier(object):
         """Authenticate a set of feature vectors, allegedly belonging to the
         given subject.
 
-        Args:
-            data (array): Input test data.
-            label (str): Internal classifier subject label.
-            threshold (int, float): Authentication threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        label : str
+            Internal classifier subject label.
+        threshold : int, float
+            Authentication threshold.
 
-        Returns:
-            decision (array): Authentication decision for each input sample.
+        Returns
+        -------
+        decision : array
+            Authentication decision for each input sample.
 
         """
 
@@ -741,8 +830,10 @@ class BaseClassifier(object):
     def _get_thresholds(self):
         """Generate an array of reasonable thresholds.
 
-        Returns:
-            ths (array): Generated thresholds.
+        Returns
+        -------
+        ths : array
+            Generated thresholds.
 
         """
 
@@ -753,12 +844,17 @@ class BaseClassifier(object):
     def _identify(self, data, threshold=None):
         """Identify a set of feature vectors.
 
-        Args:
-            data (array): Input test data.
-            threshold (int, float): Identification threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        threshold : int, float
+            Identification threshold.
 
-        Returns:
-            labels (list): Identity (internal label) of each input sample.
+        Returns
+        -------
+        labels : list
+            Identity (internal label) of each input sample.
 
         """
 
@@ -769,12 +865,17 @@ class BaseClassifier(object):
     def _prepare(self, data, targets=None):
         """Prepare data to be processed.
 
-        Args:
-            data (array): Data to process.
-            targets (list, str, optional): Target subject labels.
+        Parameters
+        ----------
+        data : array
+            Data to process.
+        targets : list, str, optional
+            Target subject labels.
 
-        Returns:
-            out (object): Processed data.
+        Returns
+        -------
+        out : object
+            Processed data.
 
         """
 
@@ -789,9 +890,12 @@ class BaseClassifier(object):
     def _train(self, enroll=None, dismiss=None):
         """Train the classifier.
 
-        Args:
-            enroll (list, optional): Labels of new or updated subjects.
-            dismiss (list, optional): Labels of deleted subjects.
+        Parameters
+        ----------
+        enroll : list, optional
+            Labels of new or updated subjects.
+        dismiss : list, optional
+            Labels of deleted subjects.
 
         """
 
@@ -811,12 +915,17 @@ class BaseClassifier(object):
     def _update(self, old, new):
         """Combine new data with existing templates (for one subject).
 
-        Args:
-            old (array): Existing data.
-            new (array): New data.
+        Parameters
+        ----------
+        old : array
+            Existing data.
+        new : array
+            New data.
 
-        Returns:
-            out (array): Combined data.
+        Returns
+        -------
+        out : array
+            Combined data.
 
         """
 
@@ -826,14 +935,19 @@ class BaseClassifier(object):
 class KNN(BaseClassifier):
     """K Nearest Neighbors (k-NN) biometric classifier.
 
-    Args:
-        k (int, optional): Number of neighbors.
-        metric (str, optional): Distance metric.
-        metric_args (dict, optional): Additional keyword arguments are passed
-            to the distance function.
+    Parameters
+    ----------
+    k : int, optional
+        Number of neighbors.
+    metric : str, optional
+        Distance metric.
+    metric_args : dict, optional
+        Additional keyword arguments are passed to the distance function.
 
-    Attributes:
-        EER_IDX (int): Reference index for the Equal Error Rate.
+    Attributes
+    ----------
+    EER_IDX : int
+        Reference index for the Equal Error Rate.
 
     """
 
@@ -859,14 +973,19 @@ class KNN(BaseClassifier):
     def _sort(self, dists, train_labels):
         """Sort the computed distances.
 
-        Args:
-            dists (array): Unsorted computed distances.
-            train_labels (list): Unsorted target subject labels.
+        Parameters
+        ----------
+        dists : array
+            Unsorted computed distances.
+        train_labels : list
+            Unsorted target subject labels.
 
-        Returns:
-            (tuple): containing:
-                dists (array): Sorted computed distances.
-                train_labels (list): Sorted target subject labels.
+        Returns
+        -------
+        dists : array
+            Sorted computed distances.
+        train_labels : list
+            Sorted target subject labels.
 
         """
 
@@ -882,13 +1001,19 @@ class KNN(BaseClassifier):
         """Authenticate a set of feature vectors, allegedly belonging to the
         given subject.
 
-        Args:
-            data (array): Input test data.
-            label (str): Internal classifier subject label.
-            threshold (int, float): Authentication threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        label : str
+            Internal classifier subject label.
+        threshold : int, float
+            Authentication threshold.
 
-        Returns:
-            decision (array): Authentication decision for each input sample.
+        Returns
+        -------
+        decision : array
+            Authentication decision for each input sample.
 
         """
 
@@ -925,8 +1050,10 @@ class KNN(BaseClassifier):
         limits, generates an array based on the maximum distances between
         enrolled subjects.
 
-        Returns:
-            ths (array): Generated thresholds.
+        Returns
+        -------
+        ths : array
+            Generated thresholds.
 
         """
 
@@ -957,12 +1084,17 @@ class KNN(BaseClassifier):
     def _identify(self, data, threshold=None):
         """Identify a set of feature vectors.
 
-        Args:
-            data (array): Input test data.
-            threshold (int, float): Identification threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        threshold : int, float
+            Identification threshold.
 
-        Returns:
-            labels (list): Identity (internal label) of each input sample.
+        Returns
+        -------
+        labels :list
+            Identity (internal label) of each input sample.
 
         """
 
@@ -1002,14 +1134,18 @@ class KNN(BaseClassifier):
 
         Computes the distances of the input data set to the target subjects.
 
-        Args:
-            data (array): Data to process.
-            targets (list, str, optional): Target subject labels.
+        Parameters
+        ----------
+        data : array
+            Data to process.
+        targets : list, str, optional
+            Target subject labels.
 
-        Returns:
-            out (dict): Processed data containing:
-                dists (array): Computed distances.
-                train_labels (array): Target subject labels.
+        Returns
+        -------
+        out : dict
+            Processed data containing the computed distances (`dists`) and the
+            target subject labels (`train_labels`).
 
         """
 
@@ -1043,12 +1179,17 @@ class KNN(BaseClassifier):
 
         Simply concatenates old data with new data.
 
-        Args:
-            old (array): Existing data.
-            new (array): New data.
+        Parameters
+        ----------
+        old : array
+            Existing data.
+        new : array
+            New data.
 
-        Returns:
-            out (array): Combined data.
+        Returns
+        -------
+        out : array
+            Combined data.
 
         """
 
@@ -1062,30 +1203,40 @@ class SVM(BaseClassifier):
 
     Wraps the 'OneClassSVM' and 'SVC' classes from 'scikit-learn'.
 
-    Args:
-        C (float, optional): Penalty parameter C of the error term.
-        kernel (str, optional): Specifies the kernel type to be used in the
-            algorithm. It must be one of ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’,
-            ‘precomputed’ or a callable. If none is given, ‘rbf’ will be used.
-            If a callable is given it is used to precompute the kernel matrix.
-        degree (int, optional): Degree of the polynomial kernel function
-            (‘poly’). Ignored by all other kernels.
-        gamma (float, optional): Kernel coefficient for ‘rbf’, ‘poly’ and
-            ‘sigmoid’. If gamma is 0.0 then 1/n_features will be used instead.
-        coef0 (float, optional): Independent term in kernel function. It is
-            only significant in ‘poly’ and ‘sigmoid’.
-        shrinking (bool, optional): Whether to use the shrinking heuristic.
-        tol (float, optional): Tolerance for stopping criterion.
-        cache_size (float, optional): Specify the size of the kernel
-            cache (in MB).
-        max_iter (int, optional): Hard limit on iterations within solver, or -1
-            for no limit.
-        random_state (int, RandomState, optional): The seed of the pseudo
-            random number generator to use when shuffling the data for
-            probability estimation.
+    Parameters
+    ----------
+    C : float, optional
+        Penalty parameter C of the error term.
+    kernel : str, optional
+        Specifies the kernel type to be used in the algorithm. It must be one
+        of ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’ or a callable.
+        If none is given, ‘rbf’ will be used. If a callable is given it is
+        used to precompute the kernel matrix.
+    degree : int, optional
+        Degree of the polynomial kernel function (‘poly’). Ignored by all other
+        kernels.
+    gamma : float, optional
+        Kernel coefficient for ‘rbf’, ‘poly’ and ‘sigmoid’. If gamma is 0.0
+        then 1/n_features will be used instead.
+    coef0 : float, optional
+        Independent term in kernel function. It is only significant in ‘poly’
+        and ‘sigmoid’.
+    shrinking : bool, optional
+        Whether to use the shrinking heuristic.
+    tol : float, optional
+        Tolerance for stopping criterion.
+    cache_size : float, optional
+        Specify the size of the kernel cache (in MB).
+    max_iter : int, optional
+        Hard limit on iterations within solver, or -1 for no limit.
+    random_state : int, RandomState, optional
+        The seed of the pseudo random number generator to use when shuffling
+        the data for probability estimation.
 
-    Attributes:
-        EER_IDX (int): Reference index for the Equal Error Rate.
+    Attributes
+    ----------
+    EER_IDX : int
+        Reference index for the Equal Error Rate.
 
     """
 
@@ -1129,12 +1280,17 @@ class SVM(BaseClassifier):
         The weights are inversely proportional to the number of samples in each
         class.
 
-        Args:
-            n1 (int): Number of samples in the first class.
-            n2 (int): Number of samples in the second class.
+        Parameters
+        ----------
+        n1 : int
+            Number of samples in the first class.
+        n2 : int
+            Number of samples in the second class.
 
-        Returns:
-            weights (dict): Weights for each class.
+        Returns
+        -------
+        weights : dict
+            Weights for each class.
 
         """
 
@@ -1147,9 +1303,12 @@ class SVM(BaseClassifier):
     def _get_single_clf(self, X, label):
         """Instantiate and train a One Class SVM classifier.
 
-        Args:
-            X (array): Training data.
-            label (str): Class label.
+        Parameters
+        ----------
+        X : array
+            Training data.
+        label : str
+            Class label.
 
         """
 
@@ -1162,13 +1321,20 @@ class SVM(BaseClassifier):
     def _get_kernel_clf(self, X1, X2, n1, n2, label1, label2):
         """Instantiate and train a SVC SVM classifier.
 
-        Args:
-            X1 (array): Trainig data for the first class.
-            X2 (array): Training data for the second class.
-            n1 (int): Number of samples in the first class.
-            n2 (int): Number of samples in the second class.
-            label1 (str): Label for the first class.
-            label2 (str): Label for the first class.
+        Parameters
+        ----------
+        X1 : array
+            Trainig data for the first class.
+        X2 : array
+            Training data for the second class.
+        n1 : int
+            Number of samples in the first class.
+        n2 : int
+            Number of samples in the second class.
+        label1 : str
+            Label for the first class.
+        label2 : str
+            Label for the first class.
 
         """
 
@@ -1196,8 +1362,10 @@ class SVM(BaseClassifier):
     def _del_clf(self, pair):
         """Delete a binary classifier.
 
-        Args:
-            pair (list, tuple): Label pair.
+        Parameters
+        ----------
+        pair : list, tuple
+            Label pair.
 
         """
 
@@ -1208,11 +1376,15 @@ class SVM(BaseClassifier):
     def _convert_pair(self, pair):
         """Sort and convert a label pair to the internal representation format.
 
-        Args:
-            pair (list, tuple): Input label pair.
+        Parameters
+        ----------
+        pair : list, tuple
+            Input label pair.
 
-        Returns:
-            pair (tuple): Sorted label pair.
+        Returns
+        -------
+        pair : tuple
+            Sorted label pair.
 
         """
 
@@ -1223,12 +1395,17 @@ class SVM(BaseClassifier):
     def _predict(self, pair, X):
         """Get a classifier prediction of the input data, given the label pair.
 
-        Args:
-            pair (list, tuple): Label pair.
-            X (array): Input data to classify.
+        Parameters
+        ----------
+        pair : list, tuple
+            Label pair.
+        X : array
+            Input data to classify.
 
-        Returns:
-            prediction (array): Prediction for each sample in the input data.
+        Returns
+        -------
+        prediction : array
+            Prediction for each sample in the input data.
 
         """
 
@@ -1255,13 +1432,19 @@ class SVM(BaseClassifier):
         """Authenticate a set of feature vectors, allegedly belonging to the
         given subject.
 
-        Args:
-            data (array): Input test data.
-            label (str): Internal classifier subject label.
-            threshold (int, float): Authentication threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        label : str
+            Internal classifier subject label.
+        threshold : int, float
+            Authentication threshold.
 
-        Returns:
-            decision (array): Authentication decision for each input sample.
+        Returns
+        -------
+        decision : array
+            Authentication decision for each input sample.
 
         """
 
@@ -1305,8 +1488,10 @@ class SVM(BaseClassifier):
         The thresholds correspond to the relative number of binary classifiers
         that agree on a class.
 
-        Returns:
-            ths (array): Generated thresholds.
+        Returns
+        -------
+        ths : array
+            Generated thresholds.
 
         """
 
@@ -1317,12 +1502,17 @@ class SVM(BaseClassifier):
     def _identify(self, data, threshold=None):
         """Identify a set of feature vectors.
 
-        Args:
-            data (array): Input test data.
-            threshold (int, float): Identification threshold.
+        Parameters
+        ----------
+        data : array
+            Input test data.
+        threshold : int, float
+            Identification threshold.
 
-        Returns:
-            labels (list): Identity (internal label) of each input sample.
+        Returns
+        -------
+        labels : list
+            Identity (internal label) of each input sample.
 
         """
 
@@ -1365,15 +1555,19 @@ class SVM(BaseClassifier):
 
         Computes the predictions for each of the targeted classifier pairs.
 
-        Args:
-            data (array): Data to process.
-            targets (list, str, optional): Target subject labels.
+        Parameters
+        ----------
+        data : array
+            Data to process.
+        targets : list, str, optional
+            Target subject labels.
 
-        Returns:
-            out (dict): Processed data containing:
-                predictions (array): Predictions of each input sample for the
-                    targeted classifier pairs.
-                pairs (list): Target label pairs.
+        Returns
+        -------
+        out : dict
+            Processed data containing an array with the predictions of each
+            input sample (`predictions`) and a list with the target label
+            pairs (`pairs`).
 
         """
 
@@ -1403,9 +1597,12 @@ class SVM(BaseClassifier):
     def _train(self, enroll=None, dismiss=None):
         """Train the classifier.
 
-        Args:
-            enroll (list, optional): Labels of new or updated subjects.
-            dismiss (list, optional): Labels of deleted subjects.
+        Parameters
+        ----------
+        enroll : list, optional
+            Labels of new or updated subjects.
+        dismiss : list, optional
+            Labels of deleted subjects.
 
         """
 
@@ -1456,12 +1653,17 @@ class SVM(BaseClassifier):
 
         Simply concatenates old data with new data.
 
-        Args:
-            old (array): Existing data.
-            new (array): New data.
+        Parameters
+        ----------
+        old : array
+            Existing data.
+        new : array
+            New data.
 
-        Returns:
-            out (array): Combined data.
+        Returns
+        -------
+        out : array
+            Combined data.
 
         """
 
@@ -1473,20 +1675,33 @@ class SVM(BaseClassifier):
 def get_auth_rates(TP=None, FP=None, TN=None, FN=None, thresholds=None):
     """Compute authentication rates from the confusion matrix.
 
-    Args:
-        TP (array): True Positive counts for each classifier threshold.
-        FP (array): False Positive counts for each classifier threshold.
-        TN (array): True Negative counts for each classifier threshold.
-        FN (array): False Negative counts for each classifier threshold.
-        thresholds (array): Classifier thresholds.
+    Parameters
+    ----------
+    TP : array
+        True Positive counts for each classifier threshold.
+    FP : array
+        False Positive counts for each classifier threshold.
+    TN : array
+        True Negative counts for each classifier threshold.
+    FN : array
+        False Negative counts for each classifier threshold.
+    thresholds : array
+        Classifier thresholds.
 
-    Returns:
-        Acc (array): Accuracy at each classifier threshold.
-        TAR (array): True Accept Rate at each classifier threshold.
-        FAR (array): False Accept Rate at each classifier threshold.
-        FRR (array): False Reject Rate at each classifier threshold.
-        TRR (array): True Reject Rate at each classifier threshold.
-        EER (array): Equal Error Rate points, with format (threshold, rate).
+    Returns
+    -------
+    Acc : array
+        Accuracy at each classifier threshold.
+    TAR : array
+        True Accept Rate at each classifier threshold.
+    FAR : array
+        False Accept Rate at each classifier threshold.
+    FRR : array
+        False Reject Rate at each classifier threshold.
+    TRR : array
+        True Reject Rate at each classifier threshold.
+    EER : array
+        Equal Error Rate points, with format (threshold, rate).
 
     """
 
@@ -1540,21 +1755,33 @@ def get_auth_rates(TP=None, FP=None, TN=None, FN=None, thresholds=None):
 def get_id_rates(H=None, M=None, R=None, N=None, thresholds=None):
     """Compute identification rates from the confusion matrix.
 
-    Args:
-        H (array): Hit counts for each classifier threshold.
-        M (array): Miss counts for each classifier threshold.
-        R (array): Reject counts for each classifier threshold.
-        N (int): Number of test samples.
-        thresholds (array): Classifier thresholds.
+    Parameters
+    ----------
+    H : array
+        Hit counts for each classifier threshold.
+    M : array
+        Miss counts for each classifier threshold.
+    R : array
+        Reject counts for each classifier threshold.
+    N : int
+        Number of test samples.
+    thresholds : array
+        Classifier thresholds.
 
-    Returns:
-        Acc (array): Accuracy at each classifier threshold.
-        Err (array): Error rate at each classifier threshold.
-        MR (array): Miss Rate at each classifier threshold.
-        RR (array): Reject Rate at each classifier threshold.
-        EID (array): Error of Identification points, with
-            format (threshold, rate).
-        EER (array): Equal Error Rate points, with format (threshold, rate).
+    Returns
+    -------
+    Acc : array
+        Accuracy at each classifier threshold.
+    Err : array
+        Error rate at each classifier threshold.
+    MR : array
+        Miss Rate at each classifier threshold.
+    RR : array
+        Reject Rate at each classifier threshold.
+    EID : array
+        Error of Identification points, with format (threshold, rate).
+    EER : array
+        Equal Error Rate points, with format (threshold, rate).
 
     """
 
@@ -1606,16 +1833,25 @@ def get_subject_results(results=None,
     """Compute authentication and identification performance metrics for a
     given subject.
 
-    Args:
-        results (dict): Classification results.
-        subject (hashable): True subject label.
-        thresholds (array): Classifier thresholds.
-        subjects (list): Target subject classes.
-        subject_dict (SubjectDict): Subject-label conversion dictionary.
-        subject_idx (list): Subject index.
+    Parameters
+    ----------
+    results : dict
+        Classification results.
+    subject : hashable
+        True subject label.
+    thresholds : array
+        Classifier thresholds.
+    subjects : list
+        Target subject classes.
+    subject_dict : SubjectDict
+        Subject-label conversion dictionary.
+    subject_idx : list
+        Subject index.
 
-    Returns:
-        assessment (dict): Authentication and identification results.
+    Returns
+    -------
+    assessment : dict
+        Authentication and identification results.
 
     """
 
@@ -1722,12 +1958,17 @@ def get_subject_results(results=None,
 def assess_classification(results=None, thresholds=None):
     """Assess the performance of a biometric classification test.
 
-    Args:
-        results (dict): Classification results.
-        thresholds (array): Classifier thresholds.
+    Parameters
+    ----------
+    results : dict
+        Classification results.
+    thresholds : array
+        Classifier thresholds.
 
-    Returns:
-        assessment (dict): Classification assessment.
+    Returns
+    -------
+    assessment : dict
+        Classification assessment.
 
     """
 
@@ -1818,12 +2059,17 @@ def assess_classification(results=None, thresholds=None):
 def assess_runs(results=None, subjects=None):
     """Assess the performance of multiple biometric classification runs.
 
-    Args:
-        results (list): Classification results for each run.
-        subjects (list): Common target subject classes.
+    Parameters
+    ----------
+    results : list
+        Classification results for each run.
+    subjects : list
+        Common target subject classes.
 
-    Returns:
-        assessment (dict): Global classification assessment.
+    Returns
+    -------
+    assessment : dict
+        Global classification assessment.
 
     """
 
@@ -1939,16 +2185,23 @@ def assess_runs(results=None, subjects=None):
 def combination(results=None, weights=None):
     """Combine results from multiple classifiers.
 
-    Args:
-        results (dict): Results for each classifier.
-        weights (dict, optional): Weight for each classifier.
+    Parameters
+    ----------
+    results : dict
+        Results for each classifier.
+    weights : dict, optional
+        Weight for each classifier.
 
-    Returns:
-        (ReturnTuple): containing:
-            decision (object): Consensus decision.
-            confidence (float): Confidence estimate of the decision.
-            counts (array): Weight for each possible decision outcome.
-            classes (array): List of possible decision outcomes.
+    Returns
+    -------
+    decision : object
+        Consensus decision.
+    confidence : float
+        Confidence estimate of the decision.
+    counts : array
+        Weight for each possible decision outcome.
+    classes : array
+        List of possible decision outcomes.
 
     """
 
@@ -2006,15 +2259,20 @@ def combination(results=None, weights=None):
 def majority_rule(labels=None, random=True):
     """Determine the most frequent class label.
 
-    Args:
-        labels (array, list): List of clas labels.
-        random (bool, optional): If True, will choose randomly in case of tied
-            classes, otherwise the first element is chosen.
+    Parameters
+    ----------
+    labels : array, list
+        List of clas labels.
+    random : bool, optional
+        If True, will choose randomly in case of tied classes, otherwise the
+        first element is chosen.
 
-    Returns:
-        (ReturnTuple): containing:
-            decision (object): Consensus decision.
-            count (int): Number of elements of the consensus decision.
+    Returns
+    -------
+        decision : object
+            Consensus decision.
+        count : int
+            Number of elements of the consensus decision.
 
     """
 
@@ -2058,21 +2316,26 @@ def cross_validation(labels,
     This iterator returns stratified randomized folds, which preserve the
     percentage of samples for each class.
 
-    Args:
-        labels (list, array): List of class labels for each data sample.
-        n_iter (int, optional): Number of splitting iterations.
-        test_size (float, int, optional): If float, represents the proportion
-            of the dataset to include in the test split; if int, represents the
-            absolute number of test samples.
-        train_size (float, int, optional): If float, represents the proportion
-            of the dataset to include in the train split; if int, represents
-            the absolute number of train samples.
-        random_state (int, RandomState, optional): The seed of the pseudo
-            random number generator to use when shuffling the data.
+    Parameters
+    ----------
+    labels : list, array
+        List of class labels for each data sample.
+    n_iter : int, optional
+        Number of splitting iterations.
+    test_size : float, int, optional
+        If float, represents the proportion of the dataset to include in the
+        test split; if int, represents the absolute number of test samples.
+    train_size : float, int, optional
+        If float, represents the proportion of the dataset to include in the
+        train split; if int, represents the absolute number of train samples.
+    random_state : int, RandomState, optional
+        The seed of the pseudo random number generator to use when shuffling
+        the data.
 
-    Returns:
-        (ReturnTuple): containing:
-            cv (CV iterator): Cross Validation iterator.
+    Returns
+    -------
+    cv : CV iterator
+        Cross Validation iterator.
 
     """
 
