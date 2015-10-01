@@ -23,39 +23,59 @@ instance). Finally, for complex biological systems like the human being,
 biosignals also include blood and urine test measurements, core body
 temperature, motion tracking signals, and imaging techniques such as CAT and MRI
 scans. However, the term biosignal is most often applied to bioelectrical,
-time-varying signals. The following sub-sections briefly describe the biosignals
+time-varying signals, such as the electrocardiogram.
+
+The task of obtaining biosignals of good quality is time-consuming,
+and typically requires the use of costly hardware. Access to these instruments
+is, therefore, usually restricted to research institutes, medical centers,
+and hospitals. However, recent projects like `BITalino <http://bitalino.com/>`__
+or `OpenBCI <http://openbci.com/>`__ have lowered the entry barriers of biosignal
+acquisition, fostering the Do-It-Yourself and Maker communities to develop
+physiological computing applications. You can find a list of biosignal
+platform `here <https://opensource.com/life/15/4/five-diy-hardware-physiological-computing>`__.
+
+
+
+
+
+The following sub-sections briefly describe the biosignals
 covered by `biosppy`.
 
+Blood Volume Pulse
+------------------
 
+Blood Volume Pulse (BVP) signals are...
 
-The following biosignals form the focus of `biosppy`:
+Electrocardiogram
+-----------------
 
-* Blood Volume Pulse (BVP);
-* Electrocardiogram (ECG);
-* Electrodermal Activity (EDA);
-* Electroencephalogram (EEG);
-* Electromyogram (EMG);
-* Respiration (Resp).
+Electrocardiogrm (ECG) signals are...
 
-Bla.
+Electrodermal Activity
+----------------------
 
-ECG
----
+Electrodermal Activity (EDA) signals are...
 
-Bla.
+Electroencephalogram
+--------------------
 
-EMG
----
+Electroencephalogram (EEG) signals are...
 
-Bla.
+Electromyogram
+--------------
 
-A very cool thing [ABCD88a]_.
-Another cool thing [ABCD88b]_.
+Electromyogram (EMG) signals are...
+
+Respiration
+-----------
+
+Respiration (Resp) signals are...
+
 
 What is Pattern Recognition?
 ============================
 
-Bla.
+To do.
 
 A Note on Return Objects
 ========================
@@ -122,9 +142,9 @@ extract. In this case, the user typically already knows what a function does,
 but it is cumbersome to remember by heart the order of the outputs, without
 having to constantly check out the documentation.
 
-For instance, the `numpy.histogram
-<http://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html>`_
-function returns first the edges or the values of the histogram? Maybe it's the
+For instance, does the `numpy.histogram
+<http://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram.html>`__
+function first return the edges or the values of the histogram? Maybe it's the
 edges first, which correspond to the x axis. Oops, it's actually the other way
 around...
 
@@ -200,7 +220,7 @@ And to list all the available keys:
     ['sum', 'sub', 'mult', 'div']
 
 It is also possible to convert the object to a more traditional dictionary,
-specifically an `OrderedDict <https://docs.python.org/2/library/collections.html#collections.OrderedDict>`_:
+specifically an `OrderedDict <https://docs.python.org/2/library/collections.html#collections.OrderedDict>`__:
 
 .. code:: python
 
@@ -214,7 +234,7 @@ Dictionary-like unpacking is supported:
 
     >>> some_function(**out)
 
-`ReturnTuple` is heavily inspired by `namedtuple <https://docs.python.org/2/library/collections.html#collections.namedtuple>`_,
+`ReturnTuple` is heavily inspired by `namedtuple <https://docs.python.org/2/library/collections.html#collections.namedtuple>`__,
 but without the dynamic class generation at object creation. It is a subclass
 of `tuple`, therefore it maintains compatibility with the native return pattern.
 It is still possible to unpack the variables in the usual way:
@@ -255,7 +275,7 @@ typical methods to filter, transform, and extract signal features. Let's see
 how this works for the example of the ECG signal.
 
 The GitHub repository includes a few example signals (see
-`here <https://github.com/PIA-Group/BioSPPy/tree/master/examples>`_). To load
+`here <https://github.com/PIA-Group/BioSPPy/tree/master/examples>`__). To load
 and plot the raw ECG signal follow:
 
 .. code:: python
@@ -306,26 +326,24 @@ It should produce a plot like the one below.
 Signal Processing
 =================
 
-Bla.
+To do..
 
 Clustering
 ==========
 
-Bla.
+To do..
 
 Biometrics
 ==========
 
-Bla.
+To do..
 
 What's Next?
 ============
 
-Bla.
+To do..
 
 References
 ==========
 
-.. [ABCD88a] Reference
-
-.. [ABCD88b] Haha
+To do.
