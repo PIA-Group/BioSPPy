@@ -1,5 +1,7 @@
-# SamplingRate: 1000
-# Resolution: 12
+# Simple Text Format
+# Sampling Rate (Hz):= 1000.00
+# Resolution:= 12
+# Labels:= Resp
 2094.0
 2094.0
 2095.0

@@ -1,5 +1,7 @@
-# SamplingRate: 1000
-# Resolution: 12
+# Simple Text Format
+# Sampling Rate (Hz):= 1000.00
+# Resolution:= 12
+# Labels:= BVP
 2065.0
 2066.0
 2066.0
