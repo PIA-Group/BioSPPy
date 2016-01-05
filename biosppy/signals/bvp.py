@@ -40,7 +40,7 @@ def bvp(signal=None, sampling_rate=1000., show=True):
     onsets : array
         Indices of BVP pulse onsets.
     heart_rate_ts : array
-     Heart rate time axis reference (seconds).
+        Heart rate time axis reference (seconds).
     heart_rate : array
         Instantaneous heart rate (bpm).
 
@@ -58,9 +58,9 @@ def bvp(signal=None, sampling_rate=1000., show=True):
     # filter signal
     filtered, _, _ = st.filter_signal(signal=signal,
                                       ftype='butter',
-                                      band='lowpass',
-                                      order=2,
-                                      frequency=4,
+                                      band='bandpass',
+                                      order=4,
+                                      frequency=[1, 8],
                                       sampling_rate=sampling_rate)
 
     # find onsets
