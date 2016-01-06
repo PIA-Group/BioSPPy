@@ -3,6 +3,13 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.2.1
+-------------
+
+Released on January 6th 2016
+
+- Fixes incorrect BVP filter parameters (closes #2)
+
 Version 0.2.0
 -------------
 

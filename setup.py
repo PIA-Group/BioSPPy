@@ -13,17 +13,16 @@ import os
 from setuptools import find_packages, setup
 
 
-
 def read(*paths):
     """Build a file path from *paths and return the contents."""
-    
+
     with open(os.path.join(*paths), 'r') as fid:
         return fid.read()
 
 
 def get_version():
     """Get the module version"""
-    
+
     return biosppy.__version__
 
 
