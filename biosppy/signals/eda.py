@@ -61,7 +61,7 @@ def eda(signal=None, sampling_rate=1000., show=True):
                                  ftype='butter',
                                  band='lowpass',
                                  order=4,
-                                 frequency=20,
+                                 frequency=5,
                                  sampling_rate=sampling_rate)
 
     # smooth
@@ -101,6 +101,8 @@ def basic_scr(signal=None, sampling_rate=1000.):
     """Basic method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
 
+    Follows the approach in [Gamb08]_.
+
     Parameters
     ----------
     signal : array
@@ -116,6 +118,11 @@ def basic_scr(signal=None, sampling_rate=1000.):
         Indices of the SRC peaks.
     amplitudes : array
         SCR pulse amplitudes.
+
+    References
+    ----------
+    .. [Gamb08] Hugo Gamboa, "Multi-modal Behavioral Biometrics Based on HCI
+       and Electrophysiology", PhD thesis, Instituto Superior T{\'e}cnico, 2008
 
     """
 

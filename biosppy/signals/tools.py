@@ -1122,7 +1122,7 @@ def get_heart_rate(beats=None, sampling_rate=1000., smooth=False, size=3):
 
     Notes
     -----
-    * Assumes normal human heart rate to be between 40 and 190 bpm.
+    * Assumes normal human heart rate to be between 40 and 200 bpm.
 
     """
 
@@ -1144,7 +1144,6 @@ def get_heart_rate(beats=None, sampling_rate=1000., smooth=False, size=3):
 
     # smooth with moving average
     if smooth:
-        size = 5
         hr, _ = smoother(signal=hr, kernel='boxcar', size=size, mirror=True)
 
     return utils.ReturnTuple((ts, hr), ('index', 'heart_rate'))
