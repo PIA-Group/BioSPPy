@@ -9,4 +9,4 @@
     :license: BSD 3-clause, see LICENSE for more details.
 """
 
-version = '0.2.1'
+version = '0.2.2'

@@ -3,6 +3,16 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.2.2
+-------------
+
+Released on April 20th 2016
+
+- Makes use of new bidict API (closes #3)
+- Updates package version in the requirements file
+- Fixes incorrect EDA filter parameters
+- Fixes heart rate smoothing (size parameter)
+
 Version 0.2.1
 -------------
 
