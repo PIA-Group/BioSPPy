@@ -109,22 +109,23 @@ def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     sm_size : int, optional
-        Size of smoother kernel.
-        Defaults to 0.25 * sampling_rate
+        Size of smoother kernel (seconds).
+        Defaults to 0.25
     size : int, optional
-        Window to search for maxima
-        Defaults to 5 * sampling_rate
+        Window to search for maxima (seconds).
+        Defaults to 5
     alpha : float, optional
+        Normalization parameter.
         Defaults to 2.0
     wrange : int, optional
-        The window in which to search for a peak
-        Defaults to 0.1 * sampling_rate
+        The window in which to search for a peak (seconds).
+        Defaults to 0.1
     d1_th : int, optional
-        Smallest allowed difference between maxima and minima
+        Smallest allowed difference between maxima and minima.
         Defaults to 0
     d2_th : int, optional
-        Smallest allowed time between maxima and minima
-        Defaults to 0.15 * sampling_rate
+        Smallest allowed time between maxima and minima (seconds),
+        Defaults to 0.15
 
     Returns
     -------
@@ -138,10 +139,14 @@ def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
         raise TypeError("Please specify an input signal.")
 
     # parameters
-    sm_size = int(0.25 * sampling_rate) if not sm_size else sm_size
-    size = int(5 * sampling_rate) if not size else size
-    wrange = int(0.1 * sampling_rate) if not wrange else wrange
-    d2_th = int(0.15 * sampling_rate) if not d2_th else d2_th
+    sm_size = 0.25 if not sm_size else sm_size
+    sm_size = int(sm_size * sampling_rate)
+    size = 5 if not size else size
+    size = int(size * sampling_rate)
+    wrange = 0.1 if not wrange else wrange
+    wrange = int(wrange * sampling_rate)
+    d2_th = 0.15 if not d2_th else d2_th
+    d2_th = int(d2_th * sampling_rate)
 
     length = len(signal)
 
