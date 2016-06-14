@@ -96,7 +96,8 @@ def bvp(signal=None, sampling_rate=1000., show=True):
     return utils.ReturnTuple(args, names)
 
 
-def find_onsets(signal=None, sampling_rate=1000.):
+def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
+                alpha=2., wrange=None, d1_th=0, d2_th=None):
     """Determine onsets of BVP pulses.
 
     Skips corrupted signal parts.
@@ -107,6 +108,23 @@ def find_onsets(signal=None, sampling_rate=1000.):
         Input filtered BVP signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    sm_size : int, optional
+        Size of smoother kernel.
+        Defaults to 0.25 * sampling_rate
+    size : int, optional
+        Window to search for maxima
+        Defaults to 5 * sampling_rate
+    alpha : float, optional
+        Defaults to 2.0
+    wrange : int, optional
+        The window in which to search for a peak
+        Defaults to 0.1 * sampling_rate
+    d1_th : int, optional
+        Smallest allowed difference between maxima and minima
+        Defaults to 0
+    d2_th : int, optional
+        Smallest allowed time between maxima and minima
+        Defaults to 0.15 * sampling_rate
 
     Returns
     -------
@@ -120,12 +138,10 @@ def find_onsets(signal=None, sampling_rate=1000.):
         raise TypeError("Please specify an input signal.")
 
     # parameters
-    sm_size = int(0.25 * sampling_rate)
-    size = int(5 * sampling_rate)
-    alpha = 2.
-    wrange = int(0.1 * sampling_rate)
-    d1_th = 0
-    d2_th = 150
+    sm_size = int(0.25 * sampling_rate) if not sm_size else sm_size
+    size = int(5 * sampling_rate) if not size else size
+    wrange = int(0.1 * sampling_rate) if not wrange else wrange
+    d2_th = int(0.15 * sampling_rate) if not d2_th else d2_th
 
     length = len(signal)
 
