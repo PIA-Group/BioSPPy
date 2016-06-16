@@ -481,6 +481,9 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
         if size > length:
             size = length - 1
 
+        if size < 1:
+            size = 1
+
         if kernel == 'boxzen':
             # hybrid method
             # 1st pass - boxcar kernel
@@ -527,6 +530,9 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
         # check length
         if size > length:
             raise ValueError("Kernel size is bigger than signal length.")
+
+        if size < 1:
+            raise ValueError("Kernel size is smaller than 1.")
 
     else:
         raise TypeError("Unknown kernel type.")
@@ -1143,7 +1149,7 @@ def get_heart_rate(beats=None, sampling_rate=1000., smooth=False, size=3):
     hr = hr[indx]
 
     # smooth with moving average
-    if smooth:
+    if smooth and (len(hr) > 1):
         hr, _ = smoother(signal=hr, kernel='boxcar', size=size, mirror=True)
 
     return utils.ReturnTuple((ts, hr), ('index', 'heart_rate'))
