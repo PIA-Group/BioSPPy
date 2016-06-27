@@ -987,6 +987,9 @@ def windower(signal=None,
     if fcn is None:
         raise TypeError("Please specify a function to apply to each window.")
 
+    if fcn_kwargs is None:
+        fcn_kwargs = {}
+
     if kernel_kwargs is None:
         kernel_kwargs = {}
 
