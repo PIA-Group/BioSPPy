@@ -1166,18 +1166,16 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
     cmap = plt.get_cmap('rainbow')
 
     for i, k in enumerate(keys):
-        aux = data[clusters[k]].T
+        aux = data[clusters[k]]
         color = cmap(x[i])
         label = 'Cluster %s' % k
-
-        # global
-        ax_global.plot(aux, color=color, lw=MINOR_LW, alpha=0.7)
-
-        # cluster
         ax = fig.add_subplot(gs[c_rows[i], c_cols[i]], sharex=ax_global)
-        ax.plot(aux, color=color, lw=MAJOR_LW)
         ax.set_title(label)
         ax.grid()
+
+        if len(aux) > 0:
+            ax_global.plot(aux.T, color=color, lw=MINOR_LW, alpha=0.7)
+            ax.plot(aux.T, color=color, lw=MAJOR_LW)
 
     ax_global.set_title('All Clusters')
     ax_global.grid()
