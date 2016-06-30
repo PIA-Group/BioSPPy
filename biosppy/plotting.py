@@ -1131,6 +1131,12 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
     fig = plt.figure()
     fig.suptitle('Clustering Summary')
 
+    ymin = np.min(data)
+    ymax = np.max(data)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+
     # determine number of clusters
     keys = clusters.keys()
     nc = len(keys)
@@ -1170,6 +1176,7 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
         color = cmap(x[i])
         label = 'Cluster %s' % k
         ax = fig.add_subplot(gs[c_rows[i], c_cols[i]], sharex=ax_global)
+        ax.set_ylim([ymin, ymax])
         ax.set_title(label)
         ax.grid()
 
@@ -1178,6 +1185,7 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
             ax.plot(aux.T, color=color, lw=MAJOR_LW)
 
     ax_global.set_title('All Clusters')
+    ax_global.set_ylim([ymin, ymax])
     ax_global.grid()
 
     # make layout tight
