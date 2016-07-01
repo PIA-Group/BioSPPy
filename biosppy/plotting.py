@@ -148,9 +148,9 @@ def plot_filter(ftype='FIR',
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
@@ -198,9 +198,9 @@ def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_bvp(ts=None,
@@ -291,9 +291,9 @@ def plot_bvp(ts=None,
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_eda(ts=None,
@@ -388,9 +388,9 @@ def plot_eda(ts=None,
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_emg(ts=None,
@@ -466,9 +466,9 @@ def plot_emg(ts=None,
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_resp(ts=None,
@@ -561,9 +561,9 @@ def plot_resp(ts=None,
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_eeg(ts=None,
@@ -689,10 +689,10 @@ def plot_eeg(ts=None,
     # show
     if show:
         plt.show()
-
-    # close
-    for _, fig in figs:
-        plt.close(fig)
+    else:
+        # close
+        for _, fig in figs:
+            plt.close(fig)
 
 
 def _yscaling(signal=None, alpha=1.5):
@@ -944,9 +944,9 @@ def plot_ecg(ts=None,
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def _plot_rates(thresholds, rates, variables,
@@ -1107,9 +1107,9 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
 
 
 def plot_clustering(data=None, clusters=None, path=None, show=False):
@@ -1131,11 +1131,7 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
     fig = plt.figure()
     fig.suptitle('Clustering Summary')
 
-    ymin = np.min(data)
-    ymax = np.max(data)
-    alpha = 0.1 * (ymax - ymin)
-    ymax += alpha
-    ymin -= alpha
+    ymin, ymax = _yscaling(data, alpha=1.2)
 
     # determine number of clusters
     keys = clusters.keys()
@@ -1204,6 +1200,6 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
     # show
     if show:
         plt.show()
-
-    # close
-    plt.close(fig)
+    else:
+        # close
+        plt.close(fig)
