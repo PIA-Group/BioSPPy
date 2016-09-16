@@ -119,9 +119,12 @@ def _filter_signal(b, a, signal, zi=None, check_phase=True, **kwargs):
             "Incompatible arguments: initial filter state cannot be set when \
             check_phase is True.")
 
-    if check_phase:
-        filtered = ss.filtfilt(b, a, signal, **kwargs)
+    if zi is None:
         zf = None
+        if check_phase:
+            filtered = ss.filtfilt(b, a, signal, **kwargs)
+        else:
+            filtered = ss.lfilter(b, a, signal, **kwargs)
     else:
         filtered, zf = ss.lfilter(b, a, signal, zi=zi, **kwargs)
 
