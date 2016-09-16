@@ -101,7 +101,7 @@ def hierarchical(data=None,
         Linkage criterion; one of 'average', 'centroid', 'complete', 'median',
         'single', 'ward', or 'weighted'.
     metric : str, optional
-        Distance metric (see scipy.spatial.distance).
+        Distance metric (see 'biosppy.metrics').
     metric_args : dict, optional
         Additional keyword arguments to pass to the distance function.
 
@@ -111,6 +111,18 @@ def hierarchical(data=None,
         Dictionary with the sample indices (rows from 'data') for each found
         cluster; outliers have key -1; clusters are assigned integer keys
         starting at 0.
+
+    Raises
+    ------
+    TypeError
+        If 'metric' is not a string.
+    ValueError
+        When the 'linkage' is unknown.
+    ValueError
+        When 'metric' is not 'euclidean' when using 'centroid', 'median',
+        or 'ward' linkage.
+    ValueError
+        When 'k' is larger than the number of data samples.
 
     """
 
@@ -122,22 +134,31 @@ def hierarchical(data=None,
                        'ward', 'weighted']:
         raise ValueError("Unknown linkage criterion '%r'." % linkage)
 
-    if metric_args is None:
-        metric_args = {}
+    if not isinstance(metric, basestring):
+        raise TypeError("Please specify the distance metric as a string.")
 
     N = len(data)
     if k > N:
-        raise ValueError("Number of clusters 'k' is higher than the number \
-                          of input samples.")
+        raise ValueError("Number of clusters 'k' is higher than the number" \
+                          " of input samples.")
+
+    if metric_args is None:
+        metric_args = {}
+
+    if linkage in ['centroid', 'median', 'ward']:
+        if metric != 'euclidean':
+            raise TypeError("Linkage '{}' requires the distance metric to be" \
+                            " 'euclidean'.".format(linkage))
+        Z = sch.linkage(data, method=linkage)
+    else:
+        # compute distances
+        D = metrics.pdist(data, metric=metric, **metric_args)
+
+        # build linkage
+        Z = sch.linkage(D, method=linkage)
 
     if k < 0:
         k = 0
-
-    # compute distances
-    D = metrics.pdist(data, metric=metric, **metric_args)
-
-    # build linkage
-    Z = sch.linkage(D, method=linkage)
 
     # extract clusters
     if k == 0:
@@ -423,7 +444,7 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
         Number of clusters to extract; if 0 uses the life-time criterion.
     linkage : str, optional
         Linkage criterion for final partition extraction; one of 'average',
-        'centroid', 'complete', 'median', 'single', 'ward', or 'weighted'.
+        'complete', 'single', or 'weighted'.
 
     Returns
     -------
@@ -438,8 +459,7 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
     if coassoc is None:
         raise TypeError("Please specify the input co-association matrix.")
 
-    if linkage not in ['average', 'centroid', 'complete', 'median', 'single',
-                       'ward', 'weighted']:
+    if linkage not in ['average', 'complete', 'single', 'weighted']:
         raise ValueError("Unknown linkage criterion '%r'." % linkage)
 
     N = len(coassoc)
