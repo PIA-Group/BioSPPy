@@ -583,7 +583,7 @@ def analytic_signal(signal=None, N=None):
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
-    # hilter transform
+    # hilbert transform
     asig = ss.hilbert(signal, N=N)
 
     # amplitude envelope
