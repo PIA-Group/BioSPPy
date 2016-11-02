@@ -83,7 +83,7 @@ def pdist(X, metric='euclidean', p=2, w=None, V=None, VI=None):
 
     """
 
-    if isinstance(metric, basestring):
+    if isinstance(metric, str):
         if metric == 'pcosine':
             metric = pcosine
 
@@ -127,7 +127,7 @@ def cdist(XA, XB, metric='euclidean', p=2, V=None, VI=None, w=None):
 
     """
 
-    if isinstance(metric, basestring):
+    if isinstance(metric, str):
         if metric == 'pcosine':
             metric = pcosine
 

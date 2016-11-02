@@ -87,7 +87,7 @@ def remainderAllocator(votes, k, reverse=True, check=False):
         else:
             ind = np.argsort(aux - seats)
 
-        for i in xrange(nb):
+        for i in range(nb):
             seats[ind[i % length]] += 1
 
     return seats.tolist()
@@ -137,9 +137,9 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
     # compute coefficients
     tab = []
     length = len(votes)
-    D = [fcn(i) for i in xrange(1, k + 1)]
-    for i in xrange(length):
-        for j in xrange(k):
+    D = [fcn(i) for i in range(1, k + 1)]
+    for i in range(length):
+        for j in range(k):
             tab.append((i, votes[i] / D[j]))
 
     # sort
@@ -148,7 +148,7 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
     tab = np.array([item[0] for item in tab], dtype='int')
 
     seats = np.zeros(length, dtype='int')
-    for i in xrange(length):
+    for i in range(length):
         seats[i] = np.sum(tab == i)
 
     return seats.tolist()
@@ -230,14 +230,14 @@ class ReturnTuple(tuple):
 
         if names is None:
             # create names
-            names = ['_%d' % i for i in xrange(nargs)]
+            names = ['_%d' % i for i in range(nargs)]
         else:
             # check length
             if len(names) != nargs:
                 raise ValueError("Number of names and values mismatch.")
 
             # convert to str
-            names = map(str, names)
+            names = list(map(str, names))
 
             # check for keywords, alphanumeric, digits, repeats
             seen = set()
@@ -270,7 +270,7 @@ class ReturnTuple(tuple):
 
         """
 
-        return collections.OrderedDict(zip(self._names, self))
+        return collections.OrderedDict(list(zip(self._names, self)))
 
     __dict__ = property(as_dict)
 
@@ -291,7 +291,7 @@ class ReturnTuple(tuple):
 
         """
 
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             if key not in self._names:
                 raise KeyError("Unknown key: %r." % key)
 

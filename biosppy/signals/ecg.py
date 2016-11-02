@@ -664,11 +664,11 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
     mmp = 0.2
 
     # Differentiator (1)
-    y1 = map(lambda i: signal[i] - signal[i - 4], xrange(4, len(signal)))
+    y1 = [signal[i] - signal[i - 4] for i in range(4, len(signal))]
 
     # Low pass filter (2)
     c = [1, 4, 6, 4, 1, -1, -4, -6, -4, -1]
-    y2 = np.array(map(lambda n: np.dot(c, y1[n - 9:n + 1]), xrange(9, len(y1))))
+    y2 = np.array([np.dot(c, y1[n - 9:n + 1]) for n in range(9, len(y1))])
     y2_len = len(y2)
 
     # vars
@@ -1087,7 +1087,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
             pass
 
         # getting positive peaks
-        for i in xrange(len(pospeaks) - 1):
+        for i in range(len(pospeaks) - 1):
             if abs(pospeaks[0][1] - pospeaks[i + 1][1]) > adjacency:
                 twopeaks.append(pospeaks[i + 1])
                 break
@@ -1097,7 +1097,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
             error[0] = True
 
         # getting negative peaks
-        for i in xrange(len(negpeaks) - 1):
+        for i in range(len(negpeaks) - 1):
             if abs(negpeaks[0][1] - negpeaks[i + 1][1]) > adjacency:
                 twonegpeaks.append(negpeaks[i + 1])
                 break

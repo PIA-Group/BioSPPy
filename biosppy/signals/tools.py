@@ -479,7 +479,7 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
 
     length = len(signal)
 
-    if isinstance(kernel, basestring):
+    if isinstance(kernel, str):
         # check length
         if size > length:
             size = length - 1
@@ -998,7 +998,7 @@ def windower(signal=None,
 
     length = len(signal)
 
-    if isinstance(kernel, basestring):
+    if isinstance(kernel, str):
         # check size
         if size > length:
             raise ValueError("Window size must be smaller than signal length.")
@@ -1029,7 +1029,7 @@ def windower(signal=None,
 
     index = []
     values = []
-    for i in xrange(nb):
+    for i in range(nb):
         start = i * step
         stop = start + size
         index.append(start)

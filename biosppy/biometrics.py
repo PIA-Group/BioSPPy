@@ -247,7 +247,7 @@ class BaseClassifier(object):
 
         """
 
-        subjects = self._subject2label.keys()
+        subjects = list(self._subject2label.keys())
 
         return subjects
 
@@ -356,7 +356,7 @@ class BaseClassifier(object):
         if data is None:
             raise TypeError("Please specify the data to train.")
 
-        for sub, val in data.iteritems():
+        for sub, val in data.items():
             if val is None:
                 try:
                     self.dismiss(sub, deferred=True)
@@ -399,10 +399,10 @@ class BaseClassifier(object):
 
         # gather data to test
         data = {}
-        for subject, label in self._subject2label.iteritems():
+        for subject, label in self._subject2label.items():
             # select a random fraction of the training data
             aux = self.io_load(label)
-            indx = range(len(aux))
+            indx = list(range(len(aux)))
             use, _ = utils.random_fraction(indx, fraction, sort=True)
 
             data[subject] = aux[use]
@@ -411,7 +411,7 @@ class BaseClassifier(object):
         _, res = self.evaluate(data, ths)
 
         # choose thresholds at EER
-        for subject, label in self._subject2label.iteritems():
+        for subject, label in self._subject2label.items():
             EER_auth = res['subject'][subject]['authentication']['rates']['EER']
             self.set_auth_thr(label, EER_auth[self.EER_IDX, 0], ready=True)
 
@@ -639,7 +639,7 @@ class BaseClassifier(object):
             thresholds = self.get_thresholds()
 
         # get subjects
-        subjects = filter(lambda item: self.check_subject(item), data.keys())
+        subjects = [item for item in list(data.keys()) if self.check_subject(item)]
         if len(subjects) == 0:
             raise ValueError("No enrolled subjects in test set.")
 
@@ -722,7 +722,7 @@ class BaseClassifier(object):
                 lbl = labels[item]
                 train_idx[lbl].append(item)
 
-            train_data = {sub: data[idx] for sub, idx in train_idx.iteritems()}
+            train_data = {sub: data[idx] for sub, idx in train_idx.items()}
 
             # test data set
             test_idx = collections.defaultdict(list)
@@ -730,7 +730,7 @@ class BaseClassifier(object):
                 lbl = labels[item]
                 test_idx[lbl].append(item)
 
-            test_data = {sub: data[idx] for sub, idx in test_idx.iteritems()}
+            test_data = {sub: data[idx] for sub, idx in test_idx.items()}
 
             # instantiate classifier
             clf = cls(**kwargs)
@@ -832,8 +832,8 @@ class BaseClassifier(object):
 
         # target class labels
         if targets is None:
-            targets = self._subject2label.values()
-        elif isinstance(targets, basestring):
+            targets = list(self._subject2label.values())
+        elif isinstance(targets, str):
             targets = [targets]
 
         return data
@@ -975,7 +975,7 @@ class KNN(BaseClassifier):
         # select based on subject label
         aux = []
         ns = len(dists)
-        for i in xrange(ns):
+        for i in range(ns):
             aux.append(dists[i, train_labels[i, :] == label])
 
         dists = np.array(aux)
@@ -984,7 +984,7 @@ class KNN(BaseClassifier):
         dists = dists[:, :self.k]
 
         decision = np.zeros(ns, dtype='bool')
-        for i in xrange(ns):
+        for i in range(ns):
             # compare distances to threshold
             count = np.sum(dists[i, :] <= threshold)
 
@@ -1014,8 +1014,8 @@ class KNN(BaseClassifier):
             return np.linspace(self.min_thr, 1., 100)
 
         maxD = []
-        for _ in xrange(3):
-            for label in self._subject2label.values():
+        for _ in range(3):
+            for label in list(self._subject2label.values()):
                 # randomly select samples
                 aux = self.io_load(label)
                 ind = np.random.randint(0, aux.shape[0], 3)
@@ -1064,7 +1064,7 @@ class KNN(BaseClassifier):
         ns = len(dists)
 
         labels = []
-        for i in xrange(ns):
+        for i in range(ns):
             lbl, _ = majority_rule(train_labels[i, :], random=True)
 
             # compare distances to threshold
@@ -1102,8 +1102,8 @@ class KNN(BaseClassifier):
 
         # target class labels
         if targets is None:
-            targets = self._subject2label.values()
-        elif isinstance(targets, basestring):
+            targets = list(self._subject2label.values())
+        elif isinstance(targets, str):
             targets = [targets]
 
         dists = []
@@ -1415,7 +1415,7 @@ class SVM(BaseClassifier):
         aux = aux[sel, :]
 
         decision = []
-        for i in xrange(ns):
+        for i in range(ns):
             # determine majority
             predMax, count = majority_rule(aux[:, i], random=True)
             rate = float(count) / norm
@@ -1483,7 +1483,7 @@ class SVM(BaseClassifier):
             norm = 1.0
 
         labels = []
-        for i in xrange(ns):
+        for i in range(ns):
             # determine majority
             predMax, count = majority_rule(aux[:, i], random=True)
             rate = float(count) / norm
@@ -1524,11 +1524,11 @@ class SVM(BaseClassifier):
 
         # target class labels
         if self._nbSubjects == 1:
-            pairs = self._models.keys()
+            pairs = list(self._models.keys())
         else:
             if targets is None:
-                pairs = self._models.keys()
-            elif isinstance(targets, basestring):
+                pairs = list(self._models.keys())
+            elif isinstance(targets, str):
                 labels = list(
                     set(self._subject2label.values()) - set([targets]))
                 pairs = [[targets, lbl] for lbl in labels]
@@ -1563,9 +1563,9 @@ class SVM(BaseClassifier):
             dismiss = []
 
         # process dismiss
-        pairs = self._models.keys()
+        pairs = list(self._models.keys())
         for t in dismiss:
-            pairs = filter(lambda p: t in p, pairs)
+            pairs = [p for p in pairs if t in p]
 
         for p in pairs:
             self._del_clf(p)
@@ -1590,11 +1590,11 @@ class SVM(BaseClassifier):
 
         # check singles
         if self._nbSubjects == 1:
-            label = self._subject2label.values()[0]
+            label = list(self._subject2label.values())[0]
             X = self.io_load(label)
             self._get_single_clf(X, label)
         elif self._nbSubjects > 1:
-            aux = filter(lambda p: '' in p, self._models.keys())
+            aux = [p for p in list(self._models.keys()) if '' in p]
             if len(aux) != 0:
                 for p in aux:
                     self._del_clf(p)
@@ -1850,7 +1850,7 @@ def get_subject_results(results=None,
     R = np.zeros(nth, dtype='float')
     CM = []
 
-    for i in xrange(nth):  # for each threshold
+    for i in range(nth):  # for each threshold
         # authentication
         for k, lbl in enumerate(subject_idx):  # for each subject
             subject_tst = subjects[k]
@@ -2163,7 +2163,7 @@ def combination(results=None, weights=None):
         weights = {}
 
     # compile results to find all classes
-    vec = results.values()
+    vec = list(results.values())
     if len(vec) == 0:
         raise CombinationError("No keys found.")
 
@@ -2182,13 +2182,13 @@ def combination(results=None, weights=None):
         # multi-class
         counts = np.zeros(nb, dtype='float')
 
-        for n in results.iterkeys():
+        for n in results.keys():
             # ensure array
             res = np.array(results[n])
             ns = float(len(res))
 
             # get count for each unique class
-            for i in xrange(nb):
+            for i in range(nb):
                 aux = float(np.sum(res == unq[i]))
                 w = weights.get(n, 1.)
                 counts[i] += ((aux / ns) * w)

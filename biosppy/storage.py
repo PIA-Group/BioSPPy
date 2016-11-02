@@ -320,7 +320,7 @@ def store_txt(path, data, sampling_rate=1000., resolution=None, date=None,
     if resolution is not None:
         header += "Resolution:= %d\n" % resolution
     if date is not None:
-        if isinstance(date, basestring):
+        if isinstance(date, str):
             header += "Date:= %s\n" % date
         elif isinstance(date, datetime.datetime):
             header += "Date:= %s\n" % date.isoformat()
@@ -338,7 +338,7 @@ def store_txt(path, data, sampling_rate=1000., resolution=None, date=None,
         ncols = data.shape[1]
 
     if labels is None:
-        labels = ['%d' % i for i in xrange(ncols)]
+        labels = ['%d' % i for i in range(ncols)]
     elif len(labels) != ncols:
         raise ValueError("Inconsistent number of labels.")
 
@@ -720,7 +720,7 @@ class HDF(object):
 
         if node.name == '/signals':
             # delete all elements
-            for _, item in node.iteritems():
+            for _, item in node.items():
                 try:
                     del self._file[item.name]
                 except IOError:
@@ -759,7 +759,7 @@ class HDF(object):
             raise KeyError("Inexistent signal group.")
 
         out = []
-        for name, item in node.iteritems():
+        for name, item in node.items():
             if isinstance(item, h5py.Dataset):
                 out.append((group, name))
             elif recursive and isinstance(item, h5py.Group):
@@ -972,7 +972,7 @@ class HDF(object):
 
         if node.name == '/events':
             # delete all elements
-            for _, item in node.iteritems():
+            for _, item in node.items():
                 try:
                     del self._file[item.name]
                 except IOError:
@@ -1011,7 +1011,7 @@ class HDF(object):
             raise KeyError("Inexistent event group.")
 
         out = []
-        for name, item in node.iteritems():
+        for name, item in node.items():
             if isinstance(item, h5py.Group):
                 try:
                     _ = item.attrs['json']

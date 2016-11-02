@@ -770,7 +770,7 @@ def _plot_multichannel(ts=None,
 
     # check labels
     if labels is None:
-        labels = ['Ch. %d' % i for i in xrange(nch)]
+        labels = ['Ch. %d' % i for i in range(nch)]
 
     if nch < nrows:
         nrows = nch
@@ -794,7 +794,7 @@ def _plot_multichannel(ts=None,
     ax0.grid()
     axs = {(0, 0): ax0}
 
-    for i in xrange(1, nch - 1):
+    for i in range(1, nch - 1):
         a = i % nrows
         b = int(np.floor(i / float(nrows)))
         ax = fig.add_subplot(gs[a, b], sharex=ax0)
@@ -822,7 +822,7 @@ def _plot_multichannel(ts=None,
     if xlabel is not None:
         ax.set_xlabel(xlabel)
 
-        for b in xrange(0, ncols - 1):
+        for b in range(0, ncols - 1):
             a = nrows - 1
             ax = axs[(a, b)]
             ax.set_xlabel(xlabel)
@@ -1042,7 +1042,7 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
     id_ax = fig.add_subplot(122)
 
     # subject results
-    for sub in assessment['subject'].iterkeys():
+    for sub in assessment['subject'].keys():
         auth_rates = assessment['subject'][sub]['authentication']['rates']
         _ = _plot_rates(ths, auth_rates, ['FAR', 'FRR'],
                         lw=MINOR_LW,
@@ -1134,7 +1134,7 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
     ymin, ymax = _yscaling(data, alpha=1.2)
 
     # determine number of clusters
-    keys = clusters.keys()
+    keys = list(clusters.keys())
     nc = len(keys)
 
     if nc <= 4:

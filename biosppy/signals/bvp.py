@@ -181,7 +181,7 @@ def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
 
         # analyze between maxima of 2nd derivative of ss
         detected = False
-        for i in xrange(1, len(dpidx) + 1):
+        for i in range(1, len(dpidx) + 1):
             try:
                 v, u = dpidx[i - 1], dpidx[i]
             except IndexError:

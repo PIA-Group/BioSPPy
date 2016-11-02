@@ -156,7 +156,7 @@ def basic_scr(signal=None, sampling_rate=1000.):
         i0[0] = 0
 
     # amplitude
-    a = np.array(map(lambda i: np.max(signal[i1[i]:i3[i]]), range(li)))
+    a = np.array([np.max(signal[i1[i]:i3[i]]) for i in range(li)])
 
     # output
     args = (i3, i1, a)
@@ -217,7 +217,7 @@ def kbk_scr(signal=None, sampling_rate=1000.):
     thr = 0.1 * np.max(df)
 
     scrs, amps, ZC, pks = [], [], [], []
-    for i in xrange(0, len(zeros) - 1, 2):
+    for i in range(0, len(zeros) - 1, 2):
         scrs += [df[zeros[i]:zeros[i + 1]]]
         aux = scrs[-1].max()
         if aux > thr:

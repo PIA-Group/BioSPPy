@@ -134,7 +134,7 @@ def hierarchical(data=None,
                        'ward', 'weighted']:
         raise ValueError("Unknown linkage criterion '%r'." % linkage)
 
-    if not isinstance(metric, basestring):
+    if not isinstance(metric, str):
         raise TypeError("Please specify the distance metric as a string.")
 
     N = len(data)
@@ -405,7 +405,7 @@ def create_coassoc(ensemble=None, N=None):
     nparts = len(ensemble)
     assoc = 0
     for part in ensemble:
-        nsamples = np.array([len(part[key]) for key in part.iterkeys()])
+        nsamples = np.array([len(part[key]) for key in part.keys()])
         dim = np.sum(nsamples * (nsamples - 1)) / 2
 
         I = np.zeros(dim)
@@ -413,11 +413,11 @@ def create_coassoc(ensemble=None, N=None):
         X = np.ones(dim)
         ntriplets = 0
 
-        for v in part.itervalues():
+        for v in part.values():
             nb = len(v)
             if nb > 0:
-                for h in xrange(nb):
-                    for f in xrange(h + 1, nb):
+                for h in range(nb):
+                    for f in range(h + 1, nb):
                         I[ntriplets] = v[h]
                         J[ntriplets] = v[f]
                         ntriplets += 1
@@ -539,7 +539,7 @@ def mdist_templates(data=None,
         clusters = {0: np.arange(len(data), dtype='int')}
 
     # cluster labels
-    ks = clusters.keys()
+    ks = list(clusters.keys())
 
     # remove the outliers' cluster, if present
     if '-1' in ks:
@@ -631,7 +631,7 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
         raise TypeError("Please specify a data clustering.")
 
     # cluster labels
-    ks = clusters.keys()
+    ks = list(clusters.keys())
 
     # remove the outliers' cluster, if present
     if '-1' in ks:
@@ -839,7 +839,7 @@ def outliers_dmean(data=None,
             outliers.append(i)
 
     outliers = np.unique(outliers)
-    normal = np.setdiff1d(range(len(data)), outliers, assume_unique=True)
+    normal = np.setdiff1d(list(range(len(data))), outliers, assume_unique=True)
 
     # output
     clusters = {-1: outliers, 0: normal}
@@ -987,7 +987,7 @@ def _merge_clusters(clusters):
 
     """
 
-    keys = clusters.keys()
+    keys = list(clusters.keys())
 
     # outliers
     if -1 in keys:
