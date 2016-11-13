@@ -11,4 +11,10 @@
 
 # get version
 from .version import version as __version__
-from .signals import *
+
+# Lazy load
+from .signals.ecg import *
+from .signals.eda import *
+from .signals.eeg import *
+from .signals.emg import *
+from .signals.rsp import *
