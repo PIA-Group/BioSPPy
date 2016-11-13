@@ -117,7 +117,7 @@ def ecg(signal=None, sampling_rate=1000., show=True):
     names = ('ts', 'filtered', 'rpeaks', 'templates_ts', 'templates',
              'heart_rate_ts', 'heart_rate')
 
-    return utils.ReturnTuple(args, names)
+    return(ts, filtered, rpeaks, ts_tmpl, templates, ts_hr, hr)
 
 
 def _extract_heartbeats(signal=None, rpeaks=None, before=200, after=400):
@@ -163,7 +163,7 @@ def _extract_heartbeats(signal=None, rpeaks=None, before=200, after=400):
     templates = np.array(templates)
     newR = np.array(newR, dtype='int')
 
-    return templates, newR
+    return(templates, newR)
 
 
 def extract_heartbeats(signal=None, rpeaks=None, sampling_rate=1000.,
@@ -216,7 +216,7 @@ def extract_heartbeats(signal=None, rpeaks=None, sampling_rate=1000.,
                                           before=before,
                                           after=after)
 
-    return utils.ReturnTuple((templates, newR), ('templates', 'rpeaks'))
+    return(templates, newR)
 
 
 def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
@@ -384,7 +384,7 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
              'mean_deviation', 'std_deviation', 'mean_ref_ibi', 'std_ref_ibi',
              'mean_test_ibi', 'std_test_ibi',)
 
-    return utils.ReturnTuple(args, names)
+    return(TP, FP, perf, acc, err, matchIdx, dev, mdev, sdev, rIBIm, rIBIs, tIBIm, tIBIs)
 
 
 def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
@@ -450,7 +450,7 @@ def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
     rpeaks.sort()
     rpeaks = np.array(rpeaks, dtype='int')
 
-    return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+    return(rpeaks)
 
 
 def christov_segmenter(signal=None, sampling_rate=1000.):
@@ -616,7 +616,7 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
     rpeaks = sorted(list(set(rpeaks)))
     rpeaks = np.array(rpeaks, dtype='int')
 
-    return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+    return(rpeaks)
 
 
 def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
@@ -770,7 +770,7 @@ def engzee_segmenter(signal=None, sampling_rate=1000., threshold=0.48):
     rpeaks = sorted(list(set(rpeaks)))
     rpeaks = np.array(rpeaks, dtype='int')
 
-    return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+    return(rpeaks)
 
 
 def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
@@ -830,7 +830,7 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
 
     rpeaks = np.array(rpeaks, dtype='int')
 
-    return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+    return(rpeaks)
 
 
 def hamilton_segmenter(signal=None, sampling_rate=1000.):
@@ -1136,4 +1136,4 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
     rpeaks = sorted(list(set(r_beats)))
     rpeaks = np.array(rpeaks, dtype='int')
 
-    return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+    return(rpeaks)
