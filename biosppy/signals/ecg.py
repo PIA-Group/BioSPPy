@@ -20,6 +20,11 @@ import scipy.signal as ss
 from . import tools as st
 from .. import plotting, utils
 
+# Compatible with python 3
+try: 
+    xrange 
+except NameError: 
+    xrange = range
 
 def ecg(signal=None, sampling_rate=1000., show=True):
     """Process a raw ECG signal and extract relevant signal features using
@@ -379,7 +384,7 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
              'mean_deviation', 'std_deviation', 'mean_ref_ibi', 'std_ref_ibi',
              'mean_test_ibi', 'std_test_ibi',)
 
-    return utils.ReturnTuple(args, names)
+    return(TP, FP, perf, acc, err, matchIdx, dev, mdev, sdev, rIBIm, rIBIs, tIBIm, tIBIs)
 
 
 def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
