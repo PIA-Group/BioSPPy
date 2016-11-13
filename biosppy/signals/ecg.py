@@ -20,6 +20,11 @@ import scipy.signal as ss
 from . import tools as st
 from .. import plotting, utils
 
+# Compatible with python 3
+try: 
+    xrange 
+except NameError: 
+    xrange = range
 
 def ecg(signal=None, sampling_rate=1000., show=True):
     """Process a raw ECG signal and extract relevant signal features using
