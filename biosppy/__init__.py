@@ -17,4 +17,4 @@ from .signals.ecg import *
 from .signals.eda import *
 from .signals.eeg import *
 from .signals.emg import *
-from .signals.rsp import *
+from .signals.resp import *
