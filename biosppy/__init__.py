@@ -11,3 +11,11 @@
 
 # get version
 from .version import version as __version__
+
+# Allow lazy loading
+from biosppy.signals import ecg
+from biosppy.signals import eda
+from biosppy.signals import eeg
+from biosppy.signals import emg
+from biosppy.signals import bvp
+from biosppy.signals import resp
