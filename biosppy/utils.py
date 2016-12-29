@@ -10,6 +10,11 @@
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import map, range, zip
+import six
+
 # built-in
 import collections
 import copy
@@ -270,7 +275,7 @@ class ReturnTuple(tuple):
 
         """
 
-        return collections.OrderedDict(list(zip(self._names, self)))
+        return collections.OrderedDict(zip(self._names, self))
 
     __dict__ = property(as_dict)
 
@@ -291,7 +296,7 @@ class ReturnTuple(tuple):
 
         """
 
-        if isinstance(key, str):
+        if isinstance(key, six.string_types):
             if key not in self._names:
                 raise KeyError("Unknown key: %r." % key)
 

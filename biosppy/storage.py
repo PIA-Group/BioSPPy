@@ -10,6 +10,11 @@
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range
+import six
+
 # built-in
 import datetime
 import json
@@ -320,7 +325,7 @@ def store_txt(path, data, sampling_rate=1000., resolution=None, date=None,
     if resolution is not None:
         header += "Resolution:= %d\n" % resolution
     if date is not None:
-        if isinstance(date, str):
+        if isinstance(date, six.string_types):
             header += "Date:= %s\n" % date
         elif isinstance(date, datetime.datetime):
             header += "Date:= %s\n" % date.isoformat()
@@ -720,7 +725,7 @@ class HDF(object):
 
         if node.name == '/signals':
             # delete all elements
-            for _, item in node.items():
+            for _, item in six.iteritems(node):
                 try:
                     del self._file[item.name]
                 except IOError:
@@ -759,7 +764,7 @@ class HDF(object):
             raise KeyError("Inexistent signal group.")
 
         out = []
-        for name, item in node.items():
+        for name, item in six.iteritems(node):
             if isinstance(item, h5py.Dataset):
                 out.append((group, name))
             elif recursive and isinstance(item, h5py.Group):
@@ -972,7 +977,7 @@ class HDF(object):
 
         if node.name == '/events':
             # delete all elements
-            for _, item in node.items():
+            for _, item in six.iteritems(node):
                 try:
                     del self._file[item.name]
                 except IOError:
@@ -1011,7 +1016,7 @@ class HDF(object):
             raise KeyError("Inexistent event group.")
 
         out = []
-        for name, item in node.items():
+        for name, item in six.iteritems(node):
             if isinstance(item, h5py.Group):
                 try:
                     _ = item.attrs['json']

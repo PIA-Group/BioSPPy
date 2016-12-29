@@ -10,6 +10,11 @@
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range, zip
+import six
+
 # built-in
 import os
 
@@ -829,7 +834,7 @@ def _plot_multichannel(ts=None,
 
     if ylabel is not None:
         # middle left
-        a = nrows / 2
+        a = nrows // 2
         ax = axs[(a, 0)]
         ax.set_ylabel(ylabel)
 
@@ -1042,7 +1047,7 @@ def plot_biometrics(assessment=None, eer_idx=None, path=None, show=False):
     id_ax = fig.add_subplot(122)
 
     # subject results
-    for sub in assessment['subject'].keys():
+    for sub in six.iterkeys(assessment['subject']):
         auth_rates = assessment['subject'][sub]['authentication']['rates']
         _ = _plot_rates(ths, auth_rates, ['FAR', 'FRR'],
                         lw=MINOR_LW,
@@ -1134,7 +1139,7 @@ def plot_clustering(data=None, clusters=None, path=None, show=False):
     ymin, ymax = _yscaling(data, alpha=1.2)
 
     # determine number of clusters
-    keys = list(clusters.keys())
+    keys = list(clusters)
     nc = len(keys)
 
     if nc <= 4:

@@ -9,13 +9,11 @@
     :license: BSD 3-clause, see LICENSE for more details.
 """
 
+# compat
+from __future__ import absolute_import, division, print_function
+
 # get version
 from .version import version as __version__
 
-# Allow lazy loading
-from biosppy.signals import ecg
-from biosppy.signals import eda
-from biosppy.signals import eeg
-from biosppy.signals import emg
-from biosppy.signals import bvp
-from biosppy.signals import resp
+# allow lazy loading
+from .signals import bvp, ecg, eda, eeg, emg, resp, tools

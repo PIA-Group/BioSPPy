@@ -11,6 +11,11 @@
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range
+import six
+
 # 3rd party
 import numpy as np
 import scipy.signal as ss
@@ -479,7 +484,7 @@ def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
 
     length = len(signal)
 
-    if isinstance(kernel, str):
+    if isinstance(kernel, six.string_types):
         # check length
         if size > length:
             size = length - 1
@@ -684,7 +689,7 @@ def power_spectrum(signal=None,
         npoints = 2 ** (np.ceil(np.log2(npoints)))
 
     Nyq = float(sampling_rate) / 2
-    hpoints = npoints / 2
+    hpoints = npoints // 2
 
     freqs = np.linspace(0, Nyq, hpoints)
     power = np.abs(np.fft.fft(signal, npoints)) / npoints
@@ -998,7 +1003,7 @@ def windower(signal=None,
 
     length = len(signal)
 
-    if isinstance(kernel, str):
+    if isinstance(kernel, six.string_types):
         # check size
         if size > length:
             raise ValueError("Window size must be smaller than signal length.")
@@ -1019,7 +1024,7 @@ def windower(signal=None,
         raise ValueError("Step size must be at least 1.")
 
     # number of windows
-    nb = 1 + (length - size) / step
+    nb = 1 + (length - size) // step
 
     # check signal dimensionality
     if np.ndim(signal) == 2:

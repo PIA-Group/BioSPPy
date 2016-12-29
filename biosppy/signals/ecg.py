@@ -12,6 +12,10 @@
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range, zip
+
 # 3rd party
 import numpy as np
 import scipy.signal as ss
@@ -279,6 +283,8 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
 
     if minRR is None:
         minRR = np.inf
+
+    sampling_rate = float(sampling_rate)
 
     # ensure numpy
     reference = np.array(reference)

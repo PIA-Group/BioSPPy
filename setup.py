@@ -8,9 +8,9 @@ A toolbox for biosignal processing written in Python.
 """
 
 # Imports
-import biosppy
-import os
 from setuptools import find_packages, setup
+import os
+import re
 
 
 def read(*paths):
@@ -21,9 +21,22 @@ def read(*paths):
 
 
 def get_version():
-    """Get the module version"""
+    """Get the module version."""
 
-    return biosppy.__version__
+    with open('biosppy/version.py', 'rb') as fid:
+        txt = fid.read()
+
+    m = re.search("version\s*=\s*'([\w.]+)'", txt)
+
+    if m:
+        try:
+            ver = m.group(1)
+        except IndexError:
+            raise Exception("Could not parse version string.")
+
+    ver = ver.strip()
+
+    return ver
 
 
 setup(name='biosppy',

@@ -10,6 +10,10 @@
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+import six
+
 # 3rd party
 import numpy as np
 import scipy.spatial.distance as ssd
@@ -83,7 +87,7 @@ def pdist(X, metric='euclidean', p=2, w=None, V=None, VI=None):
 
     """
 
-    if isinstance(metric, str):
+    if isinstance(metric, six.string_types):
         if metric == 'pcosine':
             metric = pcosine
 
@@ -127,7 +131,7 @@ def cdist(XA, XB, metric='euclidean', p=2, V=None, VI=None, w=None):
 
     """
 
-    if isinstance(metric, str):
+    if isinstance(metric, six.string_types):
         if metric == 'pcosine':
             metric = pcosine
 
