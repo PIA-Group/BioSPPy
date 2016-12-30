@@ -1,12 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.plotting
-    ----------------
+biosppy.plotting
+----------------
 
-    This module provides utilities to plot data.
+This module provides utilities to plot data.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports

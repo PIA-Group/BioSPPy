@@ -1,12 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy
-    -------
+biosppy
+-------
 
-    A toolbox for biosignal processing written in Python.
+A toolbox for biosignal processing written in Python.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # compat

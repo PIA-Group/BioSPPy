@@ -1,17 +1,17 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.biometrics
-    ------------------
+biosppy.biometrics
+------------------
 
-    This module provides classifier interfaces for identity recognition
-    (biometrics) applications. The core API methods are:
-    * enroll: add a new subject;
-    * dismiss: remove an existing subject;
-    * identify: determine the identity of collected biometric dataset;
-    * authenticate: verify the identity of collected biometric dataset.
+This module provides classifier interfaces for identity recognition
+(biometrics) applications. The core API methods are:
+* enroll: add a new subject;
+* dismiss: remove an existing subject;
+* identify: determine the identity of collected biometric dataset;
+* authenticate: verify the identity of collected biometric dataset.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports

@@ -1,13 +1,13 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.ecg
-    -------------------
+biosppy.signals.ecg
+-------------------
 
-    This module provides methods to process Electrocardiographic (ECG) signals.
-    Implemented code assumes a single-channel Lead I like ECG signal.
+This module provides methods to process Electrocardiographic (ECG) signals.
+Implemented code assumes a single-channel Lead I like ECG signal.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 
 """
 

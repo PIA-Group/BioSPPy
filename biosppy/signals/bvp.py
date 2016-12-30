@@ -1,12 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.bvp
-    -------------------
+biosppy.signals.bvp
+-------------------
 
-    This module provides methods to process Blood Volume Pulse (BVP) signals.
+This module provides methods to process Blood Volume Pulse (BVP) signals.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports

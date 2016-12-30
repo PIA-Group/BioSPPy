@@ -77,7 +77,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'BioSPPy'
-copyright = '2015, Instituto de Telecomunicacoes'
+copyright = '2015-2017, Instituto de Telecomunicacoes'
 author = 'Instituto de Telecomunicacoes'
 
 # The version info for the project you're documenting, acts as replacement for

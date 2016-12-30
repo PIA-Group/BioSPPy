@@ -1,12 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.resp
-    --------------------
+biosppy.signals.resp
+--------------------
 
-    This module provides methods to process Respiration (Resp) signals.
+This module provides methods to process Respiration (Resp) signals.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports

@@ -1,12 +1,12 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.metrics
-    ---------------
+biosppy.metrics
+---------------
 
-    This module provides pairwise distance computation methods.
+This module provides pairwise distance computation methods.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
