@@ -1,15 +1,18 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.emg
-    -------------------
+biosppy.signals.emg
+-------------------
 
-    This module provides methods to process Electromyographic (EMG) signals.
+This module provides methods to process Electromyographic (EMG) signals.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+
 # 3rd party
 import numpy as np
 

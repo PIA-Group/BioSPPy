@@ -1,16 +1,20 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.eda
-    -------------------
+biosppy.signals.eda
+-------------------
 
-    This module provides methods to process Electrodermal Activity (EDA)
-    signals, also known as Galvanic Skin Response (GSR).
+This module provides methods to process Electrodermal Activity (EDA)
+signals, also known as Galvanic Skin Response (GSR).
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range
+
 # 3rd party
 import numpy as np
 
@@ -156,7 +160,7 @@ def basic_scr(signal=None, sampling_rate=1000.):
         i0[0] = 0
 
     # amplitude
-    a = np.array(map(lambda i: np.max(signal[i1[i]:i3[i]]), range(li)))
+    a = np.array([np.max(signal[i1[i]:i3[i]]) for i in range(li)])
 
     # output
     args = (i3, i1, a)
@@ -217,7 +221,7 @@ def kbk_scr(signal=None, sampling_rate=1000.):
     thr = 0.1 * np.max(df)
 
     scrs, amps, ZC, pks = [], [], [], []
-    for i in xrange(0, len(zeros) - 1, 2):
+    for i in range(0, len(zeros) - 1, 2):
         scrs += [df[zeros[i]:zeros[i + 1]]]
         aux = scrs[-1].max()
         if aux > thr:

@@ -1,16 +1,20 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.eeg
-    -------------------
+biosppy.signals.eeg
+-------------------
 
-    This module provides methods to process Electroencephalographic (EEG)
-    signals.
+This module provides methods to process Electroencephalographic (EEG)
+signals.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range
+
 # 3rd party
 import numpy as np
 
@@ -75,7 +79,7 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
     nch = signal.shape[1]
 
     if labels is None:
-        labels = ['Ch. %d' % i for i in xrange(nch)]
+        labels = ['Ch. %d' % i for i in range(nch)]
     else:
         if len(labels) != nch:
             raise ValueError(
@@ -261,8 +265,8 @@ def get_power_features(signal=None,
         # must be odd
         md_size += 1
 
-    for i in xrange(nb):
-        for j in xrange(nch):
+    for i in range(nb):
+        for j in range(nch):
             values[:, i, j], _ = st.smoother(signal=values[:, i, j],
                                              kernel='median',
                                              size=md_size)
@@ -331,7 +335,7 @@ def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
         N = min_pad
 
     # PLF pairs
-    pairs = [(i, j) for i in xrange(nch) for j in xrange(i + 1, nch)]
+    pairs = [(i, j) for i in range(nch) for j in range(i + 1, nch)]
     nb = len(pairs)
 
     # windower
@@ -349,7 +353,7 @@ def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
         # must be odd
         md_size += 1
 
-    for i in xrange(nb):
+    for i in range(nb):
         values[:, i], _ = st.smoother(signal=values[:, i],
                                       kernel='median',
                                       size=md_size)
@@ -389,7 +393,7 @@ def _power_features(signal=None, sampling_rate=1000., bands=None, pad=0):
     nch = signal.shape[1]
 
     out = np.zeros((len(bands), nch), dtype='float')
-    for i in xrange(nch):
+    for i in range(nch):
         # compute power spectrum
         freqs, power = st.power_spectrum(signal=signal[:, i],
                                          sampling_rate=sampling_rate,

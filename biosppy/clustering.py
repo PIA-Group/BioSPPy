@@ -1,16 +1,21 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.clustering
-    ------------------
+biosppy.clustering
+------------------
 
-    This module provides various unsupervised machine learning (clustering)
-    algorithms.
+This module provides various unsupervised machine learning (clustering)
+algorithms.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import map, range, zip
+import six
+
 # 3rd party
 import numpy as np
 import scipy.cluster.hierarchy as sch
@@ -134,7 +139,7 @@ def hierarchical(data=None,
                        'ward', 'weighted']:
         raise ValueError("Unknown linkage criterion '%r'." % linkage)
 
-    if not isinstance(metric, basestring):
+    if not isinstance(metric, six.string_types):
         raise TypeError("Please specify the distance metric as a string.")
 
     N = len(data)
@@ -405,19 +410,19 @@ def create_coassoc(ensemble=None, N=None):
     nparts = len(ensemble)
     assoc = 0
     for part in ensemble:
-        nsamples = np.array([len(part[key]) for key in part.iterkeys()])
-        dim = np.sum(nsamples * (nsamples - 1)) / 2
+        nsamples = np.array([len(part[key]) for key in part])
+        dim = np.sum(nsamples * (nsamples - 1)) // 2
 
         I = np.zeros(dim)
         J = np.zeros(dim)
         X = np.ones(dim)
         ntriplets = 0
 
-        for v in part.itervalues():
+        for v in six.itervalues(part):
             nb = len(v)
             if nb > 0:
-                for h in xrange(nb):
-                    for f in xrange(h + 1, nb):
+                for h in range(nb):
+                    for f in range(h + 1, nb):
                         I[ntriplets] = v[h]
                         J[ntriplets] = v[f]
                         ntriplets += 1
@@ -539,7 +544,7 @@ def mdist_templates(data=None,
         clusters = {0: np.arange(len(data), dtype='int')}
 
     # cluster labels
-    ks = clusters.keys()
+    ks = list(clusters)
 
     # remove the outliers' cluster, if present
     if '-1' in ks:
@@ -631,7 +636,7 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
         raise TypeError("Please specify a data clustering.")
 
     # cluster labels
-    ks = clusters.keys()
+    ks = list(clusters)
 
     # remove the outliers' cluster, if present
     if '-1' in ks:
@@ -839,7 +844,7 @@ def outliers_dmean(data=None,
             outliers.append(i)
 
     outliers = np.unique(outliers)
-    normal = np.setdiff1d(range(len(data)), outliers, assume_unique=True)
+    normal = np.setdiff1d(list(range(len(data))), outliers, assume_unique=True)
 
     # output
     clusters = {-1: outliers, 0: normal}
@@ -987,7 +992,7 @@ def _merge_clusters(clusters):
 
     """
 
-    keys = clusters.keys()
+    keys = list(clusters)
 
     # outliers
     if -1 in keys:

@@ -1,15 +1,19 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.metrics
-    ---------------
+biosppy.metrics
+---------------
 
-    This module provides pairwise distance computation methods.
+This module provides pairwise distance computation methods.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+import six
+
 # 3rd party
 import numpy as np
 import scipy.spatial.distance as ssd
@@ -83,7 +87,7 @@ def pdist(X, metric='euclidean', p=2, w=None, V=None, VI=None):
 
     """
 
-    if isinstance(metric, basestring):
+    if isinstance(metric, six.string_types):
         if metric == 'pcosine':
             metric = pcosine
 
@@ -127,7 +131,7 @@ def cdist(XA, XB, metric='euclidean', p=2, V=None, VI=None, w=None):
 
     """
 
-    if isinstance(metric, basestring):
+    if isinstance(metric, six.string_types):
         if metric == 'pcosine':
             metric = pcosine
 

@@ -1,15 +1,19 @@
 ﻿# -*- coding: utf-8 -*-
 """
-    biosppy.signals.bvp
-    -------------------
+biosppy.signals.bvp
+-------------------
 
-    This module provides methods to process Blood Volume Pulse (BVP) signals.
+This module provides methods to process Blood Volume Pulse (BVP) signals.
 
-    :copyright: (c) 2015 by Instituto de Telecomunicacoes
-    :license: BSD 3-clause, see LICENSE for more details.
+:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
 """
 
 # Imports
+# compat
+from __future__ import absolute_import, division, print_function
+from six.moves import range
+
 # 3rd party
 import numpy as np
 
@@ -181,7 +185,7 @@ def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
 
         # analyze between maxima of 2nd derivative of ss
         detected = False
-        for i in xrange(1, len(dpidx) + 1):
+        for i in range(1, len(dpidx) + 1):
             try:
                 v, u = dpidx[i - 1], dpidx[i]
             except IndexError:
