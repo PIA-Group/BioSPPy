@@ -69,7 +69,8 @@ def _plot_filter(b, a, sampling_rate=1000., nfreqs=512, ax=None):
         fig = ax.figure
 
     # amplitude
-    ax.semilogy(freqs, np.abs(resp), 'b', linewidth=MAJOR_LW)
+    pwr = 20. * np.log10(np.abs(resp))
+    ax.plot(freqs, pwr, 'b', linewidth=MAJOR_LW)
     ax.set_ylabel('Amplitude (dB)', color='b')
     ax.set_xlabel('Frequency (Hz)')
 
