@@ -1301,3 +1301,56 @@ def find_intersection(x1=None,
     values = np.mean(np.vstack((p1(roots), p2(roots))), axis=0)
 
     return utils.ReturnTuple((roots, values), ('roots', 'values'))
+
+
+def finite_difference(signal=None, weights=None):
+    """Apply the Finite Difference method to compute derivatives.
+    
+    Parameters
+    ----------
+    signal : array
+        Signal to differentiate.
+    weights : list, array
+        Finite difference weight coefficients.
+    
+    Returns
+    -------
+    index : array
+        Indices from `signal` for which the derivative was computed.
+    derivative : array
+        Computed derivative.
+    
+    Notes
+    -----
+    * The method assumes central differences weights.
+    * The method accounts for the delay introduced by the method .
+    
+    Raises
+    ------
+    ValueError
+        If the number of weights is not odd.
+    
+    """
+    
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify a signal to differentiate.")
+    
+    if weights is None:
+        raise TypeError("Please specify the weight coefficients.")
+    
+    N = len(weights)
+    if N % 2 == 0:
+        raise ValueError("Number of weights must be odd.")
+    
+    # diff
+    derivative = ss.lfilter(weights, [1], signal)
+    
+    # trim delay
+    D = N - 1
+    D2 = D // 2
+    
+    index = np.arange(D2, len(signal) - D2, dtype='int')
+    derivative = derivative[D:]
+    
+    return utils.ReturnTuple((index, derivative), ('index', 'derivative'))
