@@ -136,7 +136,7 @@ def _filter_signal(b, a, signal, zi=None, check_phase=True, **kwargs):
     return filtered, zf
 
 
-def _filter_resp(b, a, sampling_rate=1000., nfreqs=512):
+def _filter_resp(b, a, sampling_rate=1000., nfreqs=4096):
     """Compute the filter frequency response.
 
     Parameters

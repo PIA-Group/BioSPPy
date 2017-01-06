@@ -33,7 +33,7 @@ MINOR_LW = 1.5
 MAX_ROWS = 10
 
 
-def _plot_filter(b, a, sampling_rate=1000., nfreqs=512, ax=None):
+def _plot_filter(b, a, sampling_rate=1000., nfreqs=4096, ax=None):
     """Compute and plot the frequency response of a digital filter.
 
     Parameters
@@ -70,7 +70,7 @@ def _plot_filter(b, a, sampling_rate=1000., nfreqs=512, ax=None):
 
     # amplitude
     pwr = 20. * np.log10(np.abs(resp))
-    ax.plot(freqs, pwr, 'b', linewidth=MAJOR_LW)
+    ax.semilogx(freqs, pwr, 'b', linewidth=MAJOR_LW)
     ax.set_ylabel('Amplitude (dB)', color='b')
     ax.set_xlabel('Frequency (Hz)')
 
