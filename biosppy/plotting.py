@@ -400,8 +400,10 @@ def plot_eda(ts=None,
 
 
 def plot_emg(ts=None,
+             sampling_rate=None,
              raw=None,
              filtered=None,
+             processed=None,
              onsets=None,
              path=None,
              show=False):
@@ -411,10 +413,14 @@ def plot_emg(ts=None,
     ----------
     ts : array
         Signal time axis reference (seconds).
+    sampling_rate : int, float
+        Sampling frequency (Hz).
     raw : array
         Raw EMG signal.
     filtered : array
         Filtered EMG signal.
+    processed : array
+        Processed EMG signal according to the chosen onset detector.
     onsets : array
         Indices of EMG pulse onsets.
     path : str, optional
@@ -428,7 +434,7 @@ def plot_emg(ts=None,
     fig.suptitle('EMG Summary')
 
     # raw signal
-    ax1 = fig.add_subplot(211)
+    ax1 = fig.add_subplot(311)
 
     ax1.plot(ts, raw, linewidth=MAJOR_LW, label='Raw')
 
@@ -437,7 +443,7 @@ def plot_emg(ts=None,
     ax1.grid()
 
     # filtered signal with onsets
-    ax2 = fig.add_subplot(212, sharex=ax1)
+    ax2 = fig.add_subplot(312, sharex=ax1)
 
     ymin = np.min(filtered)
     ymax = np.max(filtered)
@@ -455,6 +461,14 @@ def plot_emg(ts=None,
     ax2.set_ylabel('Amplitude')
     ax2.legend()
     ax2.grid()
+
+    # processed signal
+    ax3 = fig.add_subplot(313)
+    ax3.plot(np.arange(len(processed))/sampling_rate, processed, linewidth=MAJOR_LW, label='Processed')
+    ax3.set_xlabel('Time (s)')
+    ax3.set_ylabel('Amplitude')
+    ax3.legend()
+    ax3.grid()
 
     # make layout tight
     fig.tight_layout()
