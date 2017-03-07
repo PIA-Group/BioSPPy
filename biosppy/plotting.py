@@ -77,7 +77,7 @@ def _plot_filter(b, a, sampling_rate=1000., nfreqs=4096, ax=None):
     # phase
     angles = np.unwrap(np.angle(resp))
     ax2 = ax.twinx()
-    ax2.plot(freqs, angles, 'g', linewidth=MAJOR_LW)
+    ax2.semilogx(freqs, angles, 'g', linewidth=MAJOR_LW)
     ax2.set_ylabel('Angle (radians)', color='g')
 
     ax.grid()
