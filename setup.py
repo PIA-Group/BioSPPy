@@ -22,27 +22,21 @@ def read(*paths):
         return fid.read()
 
 
-def get_version():
+def get_version(path):
     """Get the module version."""
 
-    with open('biosppy/version.py', 'r') as fid:
-        txt = fid.read()
+    with open(path, 'r') as fid:
+        m = re.search("version\s*=\s*'([\w.]+)'", fid.read())
+        if m is None:
+            raise RuntimeError("Could not find version string.")
+        version = m.group(1)
+        version = version.strip()
 
-    m = re.search("version\s*=\s*'([\w.]+)'", txt)
-
-    if m:
-        try:
-            ver = m.group(1)
-        except IndexError:
-            raise Exception("Could not parse version string.")
-
-    ver = ver.strip()
-
-    return ver
+    return version
 
 
 setup(name='biosppy',
-      version=get_version(),
+      version=get_version('biosppy/version.py'),
       description="A toolbox for biosignal processing written in Python.",
       long_description=read('README.rst'),
       url='https://github.com/PIA-Group/BioSPPy',
