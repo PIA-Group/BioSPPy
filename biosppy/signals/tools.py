@@ -1769,3 +1769,119 @@ def signal_cross_join(signal1=None,
     names = ('matrix_index', 'matrix_profile')
 
     return utils.ReturnTuple(args, names)
+
+
+def mean_waves(data=None, size=None, step=None):
+    """Extract mean samples from a data set.
+    
+    Parameters
+    ----------
+    data : array
+        An m by n array of m data samples in an n-dimensional space.
+    size : int
+        Number of samples to use for each mean sample.
+    step : int, optional
+        Number of samples to jump, controlling overlap; default is equal to
+        `size` (no overlap).
+    
+    Returns
+    -------
+    waves : array
+        An k by n array of mean samples.
+    
+    Notes
+    -----
+    * Discards trailing samples if they are not enough to satify the `size`
+      parameter.
+    
+    Raises
+    ------
+    ValueError
+        If `step` is an invalid value.
+    ValueError
+        If there are not enough samples for the given `size`.
+    
+    """
+    
+    # check inputs
+    if data is None:
+        raise TypeError("Please specify an input data set.")
+    
+    if size is None:
+        raise TypeError("Please specify the number of samples for the mean.")
+    
+    if step is None:
+        step = size
+    
+    if step < 0:
+        raise ValueError("The step must be a positive integer.")
+    
+    # number of waves
+    L = len(data) - size
+    nb = 1 + L // step
+    if nb <= 0:
+        raise ValueError("Not enough samples for the given `size`.")
+    
+    # compute
+    waves = [np.mean(data[i:i+size], axis=0) for i in range(0, L+1, step)]
+    waves = np.array(waves)
+    
+    return utils.ReturnTuple((waves, ), ('waves', ))
+
+
+def median_waves(data=None, size=None, step=None):
+    """Extract median samples from a data set.
+    
+    Parameters
+    ----------
+    data : array
+        An m by n array of m data samples in an n-dimensional space.
+    size : int
+        Number of samples to use for each median sample.
+    step : int, optional
+        Number of samples to jump, controlling overlap; default is equal to
+        `size` (no overlap).
+    
+    Returns
+    -------
+    waves : array
+        An k by n array of median samples.
+    
+    Notes
+    -----
+    * Discards trailing samples if they are not enough to satify the `size`
+      parameter.
+    
+    Raises
+    ------
+    ValueError
+        If `step` is an invalid value.
+    ValueError
+        If there are not enough samples for the given `size`.
+    
+    """
+    
+    # check inputs
+    if data is None:
+        raise TypeError("Please specify an input data set.")
+    
+    if size is None:
+        raise TypeError("Please specify the number of samples for the median.")
+    
+    if step is None:
+        step = size
+    
+    if step < 0:
+        raise ValueError("The step must be a positive integer.")
+    
+    # number of waves
+    L = len(data) - size
+    nb = 1 + L // step
+    if nb <= 0:
+        raise ValueError("Not enough samples for the given `size`.")
+    
+    # compute
+    waves = [np.median(data[i:i+size], axis=0) for i in range(0, L+1, step)]
+    waves = np.array(waves)
+    
+    return utils.ReturnTuple((waves, ), ('waves', ))
