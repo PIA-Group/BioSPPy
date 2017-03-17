@@ -27,7 +27,7 @@ import collections
 import numpy as np
 import shortuuid
 from bidict import bidict
-from sklearn import cross_validation as skcv
+from sklearn import model_selection as skcv
 from sklearn import svm as sksvm
 
 # local
@@ -703,7 +703,7 @@ class BaseClassifier(object):
         labels : list, array
             A list of m class labels.
         cv : CV iterator
-            A `sklearn.cross_validation` iterator.
+            A `sklearn.model_selection` iterator.
         thresholds : array, optional
             Classifier thresholds to use.
         ``**kwargs`` : dict, optional
@@ -2268,7 +2268,7 @@ def cross_validation(labels,
                      random_state=None):
     """Return a Cross Validation (CV) iterator.
 
-    Wraps the StratifiedShuffleSplit iterator from sklearn.cross_validation.
+    Wraps the StratifiedShuffleSplit iterator from sklearn.model_selection.
     This iterator returns stratified randomized folds, which preserve the
     percentage of samples for each class.
 
@@ -2295,10 +2295,11 @@ def cross_validation(labels,
 
     """
 
-    cv = skcv.StratifiedShuffleSplit(labels,
-                                     n_iter=n_iter,
-                                     test_size=test_size,
-                                     train_size=train_size,
-                                     random_state=random_state)
+    cv = skcv.StratifiedShuffleSplit(
+        n_splits=n_iter,
+        test_size=test_size,
+        train_size=train_size,
+        random_state=random_state,
+    ).split(np.zeros(len(labels)), labels)
 
     return utils.ReturnTuple((cv,), ('cv',))

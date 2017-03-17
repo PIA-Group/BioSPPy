@@ -22,7 +22,7 @@ import scipy.cluster.hierarchy as sch
 import scipy.cluster.vq as scv
 import scipy.sparse as sp
 import sklearn.cluster as skc
-from sklearn.grid_search import ParameterGrid
+from sklearn.model_selection import ParameterGrid
 
 # local
 from . import metrics, utils
@@ -247,7 +247,7 @@ def consensus(data=None, k=0, linkage='average', fcn=None, grid=None):
         A clustering function.
     grid : dict, list, optional
         A (list of) dictionary with parameters for each run of the clustering
-        method (see sklearn.grid_search.ParameterGrid).
+        method (see sklearn.model_selection.ParameterGrid).
 
     Returns
     -------
@@ -352,7 +352,7 @@ def create_ensemble(data=None, fcn=None, grid=None):
         A clustering function.
     grid : dict, list, optional
         A (list of) dictionary with parameters for each run of the clustering
-        method (see sklearn.grid_search.ParameterGrid).
+        method (see sklearn.model_selection.ParameterGrid).
 
     Returns
     -------

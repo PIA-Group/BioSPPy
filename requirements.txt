@@ -6,7 +6,7 @@ numpy==1.11.1
 pyparsing==2.1.4
 python-dateutil==2.5.3
 pytz==2016.6.1
-scikit-learn==0.17.1
+scikit-learn==0.18.1
 scipy==0.18.1
 shortuuid==0.4.3
 six==1.10.0
