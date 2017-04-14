@@ -503,7 +503,7 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
     X = ss.filtfilt(b, a, signal)
     # 2. Moving averaging of samples in 28 ms interval for electromyogram
     # noise suppression a filter with first zero at about 35 Hz.
-    b = np.ones(sampling_rate / 35.) / 35.
+    b = np.ones(int(sampling_rate / 35.)) / 35.
     X = ss.filtfilt(b, a, X)
     X, _, _ = st.filter_signal(signal=X,
                                ftype='butter',
@@ -531,11 +531,11 @@ def christov_segmenter(signal=None, sampling_rate=1000.):
     # with first zero at about 25 Hz. It is suppressing the noise
     # magnified by the differentiation procedure used in the
     # process of the complex lead sintesis.
-    b = np.ones(sampling_rate / 25.) / 25.
+    b = np.ones(int(sampling_rate / 25.)) / 25.
     Y = ss.lfilter(b, a, Y)
 
     # Init
-    MM = M_th * np.max(Y[:5 * sampling_rate]) * np.ones(5)
+    MM = M_th * np.max(Y[:int(5 * sampling_rate)]) * np.ones(5)
     MMidx = 0
     M = np.mean(MM)
     slope = np.linspace(1.0, 0.6, int(sampling_rate))
@@ -827,7 +827,7 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
         for i in b[1:]:
             if i - previous > v_300ms:
                 previous = i
-                rpeaks.append(np.argmax(signal[i:i + v_100ms]) + i)
+                rpeaks.append(np.argmax(signal[int(i):int(i + v_100ms)]) + i)
 
     rpeaks = np.array(rpeaks, dtype='int')
 
