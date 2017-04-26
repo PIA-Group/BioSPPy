@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 """
 biosppy.signals.eda
 -------------------
@@ -23,7 +23,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def eda(signal=None, sampling_rate=1000., show=True):
+def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
     """Process a raw EDA signal and extract relevant signal features using
     default parameters.
 
@@ -35,6 +35,8 @@ def eda(signal=None, sampling_rate=1000., show=True):
         Sampling frequency (Hz).
     show : bool, optional
         If True, show a summary plot.
+    min_amplitude : float, optional
+        Minimum treshold by which to exclude SCRs.
 
     Returns
     -------
@@ -76,7 +78,7 @@ def eda(signal=None, sampling_rate=1000., show=True):
                               mirror=True)
 
     # get SCR info
-    onsets, peaks, amps = kbk_scr(signal=filtered, sampling_rate=sampling_rate)
+    onsets, peaks, amps = kbk_scr(signal=filtered, sampling_rate=sampling_rate, min_amplitude=min_amplitude)
 
     # get time vectors
     length = len(signal)
@@ -169,7 +171,7 @@ def basic_scr(signal=None, sampling_rate=1000.):
     return utils.ReturnTuple(args, names)
 
 
-def kbk_scr(signal=None, sampling_rate=1000.):
+def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
     """KBK method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
 
@@ -181,7 +183,9 @@ def kbk_scr(signal=None, sampling_rate=1000.):
         Input filterd EDA signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
-
+    min_amplitude : float, optional
+        Minimum treshold by which to exclude SCRs.
+    
     Returns
     -------
     onsets : array
@@ -218,7 +222,7 @@ def kbk_scr(signal=None, sampling_rate=1000.):
         zeros = zeros[:-1]
 
     # exclude SCRs with small amplitude
-    thr = 0.1 * np.max(df)
+    thr = min_amplitude * np.max(df)
 
     scrs, amps, ZC, pks = [], [], [], []
     for i in range(0, len(zeros) - 1, 2):
