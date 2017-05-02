@@ -17,10 +17,8 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 
 # local
-# from . import tools as st
-from biosppy.signals import tools as st
-# from .. import plotting, utils
-from biosppy import plotting, utils
+from . import tools as st
+from .. import plotting, utils
 
 
 def emg(signal=None, sampling_rate=1000., show=True):
