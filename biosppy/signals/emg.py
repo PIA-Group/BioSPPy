@@ -63,9 +63,7 @@ def emg(signal=None, sampling_rate=1000., show=True):
                                       sampling_rate=sampling_rate)
 
     # find onsets
-    # onsets, = find_onsets(signal=filtered, sampling_rate=sampling_rate)
-    onsets, processed = bonato_onset_detector(signal=filtered, rest=[49180, 63880], sampling_rate=1000.,
-                                              threshold=15, active_state_duration=40, samples_above_fail=10, fail_size=5)
+    onsets, = find_onsets(signal=filtered, sampling_rate=sampling_rate)
 
     # get time vectors
     length = len(signal)
@@ -78,7 +76,7 @@ def emg(signal=None, sampling_rate=1000., show=True):
                           sampling_rate=1000.,
                           raw=signal,
                           filtered=filtered,
-                          processed=processed,
+                          processed=None,
                           onsets=onsets,
                           path=None,
                           show=True)
@@ -157,10 +155,13 @@ def hodges_bui_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     ----------
     signal : array
         Input filtered EMG signal.
-    rest : array, list, dict, one of the following 3 options
-        N-dimensional array with filtered samples corresponding to a rest period.
-        2D array or list with the beginning and end indices of a segment of the signal corresponding to a rest period.
-        Dictionary with {'mean': mean value, 'std_dev': standard variation}.
+    rest : array, list, dict
+        One of the following 3 options:
+        * N-dimensional array with filtered samples corresponding to a
+        rest period;
+        * 2D array or list with the beginning and end indices of a segment of
+        the signal corresponding to a rest period;
+        * Dictionary with {'mean': mean value, 'std_dev': standard variation}.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     size : int
@@ -172,18 +173,24 @@ def hodges_bui_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
-    .. [HoBu96] Hodges PW, Bui BH, "A comparison of computer-based
-        methods for the determination of onset of muscle contraction using
-        electromyography", Electroencephalography and Clinical
-        Neurophysiology - Electromyography and Motor Control, vol. 101:6, pp. 511-519, 1996
+    .. [HoBu96] Hodges PW, Bui BH, "A comparison of computer-based methods for
+       the determination of onset of muscle contraction using
+       electromyography", Electroencephalography and Clinical Neurophysiology 
+       - Electromyography and Motor Control, vol. 101:6, pp. 511-519, 1996
+
     """
 
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
+
+    if rest is None:
+        raise TypeError("Please specidy rest parameters.")
 
     if size is None:
         raise TypeError("Please specify the detection window size.")
@@ -243,11 +250,12 @@ def hodges_bui_onset_detector(signal=None, rest=None, sampling_rate=1000.,
         if onsets[-1] >= length:
             onsets[-1] = length - 1
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), tf
+    return utils.ReturnTuple((onsets, tf), ('onsets', 'processed'))
 
 
 def bonato_onset_detector(signal=None, rest=None, sampling_rate=1000.,
-                          threshold=None, active_state_duration=None, samples_above_fail=None, fail_size=None):
+                          threshold=None, active_state_duration=None,
+                          samples_above_fail=None, fail_size=None):
     """Determine onsets of EMG pulses.
 
     Follows the approach by Bonato et al. [Bo98]_.
@@ -256,10 +264,13 @@ def bonato_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     ----------
     signal : array
         Input filtered EMG signal.
-    rest : array, list, dict, one of the following 3 options
-        N-dimensional array with filtered samples corresponding to a rest period.
-        2D array or list with the beginning and end indices of a segment of the signal corresponding to a rest period.
-        Dictionary with {'var': variance}.
+    rest : array, list, dict
+        One of the following 3 options:
+        * N-dimensional array with filtered samples corresponding to a
+        rest period;
+        * 2D array or list with the beginning and end indices of a segment of
+        the signal corresponding to a rest period;
+        * Dictionary with {'mean': mean value, 'std_dev': standard variation}.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     threshold : int, float
@@ -267,7 +278,8 @@ def bonato_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     active_state_duration: int
         Minimum duration of the active state.
     samples_above_fail : int
-        Number of samples above the threshold level in a group of successive samples.
+        Number of samples above the threshold level in a group of successive
+        samples.
     fail_size : int
         Number of successive samples.
 
@@ -275,26 +287,35 @@ def bonato_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
-    .. [Bo98] Bonato P, D’Alessio T, Knaflitz M, "A statistical method for the mea-
-        surement of muscle activation intervals from surface myoelectric signal during
-        gait", IEEE Transactions on Biomedical Engineering, vol. 45:3, pp. 287–299, 1998
+    .. [Bo98] Bonato P, D’Alessio T, Knaflitz M, "A statistical method for the
+       measurement of muscle activation intervals from surface myoelectric
+       signal during gait", IEEE Transactions on Biomedical Engineering,
+       vol. 45:3, pp. 287–299, 1998
+
     """
 
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
+    if rest is None:
+        raise TypeError("Please specidy rest parameters.")
+
     if threshold is None:
         raise TypeError("Please specify the detection threshold.")
 
     if active_state_duration is None:
-        raise TypeError("Please specify the mininum duration of the active state.")
+        raise TypeError("Please specify the mininum duration of the "
+                        "active state.")
 
     if samples_above_fail is None:
-        raise TypeError("Please specify the number of samples above the threshold level in a group of successive samples.")
+        raise TypeError("Please specify the number of samples above the "
+                        "threshold level in a group of successive samples.")
 
     if fail_size is None:
         raise TypeError("Please specify the number of successive samples.")
@@ -403,11 +424,12 @@ def bonato_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     # adjust indices because of odd numbers
     onsets *= 2
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), tf_list
+    return utils.ReturnTuple((onsets, tf_list), ('onsets', 'processed'))
 
 
 def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
-                            size=None, threshold=None, active_state_duration=None, fail_size=None):
+                            size=None, threshold=None,
+                            active_state_duration=None, fail_size=None):
     """Determine onsets of EMG pulses.
 
     Follows the approach by Lidierth. [Li86]_.
@@ -416,10 +438,13 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     ----------
     signal : array
         Input filtered EMG signal.
-    rest : array, list, dict, one of the following 3 options
-        N-dimensional array with filtered samples corresponding to a rest period.
-        2D array or list with the beginning and end indices of a segment of the signal corresponding to a rest period.
-        Dictionary with {'mean': mean value, 'std_dev': standard variation}.
+    rest : array, list, dict
+        One of the following 3 options:
+        * N-dimensional array with filtered samples corresponding to a
+        rest period;
+        * 2D array or list with the beginning and end indices of a segment of
+        the signal corresponding to a rest period;
+        * Dictionary with {'mean': mean value, 'std_dev': standard variation}.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     size : int
@@ -435,17 +460,24 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
-    .. [Li98] Lidierth M, "A computer based method for automated measurement of
-        the periods of muscular activity from an EMG and its application to locomotor EMGs",
-        ElectroencephClin Neurophysiol, vol. 64:4, pp. 378–380, 1986
+    .. [Li98] Lidierth M, "A computer based method for automated measurement
+       of the periods of muscular activity from an EMG and its application to
+       locomotor EMGs", ElectroencephClin Neurophysiol, vol. 64:4,
+       pp. 378–380, 1986
+
     """
 
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
+
+    if rest is None:
+        raise TypeError("Please specidy rest parameters.")
 
     if size is None:
         raise TypeError("Please specify the detection window size.")
@@ -454,7 +486,8 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
         raise TypeError("Please specify the detection threshold.")
 
     if active_state_duration is None:
-        raise TypeError("Please specify the mininum duration of the active state.")
+        raise TypeError("Please specify the mininum duration of the "
+                        "active state.")
 
     if fail_size is None:
         raise TypeError("Please specify the number of successive samples.")
@@ -524,7 +557,7 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
                         state_duration = 0
                 else:  # sample falls below the threshold level
                     j += 1
-                    if j > fail_window_size:
+                    if j > fail_size:
                         # the inactive state is above the threshold for longer than the predefined number of samples
                         alarm = False
                         j = 0
@@ -548,7 +581,7 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
                         state_duration = 0
                 else:  # sample falls below the threshold level
                     j += 1
-                    if j > fail_window_size:
+                    if j > fail_size:
                         # the active state has fallen below the threshold for longer than the predefined number of samples
                         alarm = False
                         j = 0
@@ -560,11 +593,12 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     # adjust indices because of moving average
     onsets += int(size / 2)
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), tf
+    return utils.ReturnTuple((onsets, tf), ('onsets', 'processed'))
 
 
 def abbink_onset_detector(signal=None, rest=None, sampling_rate=1000.,
-                          size=None, alarm_size=None, threshold=None, transition_threshold=None):
+                          size=None, alarm_size=None, threshold=None,
+                          transition_threshold=None):
     """Determine onsets of EMG pulses.
 
     Follows the approach by Abbink et al.. [Abb98]_.
@@ -573,16 +607,20 @@ def abbink_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     ----------
     signal : array
         Input filtered EMG signal.
-    rest : array, list, dict, one of the following 3 options
-        N-dimensional array with filtered samples corresponding to a rest period.
-        2D array or list with the beginning and end indices of a segment of the signal corresponding to a rest period.
-        Dictionary with {'mean': mean value, 'std_dev': standard variation}.
+    rest : array, list, dict
+        One of the following 3 options:
+        * N-dimensional array with filtered samples corresponding to a
+        rest period;
+        * 2D array or list with the beginning and end indices of a segment of
+        the signal corresponding to a rest period;
+        * Dictionary with {'mean': mean value, 'std_dev': standard variation}.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     size : int
         Detection window size (seconds).
     alarm_size : int
-        Number of amplitudes searched in the calculation of the transition index.
+        Number of amplitudes searched in the calculation of the transition
+        index.
     threshold : int, float
         Detection threshold.
     transition_threshold: int, float
@@ -592,23 +630,30 @@ def abbink_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
     .. [Abb98] Abbink JH, van der Bilt A, van der Glas HW, "Detection of onset
-        and termination of muscle activity in surface electromyograms",
-        Journal of Oral Rehabilitation, vol. 25, pp. 365–369, 1998
+       and termination of muscle activity in surface electromyograms",
+       Journal of Oral Rehabilitation, vol. 25, pp. 365–369, 1998
+
     """
 
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
+    if rest is None:
+        raise TypeError("Please specidy rest parameters.")
+
     if size is None:
         raise TypeError("Please specify the detection window size.")
 
     if alarm_size is None:
-        raise TypeError("Please specify the number of amplitudes searched in the calculation of the transition index.")
+        raise TypeError("Please specify the number of amplitudes searched in "
+                        "the calculation of the transition index.")
 
     if threshold is None:
         raise TypeError("Please specify the detection threshold.")
@@ -715,7 +760,7 @@ def abbink_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     # adjust indices because of moving average
     onsets += int(size / 2)
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), filtered_tf
+    return utils.ReturnTuple((onsets, filtered_tf), ('onsets', 'processed'))
 
 
 def solnik_onset_detector(signal=None, rest=None, sampling_rate=1000.,
@@ -728,10 +773,13 @@ def solnik_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     ----------
     signal : array
         Input filtered EMG signal.
-    rest : array, list, dict, one of the following 3 options
-        N-dimensional array with filtered samples corresponding to a rest period.
-        2D array or list with the beginning and end indices of a segment of the signal corresponding to a rest period.
-        Dictionary with {'mean': mean value, 'std_dev': standard variation}.
+    rest : array, list, dict
+        One of the following 3 options:
+        * N-dimensional array with filtered samples corresponding to a
+        rest period;
+        * 2D array or list with the beginning and end indices of a segment of
+        the signal corresponding to a rest period;
+        * Dictionary with {'mean': mean value, 'std_dev': standard variation}.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     threshold : int, float
@@ -743,23 +791,32 @@ def solnik_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
-    .. [Sol10] Solnik S, Rider P, Steinweg K, DeVita P, Hortobágyi T, "Teager-Kaiser
-        energy operator signal conditioning improves EMG onset detection", European
-        Journal of Applied Physiology, vol 110:3, pp. 489-498, 2010
+    .. [Sol10] Solnik S, Rider P, Steinweg K, DeVita P, Hortobágyi T,
+       "Teager-Kaiser energy operator signal conditioning improves EMG onset
+       detection", European Journal of Applied Physiology, vol 110:3,
+       pp. 489-498, 2010
+
     """
 
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
+    if rest is None:
+        raise TypeError("Please specidy rest parameters.")
+
     if threshold is None:
-        raise TypeError("Please specify the scale factor for calculating the detection threshold.")
+        raise TypeError("Please specify the scale factor for calculating the "
+                        "detection threshold.")
 
     if active_state_duration is None:
-        raise TypeError("Please specify the mininum duration of the active state.")
+        raise TypeError("Please specify the mininum duration of the "
+                        "active state.")
 
     # gather statistics on rest signal
     if isinstance(rest, np.ndarray) or isinstance(rest, list):
@@ -837,14 +894,14 @@ def solnik_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     onsets = np.union1d(onset_time_list,
                         offset_time_list)
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), tf_list
+    return utils.ReturnTuple((onsets, tf_list), ('onsets', 'processed'))
 
 
 def silva_onset_detector(signal=None, sampling_rate=1000.,
                          size=None, threshold_size=None, threshold=None):
     """Determine onsets of EMG pulses.
 
-    Follows the approach by Silva et al.. [Sil12]_.
+    Follows the approach by Silva et al. [Sil12]_.
 
     Parameters
     ----------
@@ -855,7 +912,8 @@ def silva_onset_detector(signal=None, sampling_rate=1000.,
     size : int
         Detection window size (seconds).
     threshold_size : int
-        Window size for calculation of the adaptive threshold. Must be bigger than the detection window size.
+        Window size for calculation of the adaptive threshold; must be bigger
+        than the detection window size.
     threshold : int, float
         Fixed threshold for the double criteria.
 
@@ -863,11 +921,15 @@ def silva_onset_detector(signal=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
-    .. [Sil12] Silva H, Scherer R, Sousa J, Londral A , "Towards improving the ssability of
-        electromyographic interfacess", Journal of Oral Rehabilitation, pp. 1–2, 2012
+    .. [Sil12] Silva H, Scherer R, Sousa J, Londral A , "Towards improving the
+       usability of electromyographic interfacess", Journal of Oral
+       Rehabilitation, pp. 1–2, 2012
+
     """
 
     # check inputs
@@ -878,14 +940,17 @@ def silva_onset_detector(signal=None, sampling_rate=1000.,
         raise TypeError("Please specify the detection window size.")
 
     if threshold_size is None:
-        raise TypeError("Please specify the window size for calculation of the adaptive threshold.")
+        raise TypeError("Please specify the window size for calculation of "
+                        "the adaptive threshold.")
 
     if threshold_size <= size:
-        raise TypeError("The window size for calculation of the adaptive threshold "
-                        "must be bigger than the detection window size")
+        raise TypeError("The window size for calculation of the adaptive "
+                        "threshold must be bigger than the detection "
+                        "window size")
 
     if threshold is None:
-        raise TypeError("Please specify the fixed threshold for the double criteria.")
+        raise TypeError("Please specify the fixed threshold for the "
+                        "double criteria.")
 
     # subtract baseline offset
     signal_zero_mean = signal - np.mean(signal)
@@ -920,11 +985,12 @@ def silva_onset_detector(signal=None, sampling_rate=1000.,
     # adjust indices because of moving average
     onsets += int(size / 2)
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), tf_mvgav
+    return utils.ReturnTuple((onsets, tf_mvgav), ('onsets', 'processed'))
 
 
 def londral_onset_detector(signal=None, rest=None, sampling_rate=1000.,
-                           size=None, threshold=None, active_state_duration=None):
+                           size=None, threshold=None,
+                           active_state_duration=None):
     """Determine onsets of EMG pulses.
 
     Follows the approach by Londral et al. [Lon13]_.
@@ -933,10 +999,13 @@ def londral_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     ----------
     signal : array
         Input filtered EMG signal.
-    rest : array, list, dict, one of the following 3 options
-        N-dimensional array with filtered samples corresponding to a rest period.
-        2D array or list with the beginning and end indices of a segment of the signal corresponding to a rest period.
-        Dictionary with {'mean': mean value, 'std_dev': standard variation}.
+    rest : array, list, dict
+        One of the following 3 options:
+        * N-dimensional array with filtered samples corresponding to a
+        rest period;
+        * 2D array or list with the beginning and end indices of a segment of
+        the signal corresponding to a rest period;
+        * Dictionary with {'mean': mean value, 'std_dev': standard variation}.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     size : int
@@ -950,26 +1019,35 @@ def londral_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     -------
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array
+        Processed EMG signal.
 
     References
     ----------
-    .. [Lon13] Londral A, Silva H, Nunes N, Carvalho M, Azevedo L, "A wireless user-computer interface
-        to explore various sources of biosignals and visual biofeedback for severe motor impairment",
-        Journal of Accessibility and Design for All, vol. 3:2, pp. 118–134, 2013
+    .. [Lon13] Londral A, Silva H, Nunes N, Carvalho M, Azevedo L, "A wireless
+       user-computer interface to explore various sources of biosignals and
+       visual biofeedback for severe motor impairment",
+       Journal of Accessibility and Design for All, vol. 3:2, pp. 118–134, 2013
+    
     """
 
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
+    if rest is None:
+        raise TypeError("Please specidy rest parameters.")
+
     if size is None:
         raise TypeError("Please specify the detection window size.")
 
     if threshold is None:
-        raise TypeError("Please specify the scale factor for calculating the detection threshold.")
+        raise TypeError("Please specify the scale factor for calculating the "
+                        "detection threshold.")
 
     if active_state_duration is None:
-        raise TypeError("Please specify the mininum duration of the active state.")
+        raise TypeError("Please specify the mininum duration of the "
+                        "active state.")
 
     # gather statistics on rest signal
     if isinstance(rest, np.ndarray) or isinstance(rest, list):
@@ -1008,11 +1086,12 @@ def londral_onset_detector(signal=None, rest=None, sampling_rate=1000.,
         return tf
 
     # calculate the test function
-    _, tf = sliwin = st.windower(signal=signal_zero_mean,
-                                 size=size,
-                                 step=1,
-                                 fcn=_londral_test_function,
-                                 kernel='rectangular')
+    _, tf = st.windower(
+        signal=signal_zero_mean,
+        size=size, step=1,
+        fcn=_londral_test_function,
+        kernel='rectangular',
+    )
 
     onset_time_list = []
     offset_time_list = []
@@ -1055,11 +1134,4 @@ def londral_onset_detector(signal=None, rest=None, sampling_rate=1000.,
     # adjust indices because of moving average
     onsets += int(size / 2)
 
-    return utils.ReturnTuple((onsets,), ('onsets',)), tf
-
-
-if __name__ == '__main__':
-    # load data
-    raw_signal = np.loadtxt('./examples/emg_1.txt')
-    # process data (find onsets)
-    emg(signal=raw_signal, sampling_rate=1000., show=True)
+    return utils.ReturnTuple((onsets, tf), ('onsets', 'processed'))
