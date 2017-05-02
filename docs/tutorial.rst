@@ -64,7 +64,21 @@ Electroencephalogram (EEG) signals are...
 Electromyogram
 --------------
 
-Electromyogram (EMG) signals are...
+Electromyogram (EMG) signals are a measure of the electrical activity of
+muscles. There are two types of sensors that can be used to record this
+electrical activity, in particular surface EMG (sEMG), measured by non-invasive
+electrodes, and intramuscular EMG. Out of the two, sEMG allows for non-invasive
+electrodes to be applied at the body surface, that measure muscle activity.
+In sEMG, contact with the skin can be done with standard pre-gelled electrodes,
+dry Ag/AgCl electrodes or conductive textiles. Normally, there are three
+electrodes in an sEMG interface: two electrodes work on bipolar differential
+measurement and the other one is attached to a neutral zone, to serve as the
+reference point. After being recorded, this signal can be processed in time,
+frequency and time-frequency domains. In an EMG signal, when the muscle is in
+a relaxed state, this corresponds to the baseline activity. The bursts of
+activity match the muscular activations and have a random shape, meaning that
+a raw recording of contractions cannot be exactly reproduced. The onset of an
+event corresponds to the beginning of the burst.
 
 Respiration
 -----------
