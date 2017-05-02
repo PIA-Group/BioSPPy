@@ -78,6 +78,12 @@ def ecg(signal=None, sampling_rate=1000., show=True):
     # segment
     rpeaks, = hamilton_segmenter(signal=filtered, sampling_rate=sampling_rate)
 
+    # correct R-peak locations
+    rpeaks, = correct_rpeaks(signal=filtered,
+                             rpeaks=rpeaks,
+                             sampling_rate=sampling_rate,
+                             tol=0.05)
+
     # extract templates
     templates, rpeaks = extract_heartbeats(signal=filtered,
                                            rpeaks=rpeaks,
@@ -386,6 +392,56 @@ def compare_segmentation(reference=None, test=None, sampling_rate=1000.,
              'mean_test_ibi', 'std_test_ibi',)
 
     return utils.ReturnTuple(args, names)
+
+
+def correct_rpeaks(signal=None, rpeaks=None, sampling_rate=1000., tol=0.05):
+    """Correct R-peak locations to the maximum within a tolerance.
+
+    Parameters
+    ----------
+    signal : array
+        ECG signal.
+    rpeaks : array
+        R-peak location indices.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    tol : int, float, optional
+        Correction tolerance (seconds).
+
+    Returns
+    -------
+    rpeaks : array
+        Cerrected R-peak location indices.
+
+    Notes
+    -----
+    * The tolerance is defined as the time interval :math:`[R-tol, R+tol[`.
+
+    """
+
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input signal.")
+
+    if rpeaks is None:
+        raise TypeError("Please specify the input R-peaks.")
+
+    tol = int(tol * sampling_rate)
+    length = len(signal)
+
+    newR = []
+    for r in rpeaks:
+        a = r - tol
+        if a < 0:
+            continue
+        b = r + tol
+        if b > length:
+            break
+        newR.append(a + np.argmax(signal[a:b]))
+
+    newR = np.array(newR, dtype='int')
+
+    return utils.ReturnTuple((newR,), ('rpeaks',))
 
 
 def ssf_segmenter(signal=None, sampling_rate=1000., threshold=20, before=0.03,
