@@ -403,8 +403,8 @@ def plot_emg(ts=None,
              sampling_rate=None,
              raw=None,
              filtered=None,
-             processed=None,
              onsets=None,
+             processed=None,
              path=None,
              show=False):
     """Create a summary plot from the output of signals.emg.emg.
@@ -419,10 +419,10 @@ def plot_emg(ts=None,
         Raw EMG signal.
     filtered : array
         Filtered EMG signal.
-    processed : array
-        Processed EMG signal according to the chosen onset detector.
     onsets : array
         Indices of EMG pulse onsets.
+    processed : array, optional
+        Processed EMG signal according to the chosen onset detector.
     path : str, optional
         If provided, the plot will be saved to the specified file.
     show : bool, optional
@@ -433,9 +433,27 @@ def plot_emg(ts=None,
     fig = plt.figure()
     fig.suptitle('EMG Summary')
 
-    # raw signal
-    ax1 = fig.add_subplot(311)
+    if processed is not None:
+        ax1 = fig.add_subplot(311)
+        ax2 = fig.add_subplot(312, sharex=ax1)
+        ax3 = fig.add_subplot(313)
 
+        # processed signal
+        L = len(processed)
+        T = (L - 1) / sampling_rate
+        ts_processed = np.linspace(0, T, L, endpoint=False)
+        ax3.plot(ts_processed, processed,
+                 linewidth=MAJOR_LW,
+                 label='Processed')
+        ax3.set_xlabel('Time (s)')
+        ax3.set_ylabel('Amplitude')
+        ax3.legend()
+        ax3.grid()
+    else:
+        ax1 = fig.add_subplot(211)
+        ax2 = fig.add_subplot(212, sharex=ax1)
+
+    # raw signal
     ax1.plot(ts, raw, linewidth=MAJOR_LW, label='Raw')
 
     ax1.set_ylabel('Amplitude')
@@ -443,8 +461,6 @@ def plot_emg(ts=None,
     ax1.grid()
 
     # filtered signal with onsets
-    ax2 = fig.add_subplot(312, sharex=ax1)
-
     ymin = np.min(filtered)
     ymax = np.max(filtered)
     alpha = 0.1 * (ymax - ymin)
@@ -461,14 +477,6 @@ def plot_emg(ts=None,
     ax2.set_ylabel('Amplitude')
     ax2.legend()
     ax2.grid()
-
-    # processed signal
-    ax3 = fig.add_subplot(313)
-    ax3.plot(np.arange(len(processed))/sampling_rate, processed, linewidth=MAJOR_LW, label='Processed')
-    ax3.set_xlabel('Time (s)')
-    ax3.set_ylabel('Amplitude')
-    ax3.legend()
-    ax3.grid()
 
     # make layout tight
     fig.tight_layout()
