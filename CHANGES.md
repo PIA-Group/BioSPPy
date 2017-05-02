@@ -3,6 +3,20 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.4.0
+-------------
+
+Released on May 2nd 2017
+
+- Fixed array indexing with floats (merges #23)
+- Allow user to modify SCRs rejection treshold (merges #24)
+- Fixed the Scikit-Learn cross-validation module deprecation (closes #18)
+- Addd methods to compute mean and meadian of a set of n-dimensional data points
+- Added methods to compute the matrix profile
+- Added new EMG onset detection algorithms (merges #17)
+- Added finite difference method for numerial derivatives
+- Fixed inconsistent decibel usage in plotting (closes #16)
+
 Version 0.3.0
 -------------
 
