@@ -1365,7 +1365,7 @@ def _init_dist_profile(m, n, signal):
     """Compute initial time series signal statistics for distance profile.
     
     Implements the algorithm described in [Mueen2014]_, using the notation
-    from [Yeh2016]_.
+    from [Yeh2016_a]_.
     
     Parameters
     ----------
@@ -1387,7 +1387,7 @@ def _init_dist_profile(m, n, signal):
     ----------
     .. [Mueen2014] Abdullah Mueen, Hossein Hamooni, "Trilce Estrada: Time
        Series Join on Subsequence Correlation", ICDM 2014: 450-459
-    .. [Yeh2016] Chin-Chia Michael Yeh, Yan Zhu, Liudmila Ulanova,
+    .. [Yeh2016_a] Chin-Chia Michael Yeh, Yan Zhu, Liudmila Ulanova,
        Nurjahan Begum, Yifei Ding, Hoang Anh Dau, Diego Furtado Silva,
        Abdullah Mueen, Eamonn Keogh, "Matrix Profile I: All Pairs Similarity 
        Joins for Time Series: A Unifying View that Includes Motifs, Discords 
@@ -1543,7 +1543,7 @@ def distance_profile(query=None, signal=None, metric='euclidean'):
 def signal_self_join(signal=None, size=None, index=None, limit=None):
     """Compute the matrix profile for a self-similarity join of a time series.
     
-    Implements the algorithm described in [Yeh2016]_.
+    Implements the algorithm described in [Yeh2016_b]_.
     
     Parameters
     ----------
@@ -1571,7 +1571,7 @@ def signal_self_join(signal=None, size=None, index=None, limit=None):
     
     References
     ----------
-    .. [Yeh2016] Chin-Chia Michael Yeh, Yan Zhu, Liudmila Ulanova,
+    .. [Yeh2016_b] Chin-Chia Michael Yeh, Yan Zhu, Liudmila Ulanova,
        Nurjahan Begum, Yifei Ding, Hoang Anh Dau, Diego Furtado Silva,
        Abdullah Mueen, Eamonn Keogh, "Matrix Profile I: All Pairs Similarity 
        Joins for Time Series: A Unifying View that Includes Motifs, Discords 
@@ -1661,7 +1661,7 @@ def signal_cross_join(signal1=None,
     """Compute the matrix profile for a similarity join of two time series.
     
     Computes the nearest sub-sequence in `signal2` for each sub-sequence in
-    `signal1`. Implements the algorithm described in [Yeh2016]_.
+    `signal1`. Implements the algorithm described in [Yeh2016_c]_.
     
     Parameters
     ----------
@@ -1691,7 +1691,7 @@ def signal_cross_join(signal1=None,
     
     References
     ----------
-    .. [Yeh2016] Chin-Chia Michael Yeh, Yan Zhu, Liudmila Ulanova,
+    .. [Yeh2016_c] Chin-Chia Michael Yeh, Yan Zhu, Liudmila Ulanova,
        Nurjahan Begum, Yifei Ding, Hoang Anh Dau, Diego Furtado Silva,
        Abdullah Mueen, Eamonn Keogh, "Matrix Profile I: All Pairs Similarity 
        Joins for Time Series: A Unifying View that Includes Motifs, Discords 

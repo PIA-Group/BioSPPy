@@ -465,7 +465,7 @@ def lidierth_onset_detector(signal=None, rest=None, sampling_rate=1000.,
 
     References
     ----------
-    .. [Li98] Lidierth M, "A computer based method for automated measurement
+    .. [Li86] Lidierth M, "A computer based method for automated measurement
        of the periods of muscular activity from an EMG and its application to
        locomotor EMGs", ElectroencephClin Neurophysiol, vol. 64:4,
        pp. 378–380, 1986
