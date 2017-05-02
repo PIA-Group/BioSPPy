@@ -25,3 +25,5 @@ Patches and Suggestions
 - Hayden Ball (PR/7)
 - Jason Li (PR/13)
 - Dominique Makowski (<dom.makowski@gmail.com>) (PR/15, PR/24)
+- Margarida Reis (PR/17)
+- Michael Gschwandtner (PR/23)
