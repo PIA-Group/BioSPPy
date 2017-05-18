@@ -10,7 +10,7 @@ A toolbox for biosignal processing written in Python.
 """
 
 # compat
-
+from __future__ import absolute_import, division, print_function
 
 # get version
 from .version import version as __version__

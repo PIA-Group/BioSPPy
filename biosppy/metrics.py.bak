@@ -11,7 +11,7 @@ This module provides pairwise distance computation methods.
 
 # Imports
 # compat
-
+from __future__ import absolute_import, division, print_function
 import six
 
 # 3rd party

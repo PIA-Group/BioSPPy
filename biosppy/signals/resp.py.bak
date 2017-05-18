@@ -11,7 +11,7 @@ This module provides methods to process Respiration (Resp) signals.
 
 # Imports
 # compat
-
+from __future__ import absolute_import, division, print_function
 
 # 3rd party
 import numpy as np
