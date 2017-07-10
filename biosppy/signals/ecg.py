@@ -1114,7 +1114,6 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
 
     beats = np.array(beats)
 
-    lim = lim
     r_beats = []
     thres_ch = 0.85
     adjacency = 0.05 * sampling_rate
@@ -1142,11 +1141,11 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
         try:
             twopeaks = [pospeaks[0]]
         except IndexError:
-            pass
+            twopeaks = []
         try:
             twonegpeaks = [negpeaks[0]]
         except IndexError:
-            pass
+            twonegpeaks = []
 
         # getting positive peaks
         for i in range(len(pospeaks) - 1):
@@ -1169,26 +1168,30 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
             error[1] = True
 
         # choosing type of R-peak
-        if not sum(error):
-            if posdiv > thres_ch * negdiv:
-                # pos noerr
+        n_errors = sum(error)
+        try:
+            if not n_errors:
+                if posdiv > thres_ch * negdiv:
+                    # pos noerr
+                    r_beats.append(twopeaks[0][1] + add)
+                else:
+                    # neg noerr
+                    r_beats.append(twonegpeaks[0][1] + add)
+            elif n_errors == 2:
+                if abs(twopeaks[0][1]) > abs(twonegpeaks[0][1]):
+                    # pos allerr
+                    r_beats.append(twopeaks[0][1] + add)
+                else:
+                    # neg allerr
+                    r_beats.append(twonegpeaks[0][1] + add)
+            elif error[0]:
+                # pos poserr
                 r_beats.append(twopeaks[0][1] + add)
             else:
-                # neg noerr
+                # neg negerr
                 r_beats.append(twonegpeaks[0][1] + add)
-        elif sum(error) == 2:
-            if abs(twopeaks[0][1]) > abs(twonegpeaks[0][1]):
-                # pos allerr
-                r_beats.append(twopeaks[0][1] + add)
-            else:
-                # neg allerr
-                r_beats.append(twonegpeaks[0][1] + add)
-        elif error[0]:
-            # pos poserr
-            r_beats.append(twopeaks[0][1] + add)
-        else:
-            # neg negerr
-            r_beats.append(twonegpeaks[0][1] + add)
+        except IndexError:
+            continue
 
     rpeaks = sorted(list(set(r_beats)))
     rpeaks = np.array(rpeaks, dtype='int')
