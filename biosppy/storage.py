@@ -387,7 +387,7 @@ def load_txt(path):
     # normalize path
     path = utils.normpath(path)
 
-    with open(path, 'r') as fid:
+    with open(path, 'rb') as fid:
         lines = fid.readlines()
 
     # extract header
@@ -395,7 +395,8 @@ def load_txt(path):
     fields = ['Sampling Rate', 'Resolution', 'Date', 'Data Type', 'Labels']
     values = []
     for item in lines:
-        if '#' in item:
+        if b'#' in item:
+            item = item.decode('utf-8')
             # parse comment
             for f in fields:
                 if f in item:
@@ -432,7 +433,7 @@ def load_txt(path):
         pass
 
     # load array
-    data = np.genfromtxt(values, dtype=dtype, delimiter='\t')
+    data = np.genfromtxt(values, dtype=dtype, delimiter=b'\t')
 
     return data, mdata
 
