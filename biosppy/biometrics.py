@@ -1658,6 +1658,18 @@ def get_auth_rates(TP=None, FP=None, TN=None, FN=None, thresholds=None):
         True Reject Rate at each classifier threshold.
     EER : array
         Equal Error Rate points, with format (threshold, rate).
+    Err : array
+        Error rate at each classifier threshold.
+    PPV : array
+        Positive Predictive Value at each classifier threshold.
+    FDR : array
+        False Discovery Rate at each classifier threshold.
+    NPV : array
+        Negative Predictive Value at each classifier threshold.
+    FOR : array
+        False Omission Rate at each classifier threshold.
+    MCC : array
+        Matthrews Correlation Coefficient at each classifier threshold.
 
     """
 
@@ -1680,30 +1692,48 @@ def get_auth_rates(TP=None, FP=None, TN=None, FN=None, thresholds=None):
     FN = np.array(FN)
     thresholds = np.array(thresholds)
 
-    Acc = (TP + TN) / (TP + TN + FP + FN)
+    # helper variables
+    A = TP + FP
+    B = TP + FN
+    C = TN + FP
+    D = TN + FN
+    E = A * B * C * D
+    F = A + D
 
-    # should accept counts
-    SA = TP + FN
+    # avoid divisions by zero
+    A[A == 0] = 1.
+    B[B == 0] = 1.
+    C[C == 0] = 1.
+    D[D == 0] = 1.
+    E[E == 0] = 1.
+    F[F == 0] = 1.
 
-    # should reject counts
-    SR = TN + FP
+    # rates
+    Acc = (TP + TN) / F # accuracy
+    Err = (FP + FN) / F # error rate
 
-    # avoid division by zero
-    SA[SA <= 0] = 1.
-    SR[SR <= 0] = 1.
+    TAR = TP / B # true accept rate /true positive rate
+    FRR = FN / B # false rejection rate / false negative rate
 
-    TAR = TP / SA
-    FAR = FP / SR
-    FRR = FN / SA
-    TRR = TN / SR
+    TRR = TN / C # true rejection rate / true negative rate
+    FAR = FP / C # false accept rate / false positive rate
+
+    PPV = TP / A # positive predictive value
+    FDR = FP / A # false discovery rate
+
+    NPV = TN / D # negative predictive value
+    FOR = FN / D # false omission rate
+
+    MCC = (TP*TN - FP*FN) / np.sqrt(E) # matthews correlation coefficient 
 
     # determine EER
     roots, values = tools.find_intersection(thresholds, FAR, thresholds, FRR)
     EER = np.vstack((roots, values)).T
 
     # output
-    args = (Acc, TAR, FAR, FRR, TRR, EER)
-    names = ('Acc', 'TAR', 'FAR', 'FRR', 'TRR', 'EER')
+    args = (Acc, TAR, FAR, FRR, TRR, EER, Err, PPV, FDR, NPV, FOR, MCC)
+    names = ('Acc', 'TAR', 'FAR', 'FRR', 'TRR', 'EER', 'Err', 'PPV', 'FDR',
+             'NPV', 'FOR', 'MCC')
 
     return utils.ReturnTuple(args, names)
 
