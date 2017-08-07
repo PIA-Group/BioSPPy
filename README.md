@@ -1,6 +1,8 @@
 # BioSPPy - Biosignal Processing in Python
 
-A toolbox for biosignal processing written in Python.
+*A toolbox for biosignal processing written in Python.*
+
+[![Image](https://github.com/PIA-Group/BioSPPy/raw/master/docs/logo/logo.png "I know you're listening!")](http://biosppy.readthedocs.org/)
 
 The toolbox bundles together various signal processing and pattern recognition
 methods geared towards the analysis of biosignals.

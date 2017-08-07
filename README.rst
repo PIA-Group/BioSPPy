@@ -1,7 +1,9 @@
 BioSPPy - Biosignal Processing in Python
 ========================================
 
-A toolbox for biosignal processing written in Python.
+*A toolbox for biosignal processing written in Python.*
+
+|Image|
 
 The toolbox bundles together various signal processing and pattern
 recognition methods geared towards the analysis of biosignals.
@@ -72,3 +74,6 @@ profits, losses resulting from business interruption or loss of data,
 regardless of the form of action or legal theory under which the
 liability may be asserted, even if advised of the possibility of such
 damages.
+
+.. |Image| image:: https://github.com/PIA-Group/BioSPPy/raw/master/docs/logo/logo.png
+   :target: http://biosppy.readthedocs.org/
