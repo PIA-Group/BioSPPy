@@ -3,6 +3,18 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.5.0
+-------------
+
+Released on August 28th 2017
+
+- Added a simple timing module
+- Added methods to help with file manipulations
+- Added a logo :camera:
+- Added the Matthews Correlation Coefficient as another authentication metric.
+- Fixed an issue in the ECG Hamilton algorithm (closes #28)
+- Various bug fixes
+
 Version 0.4.0
 -------------
 

@@ -13,8 +13,8 @@
 # serve to show the default.
 
 import sys
-import os
-import shlex
+# import os
+# import shlex
 
 # To be able to import to ReadTheDocs
 from mock import Mock as MagicMock
@@ -85,7 +85,7 @@ author = 'Instituto de Telecomunicacoes'
 # built documents.
 #
 # The short X.Y version.
-version = '0.4.0'
+version = '0.5.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
