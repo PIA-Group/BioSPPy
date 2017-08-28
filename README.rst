@@ -76,5 +76,5 @@ regardless of the form of action or legal theory under which the
 liability may be asserted, even if advised of the possibility of such
 damages.
 
-.. |Image| image:: https://github.com/PIA-Group/BioSPPy/raw/master/docs/logo/logo.png
+.. |Image| image:: https://github.com/PIA-Group/BioSPPy/raw/master/docs/logo/logo_400.png
    :target: http://biosppy.readthedocs.org/
