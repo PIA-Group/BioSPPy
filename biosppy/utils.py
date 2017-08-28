@@ -20,6 +20,7 @@ import collections
 import copy
 import keyword
 import os
+import re
 
 # 3rd party
 import numpy as np
@@ -46,6 +47,112 @@ def normpath(path):
         out = os.path.abspath(path)
 
     return out
+
+
+def fileparts(path):
+    """split a file path into its directory, name, and extension.
+    
+    Parameters
+    ----------
+    path : str
+        Input file path.
+    
+    Returns
+    -------
+    dirname : str
+        File directory.
+    fname : str
+        File name.
+    ext : str
+        File extension.
+    
+    Notes
+    -----
+    * Removes the dot ('.') from the extension.
+    
+    """
+    
+    dirname, fname = os.path.split(path)
+    fname, ext = os.path.splitext(fname)
+    ext = ext.replace('.', '')
+    
+    return dirname, fname, ext
+
+
+def fullfile(*args):
+    """Join one or more file path components, assuming the last is
+    the extension.
+    
+    Parameters
+    ----------
+    ``*args`` : list, optional
+        Components to concatenate.
+    
+    Returns
+    -------
+    fpath : str
+        The concatenated file path.
+    
+    """
+    
+    nb = len(args)
+    if nb == 0:
+        return ''
+    elif nb == 1:
+        return args[0]
+    elif nb == 2:
+        return os.path.join(*args)
+    
+    fpath = os.path.join(*args[:-1]) + '.' + args[-1]
+    
+    return fpath
+
+
+def walktree(top=None, spec=None):
+    """Iterator to recursively descend a directory and return all files
+    matching the spec.
+    
+    Parameters
+    ----------
+    top : str, optional
+        Starting directory; if None, defaults to the current working directoty.
+    spec : str, optional
+        Regular expression to match the desired files;
+        if None, matches all files. Typical patterns:
+        * `r'\.txt$'` - matches files with '.txt' extension;
+        * `r'^File_'` - matches files starting with 'File_'
+        * `r'^File_.+\.txt$'` - matches files starting with 'File_' and ending
+        with the '.txt' extension.
+    
+    Yields
+    ------
+    fpath : str
+        Absolute file path.
+    
+    Notes
+    -----
+    * Partial matches are also selected.
+    
+    See Also
+    --------
+    https://docs.python.org/3/library/re.html
+    https://regex101.com/
+    
+    """
+    
+    if top is None:
+        top = os.getcwd()
+    
+    if spec is None:
+        spec = r'.*?'
+    
+    prog = re.compile(spec)
+    
+    for root, _, files in os.walk(top):
+        for name in files:
+            if prog.search(name):
+                fname = os.path.join(root, name)
+                yield fname
 
 
 def remainderAllocator(votes, k, reverse=True, check=False):
