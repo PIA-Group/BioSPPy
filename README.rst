@@ -54,6 +54,7 @@ Dependencies
 -  scikit-learn
 -  scipy
 -  shortuuid
+-  six
 
 License
 -------

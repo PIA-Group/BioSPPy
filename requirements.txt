@@ -1,8 +1,8 @@
 bidict==0.13.1
-h5py==2.6.0
-matplotlib==2.0.0
-numpy==1.11.3
-scikit-learn==0.18.1
-scipy==0.18.1
+h5py==2.7.0
+matplotlib==2.0.2
+numpy==1.13.1
+scikit-learn==0.18.2
+scipy==0.19.1
 shortuuid==0.5.0
 six==1.10.0

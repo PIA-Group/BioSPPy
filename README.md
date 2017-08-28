@@ -49,6 +49,7 @@ out = ecg.ecg(signal=signal, sampling_rate=1000., show=True)
 - scikit-learn
 - scipy
 - shortuuid
+- six
 
 ## License
 
