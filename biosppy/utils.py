@@ -119,10 +119,10 @@ def walktree(top=None, spec=None):
     spec : str, optional
         Regular expression to match the desired files;
         if None, matches all files. Typical patterns:
-        * `r'\.txt$'` - matches files with '.txt' extension;
-        * `r'^File_'` - matches files starting with 'File_'
-        * `r'^File_.+\.txt$'` - matches files starting with 'File_' and ending
-        with the '.txt' extension.
+            * `r'\.txt$'` - matches files with '.txt' extension;
+            * `r'^File_'` - matches files starting with 'File\_'
+            * `r'^File_.+\.txt$'` - matches files starting with 'File\_'
+            and ending with the '.txt' extension.
     
     Yields
     ------
@@ -135,8 +135,8 @@ def walktree(top=None, spec=None):
     
     See Also
     --------
-    https://docs.python.org/3/library/re.html
-    https://regex101.com/
+    * https://docs.python.org/3/library/re.html
+    * https://regex101.com/
     
     """
     

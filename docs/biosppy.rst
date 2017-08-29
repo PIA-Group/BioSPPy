@@ -42,6 +42,11 @@ Modules
     :undoc-members:
     :show-inheritance:
 
+.. automodule:: biosppy.timing
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: biosppy.utils
     :members:
     :undoc-members:
