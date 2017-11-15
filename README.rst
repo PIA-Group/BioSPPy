@@ -56,6 +56,26 @@ Dependencies
 -  shortuuid
 -  six
 
+Citing
+------
+
+Please use the following if you need to cite BioSPPy:
+
+-  Carreiras C, Alves AP, Lourenço A, Canento F, Silva H, Fred A, *et
+   al.* **BioSPPy - Biosignal Processing in Python**, 2015-,
+   https://github.com/PIA-Group/BioSPPy/ [Online; accessed
+   ``<year>-<month>-<day>``].
+
+.. code:: latex
+
+    @Misc{,
+      author = {Carlos Carreiras and Ana Priscila Alves and Andr\'{e} Louren\c{c}o and Filipe Canento and Hugo Silva and Ana Fred and others},
+      title = {{BioSPPy}: Biosignal Processing in {Python}},
+      year = {2015--},
+      url = "https://github.com/PIA-Group/BioSPPy/",
+      note = {[Online; accessed <today>]}
+    }
+
 License
 -------
 
