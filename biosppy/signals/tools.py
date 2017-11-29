@@ -1283,9 +1283,13 @@ def find_intersection(x1=None,
     # search for solutions
     roots = set()
     for v in xi:
-        root, _, ier, _ = optimize.fsolve(_pdiff, v, (p1, p2),
-                                          full_output=True,
-                                          xtol=xtol)
+        root, _, ier, _ = optimize.fsolve(
+            _pdiff,
+            v,
+            args=(p1, p2),
+            full_output=True,
+            xtol=xtol,
+        )
         if ier == 1 and x_min <= root <= x_max:
             roots.add(root[0])
 

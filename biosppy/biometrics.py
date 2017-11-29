@@ -534,7 +534,7 @@ class BaseClassifier(object):
 
         """
 
-        if force or (self._autoThresholds is not None):
+        if force or (self._autoThresholds is None):
             self._autoThresholds = self._get_thresholds()
 
         return self._autoThresholds
@@ -1298,12 +1298,11 @@ class SVM(BaseClassifier):
         X = np.concatenate((X1, X2), axis=0)
         Y = np.ones(n1 + n2)
 
-        if label1 < label2:
+        pair = self._convert_pair((label1, label2))
+        if pair[0] == label1:
             Y[:n1] = -1
-            pair = (label1, label2)
         else:
             Y[n1:] = -1
-            pair = (label2, label1)
 
         # class weights
         weights = self._get_weights(n1, n2)
@@ -2048,7 +2047,7 @@ def assess_runs(results=None, subjects=None):
     Parameters
     ----------
     results : list
-        Classification results for each run.
+        Classification assessment for each run.
     subjects : list
         Common target subject classes.
 
