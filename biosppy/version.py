@@ -9,4 +9,4 @@ Version tracker.
 :license: BSD 3-clause, see LICENSE for more details.
 """
 
-version = '0.5.0'
+version = '0.5.1'
