@@ -3,6 +3,16 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.5.1
+-------------
+
+Released on November 29th 2017
+
+- Fixed bug when correcting r-peaks (closes #35)
+- Fixed a bug in the generation of the classifier thresholds
+- Added citation information to readme file (closes #34)
+- Various minor changes
+
 Version 0.5.0
 -------------
 
