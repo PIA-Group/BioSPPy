@@ -439,6 +439,7 @@ def correct_rpeaks(signal=None, rpeaks=None, sampling_rate=1000., tol=0.05):
             break
         newR.append(a + np.argmax(signal[a:b]))
 
+    newR = sorted(list(set(newR)))
     newR = np.array(newR, dtype='int')
 
     return utils.ReturnTuple((newR,), ('rpeaks',))
@@ -885,6 +886,7 @@ def gamboa_segmenter(signal=None, sampling_rate=1000., tol=0.002):
                 previous = i
                 rpeaks.append(np.argmax(signal[int(i):int(i + v_100ms)]) + i)
 
+    rpeaks = sorted(list(set(rpeaks)))
     rpeaks = np.array(rpeaks, dtype='int')
 
     return utils.ReturnTuple((rpeaks,), ('rpeaks',))
