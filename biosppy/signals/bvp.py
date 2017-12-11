@@ -105,6 +105,7 @@ def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
     """Determine onsets of BVP pulses.
 
     Skips corrupted signal parts.
+    Based on the approach by Zong *et al.* [Zong03]_.
 
     Parameters
     ----------
@@ -135,6 +136,12 @@ def find_onsets(signal=None, sampling_rate=1000., sm_size=None, size=None,
     -------
     onsets : array
         Indices of BVP pulse onsets.
+    
+    References
+    ----------
+    .. [Zong03] W Zong, T Heldt, GB Moody and RG Mark, "An Open-source
+       Algorithm to Detect Onset of Arterial Blood Pressure Pulses",
+       IEEE Comp. in Cardiology, vol. 30, pp. 259-262, 2003
 
     """
 
