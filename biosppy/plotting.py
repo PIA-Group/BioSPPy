@@ -277,7 +277,7 @@ def plot_bvp(ts=None,
     ax3.plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label='Heart Rate')
 
     ax3.set_xlabel('Time (s)')
-    ax3.set_ylabel('Heart Rate (bmp)')
+    ax3.set_ylabel('Heart Rate (bpm)')
     ax3.legend()
     ax3.grid()
 
@@ -942,7 +942,7 @@ def plot_ecg(ts=None,
     ax3.plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label='Heart Rate')
 
     ax3.set_xlabel('Time (s)')
-    ax3.set_ylabel('Heart Rate (bmp)')
+    ax3.set_ylabel('Heart Rate (bpm)')
     ax3.legend()
     ax3.grid()
 
