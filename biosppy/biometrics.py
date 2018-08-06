@@ -319,6 +319,11 @@ class BaseClassifier(object):
         deferred : bool, optional
             If True, computations are delayed until `flush` is called.
 
+        Raises
+        ------
+        SubjectError
+            If the subject to remove is not enrolled.
+
         Notes
         -----
         * When using deferred calls, a dismiss overrides a previous enroll
