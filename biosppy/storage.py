@@ -748,7 +748,7 @@ class HDF(object):
         group : str, optional
             Signal group.
         recursive : bool, optional
-            It True, also lists signals in sub-groups.
+            If True, also lists signals in sub-groups.
 
         Returns
         -------
@@ -1000,7 +1000,7 @@ class HDF(object):
         group : str, optional
             Event group.
         recursive : bool, optional
-            It True, also lists events in sub-groups.
+            If True, also lists events in sub-groups.
 
         Returns
         -------
