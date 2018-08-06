@@ -1190,7 +1190,7 @@ def pearson_correlation(x=None, y=None):
 
     .. math::
 
-        r = \\frac{E\\[\\(X - \\mu_X\\) \\(Y - \\mu_Y\\)\\]}{\\sigma_X \\sigma_Y}
+        r = \\frac{E[(X - \\mu_X) (Y - \\mu_Y)]}{\\sigma_X \\sigma_Y}
 
     Parameters
     ----------
@@ -1252,7 +1252,7 @@ def rms_error(x=None, y=None):
 
     .. math::
 
-        rmse = \\sqrt{E((X - Y)^2)}
+        rmse = \\sqrt{E[(X - Y)^2]}
 
     Parameters
     ----------

@@ -118,11 +118,10 @@ def walktree(top=None, spec=None):
         Starting directory; if None, defaults to the current working directoty.
     spec : str, optional
         Regular expression to match the desired files;
-        if None, matches all files. Typical patterns:
+        if None, matches all files; typical patterns:
             * `r'\.txt$'` - matches files with '.txt' extension;
             * `r'^File_'` - matches files starting with 'File\_'
-            * `r'^File_.+\.txt$'` - matches files starting with 'File\_'
-            and ending with the '.txt' extension.
+            * `r'^File_.+\.txt$'` - matches files starting with 'File\_' and ending with the '.txt' extension.
     
     Yields
     ------
