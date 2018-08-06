@@ -5,7 +5,7 @@ biosppy.signals.bvp
 
 This module provides methods to process Blood Volume Pulse (BVP) signals.
 
-:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:copyright: (c) 2015-2018 by Instituto de Telecomunicacoes
 :license: BSD 3-clause, see LICENSE for more details.
 """
 

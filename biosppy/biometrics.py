@@ -10,7 +10,7 @@ This module provides classifier interfaces for identity recognition
 * identify: determine the identity of collected biometric dataset;
 * authenticate: verify the identity of collected biometric dataset.
 
-:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:copyright: (c) 2015-2018 by Instituto de Telecomunicacoes
 :license: BSD 3-clause, see LICENSE for more details.
 """
 

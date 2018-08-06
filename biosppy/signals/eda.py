@@ -6,7 +6,7 @@ biosppy.signals.eda
 This module provides methods to process Electrodermal Activity (EDA)
 signals, also known as Galvanic Skin Response (GSR).
 
-:copyright: (c) 2015-2017 by Instituto de Telecomunicacoes
+:copyright: (c) 2015-2018 by Instituto de Telecomunicacoes
 :license: BSD 3-clause, see LICENSE for more details.
 """
 
