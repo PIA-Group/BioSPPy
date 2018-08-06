@@ -433,6 +433,63 @@ def filter_signal(signal=None,
     return utils.ReturnTuple(args, names)
 
 
+class OnlineFilter(object):
+    """Online filtering.
+
+    Parameters
+    ----------
+    b : array
+        Numerator coefficients.
+    a : array
+        Denominator coefficients.
+
+    """
+
+    def __init__(self, b=None, a=None):
+        # check inputs
+        if b is None:
+            raise TypeError('Please specify the numerator coefficients.')
+
+        if a is None:
+            raise TypeError('Please specify the denominator coefficients.')
+
+        # self things
+        self.b = b
+        self.a = a
+
+        # reset
+        self.reset()
+
+    def reset(self):
+        """Reset the filter state."""
+
+        self.zi = ss.lfilter_zi(self.b, self.a)
+
+    def filter(self, signal=None):
+        """Filter a signal segment.
+
+        Parameters
+        ----------
+        signal : array
+            Signal segment to filter.
+
+        Returns
+        -------
+        filtered : array
+            Filtered signal segment.
+
+        """
+
+        # check input
+        if signal is None:
+            raise TypeError('Please specify the input signal.')
+
+        filtered, zf = ss.lfilter(self.b, self.a, signal, zi=self.zi)
+        self.zi = zf
+
+        return utils.ReturnTuple((filtered, ), ('filtered', ))
+
+
 def smoother(signal=None, kernel='boxzen', size=10, mirror=True, **kwargs):
     """Smooth a signal using an N-point moving average [MAvg]_ filter.
 
@@ -1056,68 +1113,185 @@ def windower(signal=None,
     return utils.ReturnTuple((index, values), ('index', 'values'))
 
 
-def synchronize(signal1=None, signal2=None):
+def synchronize(x=None, y=None, detrend=True):
     """Align two signals based on cross-correlation.
 
     Parameters
     ----------
-    signal1 : array
+    x : array
         First input signal.
-    signal2 : array
+    y : array
         Second input signal.
+    detrend : bool, optional
+        If True, remove signal means before computation.
 
     Returns
     -------
     delay : int
-        Delay (number of samples) of 'signal1' in relation to 'signal2';
-        if 'delay' < 0 , 'signal1' is ahead in relation to 'signal2';
-        if 'delay' > 0 , 'signal1' is delayed in relation to 'signal2'.
+        Delay (number of samples) of 'x' in relation to 'y';
+        if 'delay' < 0 , 'x' is ahead in relation to 'y';
+        if 'delay' > 0 , 'x' is delayed in relation to 'y'.
     corr : float
         Value of maximum correlation.
-    synch1 : array
-        Biggest possible portion of 'signal1' in synchronization.
-    synch2 : array
-        Biggest possible portion of 'signal2' in synchronization.
+    synch_x : array
+        Biggest possible portion of 'x' in synchronization.
+    synch_y : array
+        Biggest possible portion of 'y' in synchronization.
 
     """
 
     # check inputs
-    if signal1 is None:
+    if x is None:
         raise TypeError("Please specify the first input signal.")
 
-    if signal2 is None:
+    if y is None:
         raise TypeError("Please specify the second input signal.")
 
-    n1 = len(signal1)
-    n2 = len(signal2)
+    n1 = len(x)
+    n2 = len(y)
+
+    if detrend:
+        x = x - np.mean(x)
+        y = y - np.mean(y)
 
     # correlate
-    corr = np.correlate(signal1, signal2, mode='full')
-    x = np.arange(-n2 + 1, n1, dtype='int')
+    corr = np.correlate(x, y, mode='full')
+    d = np.arange(-n2 + 1, n1, dtype='int')
     ind = np.argmax(corr)
 
-    delay = x[ind]
+    delay = d[ind]
     maxCorr = corr[ind]
 
     # get synchronization overlap
     if delay < 0:
-        c = min([n1, len(signal2[-delay:])])
-        synch1 = signal1[:c]
-        synch2 = signal2[-delay:-delay + c]
+        c = min([n1, len(y[-delay:])])
+        synch_x = x[:c]
+        synch_y = y[-delay:-delay + c]
     elif delay > 0:
-        c = min([n2, len(signal1[delay:])])
-        synch1 = signal1[delay:delay + c]
-        synch2 = signal2[:c]
+        c = min([n2, len(x[delay:])])
+        synch_x = x[delay:delay + c]
+        synch_y = y[:c]
     else:
         c = min([n1, n2])
-        synch1 = signal1[:c]
-        synch2 = signal2[:c]
+        synch_x = x[:c]
+        synch_y = y[:c]
 
     # output
-    args = (delay, maxCorr, synch1, synch2)
-    names = ('delay', 'corr', 'synch1', 'synch2')
+    args = (delay, maxCorr, synch_x, synch_y)
+    names = ('delay', 'corr', 'synch_x', 'synch_y')
 
     return utils.ReturnTuple(args, names)
+
+
+def pearson_correlation(x=None, y=None):
+    """Compute the Pearson Correlation Coefficient bertween two signals.
+
+    The coefficient if given by:
+
+    .. math::
+
+        r = \\frac{E\\[\\(X - \\mu_X\\) \\(Y - \\mu_Y\\)\\]}{\\sigma_X \\sigma_Y}
+
+    Parameters
+    ----------
+    x : array
+        First input signal.
+    y : array
+        Second input signal.
+
+    Returns
+    -------
+    rxy : float
+        Pearson correlation coefficient, ranging between -1 and +1.
+
+    Raises
+    ------
+    ValueError
+        If the input signals do not have the same length.
+
+    """
+
+    # check inputs
+    if x is None:
+        raise TypeError("Please specify the first input signal.")
+
+    if y is None:
+        raise TypeError("Please specify the second input signal.")
+
+    # ensure numpy
+    x = np.array(x)
+    y = np.array(y)
+
+    n = len(x)
+
+    if n != len(y):
+        raise ValueError('Input signals must have the same length.')
+
+    mx = np.mean(x)
+    my = np.mean(y)
+
+    Sxy = np.sum(x * y) - n*mx*my
+    Sxx = np.sum(np.power(x, 2)) - n * mx**2
+    Syy = np.sum(np.power(x, 2)) - n * my**2
+
+    rxy = Sxy / (np.sqrt(Sxx) * np.sqrt(Syy))
+
+    # avoid propagation of numerical errors
+    if rxy > 1.0:
+        rxy = 1.0
+    elif rxy < -1.0:
+        rxy = -1.0
+
+    return utils.ReturnTuple((rxy, ), ('rxy', ))
+
+
+def rms_error(x=None, y=None):
+    """Compute the Root-Mean-Square Error between two signals.
+
+    The error if given by:
+
+    .. math::
+
+        rmse = \\sqrt{E((X - Y)^2)}
+
+    Parameters
+    ----------
+    x : array
+        First input signal.
+    y : array
+        Second input signal.
+
+    Returns
+    -------
+    rmse : float
+        Root-mean-square error.
+
+    Raises
+    ------
+    ValueError
+        If the input signals do not have the same length.
+
+    """
+
+    # check inputs
+    if x is None:
+        raise TypeError("Please specify the first input signal.")
+
+    if y is None:
+        raise TypeError("Please specify the second input signal.")
+
+    # ensure numpy
+    x = np.array(x)
+    y = np.array(y)
+
+    n = len(x)
+
+    if n != len(y):
+        raise ValueError('Input signals must have the same length.')
+
+    rmse = np.sqrt(np.mean(np.power(x - y, 2)))
+
+    return utils.ReturnTuple((rmse, ), ('rmse', ))
 
 
 def get_heart_rate(beats=None, sampling_rate=1000., smooth=False, size=3):
@@ -1331,7 +1505,7 @@ def finite_difference(signal=None, weights=None):
     Notes
     -----
     * The method assumes central differences weights.
-    * The method accounts for the delay introduced by the method .
+    * The method accounts for the delay introduced by the algorithm.
     
     Raises
     ------
