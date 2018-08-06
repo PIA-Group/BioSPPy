@@ -13,7 +13,7 @@ A toolbox for biosignal processing written in Python.
 from __future__ import absolute_import, division, print_function
 
 # get version
-from .version import version as __version__
+from .__version__ import __version__
 
 # allow lazy loading
 from .signals import bvp, ecg, eda, eeg, emg, resp, tools
