@@ -713,7 +713,8 @@ def power_spectrum(signal=None,
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
     pad : int, optional
-        Padding for the Fourier Transform (number of zeros added).
+        Padding for the Fourier Transform (number of zeros added);
+        defaults to no padding..
     pow2 : bool, optional
         If True, rounds the number of points `N = len(signal) + pad` to the
         nearest power of 2 greater than N.
@@ -755,6 +756,107 @@ def power_spectrum(signal=None,
     power = power[:hpoints]
     power[1:] *= 2
     power = np.power(power, 2)
+
+    if decibel:
+        power = 10. * np.log10(power)
+
+    return utils.ReturnTuple((freqs, power), ('freqs', 'power'))
+
+
+def welch_spectrum(signal=None,
+                   sampling_rate=1000.,
+                   size=None,
+                   overlap=None,
+                   window='hanning',
+                   window_kwargs=None,
+                   pad=None,
+                   decibel=True):
+    """Compute the power spectrum of a signal using Welch's method (one-sided).
+
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    size : int, optional
+        Number of points in each Welch segment;
+        defaults to the equivalent of 1 second;
+        ignored when 'window' is an array.
+    overlap : int, optional
+        Number of points to overlap between segments; defaults to `size / 2`.
+    window : str, array, optional
+        Type of window to use.
+    window_kwargs : dict, optional
+        Additional keyword arguments to pass on window creation; ignored if
+        'window' is an array.
+    pad : int, optional
+        Padding for the Fourier Transform (number of zeros added);
+        defaults to no padding.
+    decibel : bool, optional
+        If True, returns the power in decibels.
+
+    Returns
+    -------
+    freqs : array
+        Array of frequencies (Hz) at which the power was computed.
+    power : array
+        Power spectrum.
+
+    Notes
+    -----
+    * Detrends each Welch segment by removing the mean.
+
+    """
+
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input signal.")
+
+    length = len(signal)
+    sampling_rate = float(sampling_rate)
+
+    if size is None:
+        size = int(sampling_rate)
+
+    if window_kwargs is None:
+        window_kwargs = {}
+
+    if isinstance(window, six.string_types):
+        win = _get_window(window, size, **window_kwargs)
+    elif isinstance(window, np.ndarray):
+        win = window
+        size = len(win)
+
+    if size > length:
+        raise ValueError('Segment size must be smaller than signal length.')
+
+    if overlap is None:
+        overlap = size // 2
+    elif overlap > size:
+        raise ValueError('Overlap must be smaller than segment size.')
+
+    nfft = size
+    if pad is not None:
+        if pad >= 0:
+            nfft += pad
+        else:
+            raise ValueError("Padding must be a positive integer.")
+
+    freqs, power = ss.welch(
+        signal,
+        fs=sampling_rate,
+        window=win,
+        nperseg=size,
+        noverlap=overlap,
+        nfft=nfft,
+        detrend='constant',
+        return_onesided=True,
+        scaling='spectrum',
+    )
+
+    # compensate one-sided
+    power *= 2
 
     if decibel:
         power = 10. * np.log10(power)
