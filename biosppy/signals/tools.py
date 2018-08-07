@@ -1186,11 +1186,11 @@ def synchronize(x=None, y=None, detrend=True):
 def pearson_correlation(x=None, y=None):
     """Compute the Pearson Correlation Coefficient bertween two signals.
 
-    The coefficient if given by:
+    The coefficient is given by:
 
     .. math::
 
-        r = \\frac{E[(X - \\mu_X) (Y - \\mu_Y)]}{\\sigma_X \\sigma_Y}
+        r_{xy} = \\frac{E[(X - \\mu_X) (Y - \\mu_Y)]}{\\sigma_X \\sigma_Y}
 
     Parameters
     ----------
@@ -1248,7 +1248,7 @@ def pearson_correlation(x=None, y=None):
 def rms_error(x=None, y=None):
     """Compute the Root-Mean-Square Error between two signals.
 
-    The error if given by:
+    The error is given by:
 
     .. math::
 
