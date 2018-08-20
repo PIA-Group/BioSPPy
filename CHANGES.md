@@ -3,6 +3,13 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.6.1
+-------------
+
+Released on August 20th 2018
+
+- Fixed source file encoding
+
 Version 0.6.0
 -------------
 
