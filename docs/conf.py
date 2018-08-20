@@ -77,7 +77,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'BioSPPy'
-copyright = '2015-2017, Instituto de Telecomunicacoes'
+copyright = '2015-2018, Instituto de Telecomunicacoes'
 author = 'Instituto de Telecomunicacoes'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -85,7 +85,7 @@ author = 'Instituto de Telecomunicacoes'
 # built documents.
 #
 # The short X.Y version.
-version = '0.5.1'
+version = '0.6.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 

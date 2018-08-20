@@ -3,6 +3,20 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.6.0
+-------------
+
+Released on August 20th 2018
+
+- Added reference for BVP onset detection algorithm (closes #36)
+- Updated readme file
+- New setup.py style
+- Added online filtering class in signals.tools
+- Added Pearson correlation and RMSE methods in signals.tools
+- Added method to compute Welch's power spectrum in signals.tools
+- Don't use detrended derivative in signals.eda.kbk_scr (closes #43)
+- Various minor changes
+
 Version 0.5.1
 -------------
 
