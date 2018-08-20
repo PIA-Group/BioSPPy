@@ -78,7 +78,9 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
                               mirror=True)
 
     # get SCR info
-    onsets, peaks, amps = kbk_scr(signal=filtered, sampling_rate=sampling_rate, min_amplitude=min_amplitude)
+    onsets, peaks, amps = kbk_scr(signal=filtered,
+                                  sampling_rate=sampling_rate,
+                                  min_amplitude=min_amplitude)
 
     # get time vectors
     length = len(signal)
@@ -215,7 +217,7 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
     df, _ = st.smoother(signal=df, kernel='bartlett', size=size, mirror=True)
 
     # zero crosses
-    zeros, = st.zero_cross(signal=df, detrend=True)
+    zeros, = st.zero_cross(signal=df, detrend=False)
     if np.all(df[:zeros[0]] > 0):
         zeros = zeros[1:]
     if np.all(df[zeros[-1]:] > 0):
