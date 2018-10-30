@@ -263,7 +263,7 @@ def get_filter(ftype='FIR',
         Order of the filter.
     frequency : int, float, list, array
         Cutoff frequencies; format depends on type of band:
-            * 'lowpass' or 'bandpass': single frequency;
+            * 'lowpass' or 'highpass': single frequency;
             * 'bandpass' or 'bandstop': pair of frequencies.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
@@ -1334,7 +1334,7 @@ def pearson_correlation(x=None, y=None):
 
     Sxy = np.sum(x * y) - n*mx*my
     Sxx = np.sum(np.power(x, 2)) - n * mx**2
-    Syy = np.sum(np.power(x, 2)) - n * my**2
+    Syy = np.sum(np.power(y, 2)) - n * my**2
 
     rxy = Sxy / (np.sqrt(Sxx) * np.sqrt(Syy))
 
