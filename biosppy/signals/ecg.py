@@ -100,7 +100,7 @@ def ecg(signal=None, sampling_rate=1000., show=True):
     # get time vectors
     length = len(signal)
     T = (length - 1) / sampling_rate
-    ts = np.linspace(0, T, length, endpoint=False)
+    ts = np.linspace(0, T, length, endpoint=True)
     ts_hr = ts[hr_idx]
     ts_tmpl = np.linspace(-0.2, 0.4, templates.shape[1], endpoint=False)
 

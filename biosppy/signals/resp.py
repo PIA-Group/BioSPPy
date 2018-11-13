@@ -93,7 +93,7 @@ def resp(signal=None, sampling_rate=1000., show=True):
     # get time vectors
     length = len(signal)
     T = (length - 1) / sampling_rate
-    ts = np.linspace(0, T, length, endpoint=False)
+    ts = np.linspace(0, T, length, endpoint=True)
     ts_rate = ts[rate_idx]
 
     # plot

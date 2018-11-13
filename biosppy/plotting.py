@@ -441,7 +441,7 @@ def plot_emg(ts=None,
         # processed signal
         L = len(processed)
         T = (L - 1) / sampling_rate
-        ts_processed = np.linspace(0, T, L, endpoint=False)
+        ts_processed = np.linspace(0, T, L, endpoint=True)
         ax3.plot(ts_processed, processed,
                  linewidth=MAJOR_LW,
                  label='Processed')

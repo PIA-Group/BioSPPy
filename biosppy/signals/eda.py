@@ -85,7 +85,7 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
     # get time vectors
     length = len(signal)
     T = (length - 1) / sampling_rate
-    ts = np.linspace(0, T, length, endpoint=False)
+    ts = np.linspace(0, T, length, endpoint=True)
 
     # plot
     if show:

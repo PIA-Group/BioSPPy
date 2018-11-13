@@ -124,7 +124,7 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
     # get time vectors
     length = len(signal)
     T = (length - 1) / sampling_rate
-    ts = np.linspace(0, T, length, endpoint=False)
+    ts = np.linspace(0, T, length, endpoint=True)
 
     # plot
     if show:
