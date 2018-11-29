@@ -463,7 +463,7 @@ class OnlineFilter(object):
     def reset(self):
         """Reset the filter state."""
 
-        self.zi = ss.lfilter_zi(self.b, self.a)
+        self.zi = None
 
     def filter(self, signal=None):
         """Filter a signal segment.
@@ -484,8 +484,10 @@ class OnlineFilter(object):
         if signal is None:
             raise TypeError('Please specify the input signal.')
 
-        filtered, zf = ss.lfilter(self.b, self.a, signal, zi=self.zi)
-        self.zi = zf
+        if self.zi is None:
+            self.zi = signal[0] * ss.lfilter_zi(self.b, self.a)
+
+        filtered, self.zi = ss.lfilter(self.b, self.a, signal, zi=self.zi)
 
         return utils.ReturnTuple((filtered, ), ('filtered', ))
 
