@@ -23,6 +23,7 @@ import scipy.signal as ss
 # local
 from . import tools as st
 from .. import plotting, utils
+from scipy.signal import argrelextrema 
 
 
 def ecg(signal=None, sampling_rate=1000., show=True):
@@ -1199,3 +1200,240 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
     rpeaks = np.array(rpeaks, dtype='int')
 
     return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+
+
+
+def getQPositions(ecg_proc=None, print_samples=False):
+	"""Different ECG Waves (Q, R, S, ...) are not present or are not so clear to identify in all ECG signals (I II III V1 V2 V3, ...)
+	   For Q wave we suggest to use signals I, aVL . Avoid II, III, V1, V2, V3, V4, aVR, aVF 
+	   
+	Parameters
+    ----------
+	signal : object
+        object return by the function ecg.
+	show : bool, optional
+        If True, show a plot of the Q Positions on every signal sample/template.
+	
+	Returns
+    -------
+	Q_positions : array
+		Array with all Q positions on the signal
+		
+	Q_start_ positions : array
+		Array with all Q start positions on the signal
+	
+	"""
+	
+	
+	
+    template_r_position = 100 #R peek on the template is always on 100 index 
+    Q_positions = []
+    Q_start_positions = []
+
+    for n, each in enumerate(ecg_proc['templates']): 
+        # Get Q Position
+        template_left = each[0:template_r_position+1]
+        mininums_from_template_left = argrelextrema(template_left, np.less)
+        #print("Q position= " + str(mininums_from_template_left[0][-1]))
+        Q_position = ecg_proc['rpeaks'][n] - (template_r_position - mininums_from_template_left[0][-1])
+        Q_positions.append(Q_position) 
+        
+        #Get Q start position
+        template_Q_left = each[0:mininums_from_template_left[0][-1]+1]
+        maximum_from_template_Q_left = argrelextrema(template_Q_left, np.greater)
+        #print("Q start position=" + str(maximum_from_template_Q_left[0][-1]))
+        #print("Q start value=" + str(template_Q_left[maximum_from_template_Q_left[0][-1]]))
+        Q_start_position = ecg_proc['rpeaks'][n] - template_r_position + maximum_from_template_Q_left[0][-1]
+        Q_start_positions.append(Q_start_position) 
+        
+        
+        if print_samples:         
+            plt.plot(each) 
+            plt.axvline(x=template_r_position, color='r', label='R peak')
+            plt.axvline(x=mininums_from_template_left[0][-1], color='yellow', label='Q Position')
+            plt.axvline(x=maximum_from_template_Q_left[0][-1], color='green', label='Q Start Position')
+            plt.legend()
+            show()
+    return Q_positions, Q_start_positions
+
+
+def getSPositions(ecg_proc=None, print_samples=False):
+	"""Different ECG Waves (Q, R, S, ...) are not present or are not so clear to identify in all ECG signals (I II III V1 V2 V3, ...)
+	   For S wave we suggest to use signals V1, V2, V3. Avoid I, V5, V6, aVR, aVL
+	   
+	Parameters
+    ----------
+	signal : object
+        object return by the function ecg.
+	show : bool, optional
+        If True, show a plot of the S Positions on every signal sample/template.
+	
+	Returns
+    -------
+	S_positions : array
+		Array with all S positions on the signal
+		
+	S_end_ positions : array
+		Array with all S end positions on the signal
+	
+	"""
+
+    template_r_position = 100 #R peek on the template is always on 100 index 
+    S_positions = []
+    S_end_positions = []
+    template_size = len(ecg_proc['templates'][0])
+    
+    
+    for n, each in enumerate(ecg_proc['templates']): 
+        #Get S Position
+        template_right = each[template_r_position:template_size+1]
+        mininums_from_template_right = argrelextrema(template_right, np.less)     
+        S_position = ecg_proc['rpeaks'][n] + mininums_from_template_right[0][0]
+        S_positions.append(S_position) 
+        
+        #Get S end position
+        maximums_from_template_right = argrelextrema(template_right, np.greater)
+        #print("S end position=" + str(maximums_from_template_right[0][0]))
+        #print("S end value=" + str(template_right[maximums_from_template_right[0][0]]))
+        S_end_position = ecg_proc['rpeaks'][n] + maximums_from_template_right[0][0]
+        S_end_positions.append(S_end_position) 
+        
+
+        if print_samples:
+            plt.plot(each) 
+            plt.axvline(x=template_r_position, color='r', label='R peak')
+            plt.axvline(x=template_r_position+mininums_from_template_right[0][0], color='yellow', label='S Position')
+            plt.axvline(x=template_r_position+maximums_from_template_right[0][0], color='green', label='S end Position')
+            plt.legend()
+            show()
+            
+    return S_positions,S_end_positions
+	
+	
+
+def getPPositions(ecg_proc=None, print_samples=False):
+	"""Different ECG Waves (Q, R, S, ...) are not present or are not so clear to identify in all ECG signals (I II III V1 V2 V3, ...)
+	   For P wave we suggest to use signals II, V1, aVF . Avoid I, III, V1, V2, V3, V4, V5, AVL
+	   
+	Parameters
+    ----------
+	signal : object
+        object return by the function ecg.
+	show : bool, optional
+        If True, show a plot of the P Positions on every signal sample/template.
+	
+	Returns
+    -------
+	P_positions : array
+		Array with all P positions on the signal
+	P_start_ positions : array
+		Array with all P start positions on the signal	
+	P_end_ positions : array
+		Array with all P end positions on the signal
+	
+	"""
+
+    template_r_position = 100 #R peek on the template is always on 100 index 
+    template_p_position_max = 80 # the P will be always hapenning on the first 80 indexes of the template 
+    P_positions = []
+    P_start_positions = []
+    P_end_positions = []
+
+    for n, each in enumerate(ecg_proc['templates']): 
+        # Get P position 
+        template_left = each[0:template_p_position_max+1]  
+        max_from_template_left = np.argmax(template_left)
+        #print("P Position=" + str(max_from_template_left))
+        P_position = ecg_proc['rpeaks'][n] - template_r_position + max_from_template_left
+        P_positions.append(P_position) 
+        
+        #Get P start position
+        template_P_left = each[0:max_from_template_left+1]
+        mininums_from_template_left = argrelextrema(template_P_left, np.less)
+        #print("P start position=" + str(mininums_from_template_left[0][-1]))
+        P_start_position = ecg_proc['rpeaks'][n] - template_r_position + mininums_from_template_left[0][-1]
+        P_start_positions.append(P_start_position) 
+                    
+        #Get P end position 
+        template_P_right = each[max_from_template_left:template_p_position_max+1]
+        mininums_from_template_right = argrelextrema(template_P_right, np.less)
+        #print("P end position=" + str(mininums_from_template_right[0][0]+max_from_template_left))
+        P_end_position = ecg_proc['rpeaks'][n] - template_r_position + max_from_template_left + mininums_from_template_right[0][0] 
+        P_end_positions.append(P_end_position)   
+        
+        
+        if print_samples:         
+            plt.plot(each) 
+            plt.axvline(x=template_r_position, color='r', label='R peak')
+            plt.axvline(x=max_from_template_left, color='yellow', label='P Position')
+            plt.axvline(x=mininums_from_template_left[0][-1], color='green', label='P start')
+            plt.axvline(x=(max_from_template_left + mininums_from_template_right[0][0]), color='green', label='P end')
+            plt.legend()
+            show()
+    return P_positions, P_start_positions, P_end_positions
+
+
+
+def getTPositions(ecg_proc=None, print_samples=False):
+	"""Different ECG Waves (Q, R, S, ...) are not present or are not so clear to identify in all ECG signals (I II III V1 V2 V3, ...)
+	   For T wave we suggest to use signals V4, v5 (II, V3 have good results, but in less accuracy) . Avoid I, V1, V2, aVR, aVL
+	   
+	Parameters
+    ----------
+	signal : object
+        object return by the function ecg.
+	show : bool, optional
+        If True, show a plot of the T Positions on every signal sample/template.
+	
+	Returns
+    -------
+	T_positions : array
+		Array with all T positions on the signal
+	T_start_ positions : array
+		Array with all T start positions on the signal	
+	T_end_ positions : array
+		Array with all T end positions on the signal
+	
+	"""
+
+
+
+    template_r_position = 100 #R peek on the template is always on 100 index
+    template_T_position_min = 170 #the T will be always hapenning after 150 indexes of the template 
+    T_positions = []
+    T_start_positions = []
+    T_end_positions = []
+
+    for n, each in enumerate(ecg_proc['templates']):
+        # Get T position 
+        template_right = each[template_T_position_min:]
+        max_from_template_right = np.argmax(template_right)
+        #print("T Position=" + str(template_T_position_min + max_from_template_right))        
+        T_position = ecg_proc['rpeaks'][n] - template_r_position + template_T_position_min + max_from_template_right
+        T_positions.append(T_position)
+               
+        #Get T start position
+        template_T_left = each[template_r_position:template_T_position_min + max_from_template_right]
+        min_from_template_T_left = argrelextrema(template_T_left, np.less)
+        #print("T start position=" + str(template_r_position+min_from_template_T_left[0][-1]))  
+        T_start_position = ecg_proc['rpeaks'][n] + min_from_template_T_left[0][-1]
+        T_start_positions.append(T_start_position) 
+        
+                       
+        #Get T end position 
+        template_T_right = each[template_T_position_min + max_from_template_right:]
+        mininums_from_template_T_right = argrelextrema(template_T_right, np.less)
+        #print("T end position=" + str(template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]))
+        T_end_position = ecg_proc['rpeaks'][n] - template_r_position + template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0] 
+        T_end_positions.append(T_end_position)   
+        
+        
+        if print_samples:         
+            plt.plot(each) 
+            plt.axvline(x=template_r_position, color='r', label='R peak')
+            plt.axvline(x=template_T_position_min + max_from_template_right, color='yellow', label='T Position')
+            plt.axvline(x=template_r_position + min_from_template_T_left[0][-1], color='green', label='P start')
+            plt.axvline(x=(template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]), color='green', label='P end')
+            plt.legend()
+            show()
+    return T_positions, T_start_positions, T_end_positions
