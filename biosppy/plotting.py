@@ -980,7 +980,7 @@ def plot_ecg(ts=None,
 def plot_bcg(ts=None,
              raw=None,
              filtered=None,
-             ipeaks=None,
+             jpeaks=None,
              templates_ts=None,
              templates=None,
              heart_rate_ts=None,
@@ -1037,10 +1037,10 @@ def plot_bcg(ts=None,
     ymin -= alpha
 
     ax2.plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered')
-    ax2.vlines(ts[rpeaks], ymin, ymax,
+    ax2.vlines(ts[jpeaks], ymin, ymax,
                color='m',
                linewidth=MINOR_LW,
-               label='I-peaks')
+               label='J-peaks')
 
     ax2.set_ylabel('Amplitude')
     ax2.legend()
