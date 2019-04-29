@@ -18,6 +18,7 @@ from six.moves import range, zip
 # 3rd party
 import numpy as np
 import scipy.signal as ss
+from cv2 import matchTemplate,TM_CCORR_NORMED
 
 # local
 from . import tools as st
@@ -130,7 +131,7 @@ def bsegpp_segmenter(signal=None, sampling_rate=1000., thresholds= [0.05,5],
         Lower and upper amplitude threshold values for local maxima of the
         absolute coarse signal.
     R : float
-        Range of local minima search for final synchronization points (seconds).
+        Range of local extrema search for final synchronization points (seconds).
         Empirically 0.1<R<0.5.
     t1 : float
         Minimum delay between final synchronization points (seconds).
@@ -210,7 +211,7 @@ def bsegpp_segmenter(signal=None, sampling_rate=1000., thresholds= [0.05,5],
                              peaks=cntr,
                              sampling_rate=sampling_rate,
                              tol=R)
-                             
+
     # define G waves
     gpeaks = p
     # search for H waves
@@ -234,6 +235,108 @@ def bsegpp_segmenter(signal=None, sampling_rate=1000., thresholds= [0.05,5],
 
     return utils.ReturnTuple((gpeaks,hpeaks,ipeaks,jpeaks,filtered),
                                 ('gpeaks','hpeaks','ipeaks','jpeaks','filtered'))
+
+
+def template_matching(signal=None,filtered=None,peaks=None,sampling_rate=1000.,
+                            threshold = 0.5,R=0.1,show=True):
+    """Manual template matching algorithm.
+
+    Follows the approach by Shin et al. [Shin03]_.
+
+    Parameters
+    ----------
+    signal : array
+        Input unfiltered BCG signal.
+    filtered : array
+        Input filtered BCG signal, bandpassed to the [2,20] Hz frequency range.
+    peaks : array
+        J-peaks labels.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    threshold : float
+        Minimal correlation value for local maxima.
+    R : float
+        Range of local extrema search for final synchronization points (seconds).
+        Empirically 0.1<R<0.5.
+
+    Returns
+    -------
+    template : array
+        Template model.
+    peaks : array
+        J-peaks location indices.
+
+    References
+    ----------
+    .. [Shin03] J. H. Shin, B. H. Choi, Y. G. Lim, D. U. Jeong, K. S. Park,
+    "Automatic Ballistocardiogram (BCG) Beat Detection Using a Template Matching
+    Approach", Proceedings of the 30th Annual International Conference of the
+    IEEE EMBS, 2008
+
+    """
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input unfiltered signal.")
+    if filtered is None:
+        raise TypeError("Please specify an input filtered signal.")
+    if peaks is None:
+        raise TypeError("Please specify peaks indices in the input signal.")
+
+    # ensure numpy
+    signal = np.array(signal)
+    filtered = np.array(filtered)
+    sampling_rate = float(sampling_rate)
+
+    #template modelling
+    templates, peaks = extract_heartbeats(signal=filtered, peaks=peaks,
+                                sampling_rate=1000., before=0.4, after=0.4)
+    for n,tmpl in enumerate(templates):
+        tmpl -= np.mean(tmpl)
+        tmpl /= max(abs(tmpl))
+        templates[n] = tmpl
+    template = np.mean(templates,axis=0)
+
+    #template_matching
+    corr = matchTemplate(filtered.astype('float32'),template.astype('float32'),TM_CCORR_NORMED)
+    corr = corr.flatten()
+    cntr,properties = ss.find_peaks(corr,height=threshold)
+    cntr += int(len(template)/2)
+    peaks, = correct_peaks(signal=filtered,
+                             peaks=cntr,
+                             sampling_rate=sampling_rate,
+                             tol=R)
+    # plot
+    if show:
+        # extract templates
+        templates, peaks = extract_heartbeats(signal=filtered,
+                                               peaks=peaks,
+                                               sampling_rate=sampling_rate,
+                                               before=0.4,
+                                               after=0.4)
+        # compute heart rate
+        hr_idx, hr = st.get_heart_rate(beats=peaks,
+                                       sampling_rate=sampling_rate,
+                                       smooth=True,
+                                       size=3)
+        # get time vectors
+        length = len(signal)
+        T = (length - 1) / sampling_rate
+        ts = np.linspace(0, T, length, endpoint=True)
+        ts_hr = ts[hr_idx]
+        ts_tmpl = np.linspace(-0.4, 0.4, templates.shape[1], endpoint=False)
+
+        plotting.plot_bcg(ts=ts,
+                          raw=signal,
+                          filtered=filtered,
+                          jpeaks=peaks,
+                          templates_ts=ts_tmpl,
+                          templates=templates,
+                          heart_rate_ts=ts_hr,
+                          heart_rate=hr,
+                          path=None,
+                          show=True)
+
+    return utils.ReturnTuple((template,peaks),('template','peaks'))
 
 
 def correct_peaks(signal=None, peaks=None, sampling_rate=1000., tol=0.3):
