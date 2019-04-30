@@ -327,7 +327,7 @@ def get_filter(ftype='FIR',
                          analog=False,
                          output='ba', **kwargs)
     elif ftype == 'cheby2':
-        # chevyshev type II filter
+        # chebyshev type II filter
         b, a = ss.cheby2(N=order,
                          Wn=frequency,
                          btype=band,
