@@ -942,14 +942,18 @@ def signal_stats(signal=None):
         Mean of the signal.
     median : float
         Median of the signal.
+    min : float
+        Minimum signal value.
     max : float
-        Maximum signal amplitude.
+        Maximum signal value.
+    max_amp : float
+        Maximum absolute signal amplitude, in relation to the mean.
     var : float
         Signal variance (unbiased).
     std_dev : float
         Standard signal deviation (unbiased).
     abs_dev : float
-        Absolute signal deviation.
+        Mean absolute signal deviation around the median.
     kurtosis : float
         Signal kurtosis (unbiased).
     skew : float
@@ -970,6 +974,12 @@ def signal_stats(signal=None):
     # median
     median = np.median(signal)
 
+    # min
+    minVal = np.min(signal)
+
+    # max
+    maxVal = np.max(signal)
+
     # maximum amplitude
     maxAmp = np.abs(signal - mean).max()
 
@@ -980,7 +990,7 @@ def signal_stats(signal=None):
     sigma = signal.std(ddof=1)
 
     # absolute deviation
-    ad = np.sum(np.abs(signal - median))
+    ad = np.mean(np.abs(signal - median))
 
     # kurtosis
     kurt = stats.kurtosis(signal, bias=False)
@@ -989,9 +999,9 @@ def signal_stats(signal=None):
     skew = stats.skew(signal, bias=False)
 
     # output
-    args = (mean, median, maxAmp, sigma2, sigma, ad, kurt, skew)
-    names = ('mean', 'median', 'max', 'var', 'std_dev', 'abs_dev', 'kurtosis',
-             'skewness')
+    args = (mean, median, minVal, maxVal, maxAmp, sigma2, sigma, ad, kurt, skew)
+    names = ('mean', 'median', 'min', 'max', 'max_amp', 'var', 'std_dev',
+             'abs_dev', 'kurtosis', 'skewness')
 
     return utils.ReturnTuple(args, names)
 
