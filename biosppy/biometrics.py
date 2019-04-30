@@ -1572,9 +1572,10 @@ class SVM(BaseClassifier):
             dismiss = []
 
         # process dismiss
-        pairs = list(self._models)
+        src_pairs = list(self._models)
+        pairs = []
         for t in dismiss:
-            pairs = [p for p in pairs if t in p]
+            pairs.extend([p for p in src_pairs if t in p])
 
         for p in pairs:
             self._del_clf(p)
