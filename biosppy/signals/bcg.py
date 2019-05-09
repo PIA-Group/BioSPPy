@@ -23,10 +23,12 @@ import scipy.cluster.hierarchy as sch
 import scipy.spatial.distance as ssd
 import scipy.fftpack as sf
 import scipy.optimize as so
-from cv2 import matchTemplate,TM_CCORR_NORMED
+from cv2 import matchTemplate,TM_CCORR_NORMED,TM_CCORR
 from plotly.offline import plot
 from plotly.graph_objs import Scatter
 import matplotlib.pyplot as plt
+from operator import itemgetter
+from itertools import groupby
 # local
 from . import tools as st
 from .. import plotting, utils
@@ -123,7 +125,7 @@ def bsegpp_segmenter(signal=None, sampling_rate=1000., thresholds= [0.05,5],
                         R=0.1, t1=0.6, H=0.2, I=0.3, J=0.4):
     """BSEG++ BCG cycle extraction algorithm.
 
-    Follows the approach by Akhbardeh et al. [Akhb02]_.
+    Follows the approach by Akhbardeh et al. [Akhb07]_.
     It was adapted to our BCG device, which measures higher G-peaks in the [1,2]
      Hz frequency band. Thus G-peaks are here synchronization points and H, I, J
      peaks are searched time ranges depending on G-peaks positions.
@@ -164,7 +166,7 @@ def bsegpp_segmenter(signal=None, sampling_rate=1000., thresholds= [0.05,5],
 
     References
     ----------
-    .. [Akhb02] A. Akhbardeh, B. Kaminska, K. Tavakolian, "BSeg++: A modified
+    .. [Akhb07] A. Akhbardeh, B. Kaminska, K. Tavakolian, "BSeg++: A modified
     Blind Segmentation Method for Ballistocardiogram Cycle Extraction",
     Proceedings of the 29th Annual International Conference of the IEEE EMBS,
     2007
@@ -245,7 +247,7 @@ def template_matching(signal=None,filtered=None,peaks=None,sampling_rate=1000.,
                             threshold = 0.5,R=0.1,show=True):
     """Manual template matching algorithm.
 
-    Follows the approach by Shin et al. [Shin03]_.
+    Follows the approach by Shin et al. [Shin08]_.
 
     Parameters
     ----------
@@ -272,7 +274,7 @@ def template_matching(signal=None,filtered=None,peaks=None,sampling_rate=1000.,
 
     References
     ----------
-    .. [Shin03] J. H. Shin, B. H. Choi, Y. G. Lim, D. U. Jeong, K. S. Park,
+    .. [Shin08] J. H. Shin, B. H. Choi, Y. G. Lim, D. U. Jeong, K. S. Park,
     "Automatic Ballistocardiogram (BCG) Beat Detection Using a Template Matching
     Approach", Proceedings of the 30th Annual International Conference of the
     IEEE EMBS, 2008
@@ -342,25 +344,33 @@ def template_matching(signal=None,filtered=None,peaks=None,sampling_rate=1000.,
 
     return utils.ReturnTuple((template,peaks),('template','peaks'))
 
-# def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length = 0.6,gaussian_filter_std = 0.06,show=True):
-def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length = 0.6,gaussian_filter_std = 0.1,show=True):
+def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length=0.6,residual_threshold = 0.35, show=True):
 
     """Adaptive Heartbeat Modelling.
 
-    Follows the approach by Paalasmaa et al. [Paal04]_.
+    Follows the approach by Paalasmaa et al. [Paal14]_. Only suitable here for 15s-long BCG.
 
     Parameters
     ----------
     signal : array
         Input unfiltered BCG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    initial_length : float, optional
+        Initial length of the template.
+    residual_threshold :
+        Threshold for heartbeat intervals selection.
 
     Returns
     -------
-
+    template : array
+        Heartbeat model.
+    peaks : array
+        Heartbeats location indices.
 
     References
     ----------
-    .. [Paal04] J. Paalasmaa, H. Toivonen, M. Partinen,
+    .. [Paal14] J. Paalasmaa, H. Toivonen, M. Partinen,
     "Adaptive heartbeat modeling for beat-to-beat heart rate measurement in
     ballistocardiograms", IEEE journal of biomedical and health informatics, 2015
 
@@ -381,6 +391,7 @@ def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length 
                                       order=2,
                                       frequency=10,
                                       sampling_rate=sampling_rate)
+    gaussian_filter_std = 0.1
     filtered -= si.gaussian_filter(filtered,gaussian_filter_std*sampling_rate)
 
     #D. Initial estimation of the heartbeat model
@@ -415,6 +426,7 @@ def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length 
 
     mu = np.mean(windows,axis=0)
 
+
     hvs_result = modified_heart_valve_signal(signal = signal, sampling_rate=sampling_rate)
     hvs = hvs_result['hvs']
     hvs_minima,_ = ss.find_peaks(-hvs)
@@ -425,81 +437,104 @@ def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length 
 
     half_len = min(half_lengths)
     mu = mu[int(len(mu)/2)-half_len:int(len(mu)/2)+half_len]
+    mu_center = int(len(mu)/2)
 
     #E/ Detecting heartbeat position candidates
-    half_len = int(0.2*sampling_rate)
-    mu04 = mu[int(len(mu)/2)-half_len:int(len(mu)/2)+half_len] #attention non utilisé ici
+    peaks=[]
+    ta=[]
+    tb=[]
 
-    corr = matchTemplate(filtered.astype('float32'),mu.astype('float32'),TM_CCORR_NORMED)
-    corr = corr.flatten()
-    candidates_pos,_ = ss.find_peaks(corr)
+    for iter in range(2):
+        peaks=[]
+        ta =[]
+        tb=[]
+        half_len = int(initial_length*sampling_rate/2)
+        if (half_len > mu_center)|(half_len > len(mu)-mu_center):
+            raise ValueError('Template is too short or badly centered')
+        mu_corr = mu[mu_center-half_len:mu_center+half_len]
+        corr = matchTemplate(filtered.astype('float32'),mu_corr.astype('float32'),TM_CCORR_NORMED)
+        corr = corr.flatten()
+        candidates_pos,_ = ss.find_peaks(corr)
+        corr_delay = -mu_center+half_len
 
-    #F/Detecting beat-to-beat intervals
-    # IBI = []
-    peaks = []
-    mu2 = np.concatenate((mu,np.zeros(int(2*sampling_rate)-len(mu))))
-    candidates_pos = candidates_pos[candidates_pos>=0]
+        #F/Detecting beat-to-beat intervals
+        half_len = int(1*sampling_rate)
+        if half_len > len(mu)-mu_center:
+            mu2 = np.append(mu,np.zeros(2*half_len-len(mu)))
+        else:
+            mu2 = mu[:int(2*sampling_rate)]
 
-    #1) Initialize ta to the first candidate position
-    ta_cand = candidates_pos[0]
-    while ta_cand < candidates_pos[-1]:
+        candidates_pos += corr_delay
+        candidates_pos = candidates_pos[candidates_pos>=0]
+
+        #1) Initialize ta to the first candidate position
+        ta_cand = candidates_pos[0]
+        while ta_cand < candidates_pos[-1]:
+            try:
+                if ta_cand+int(2*sampling_rate)>len(filtered):
+                    raise Exception
+                sa = filtered[ta_cand:ta_cand+int(2*sampling_rate)]
+                za = so.least_squares(lambda z: np.mean(np.power(sa-z*mu2,2)),1).x[0]
+                xa = za*mu2
+                #2) Find candidates for tb
+                tb_candidates = candidates_pos[np.logical_and(ta_cand+int(0.4*sampling_rate)<candidates_pos,candidates_pos<ta_cand+int(2*sampling_rate))]
+                #3) find best tb or find another ta -> step 2)
+                for tb_cand in tb_candidates:
+                    if tb_cand+int(2*sampling_rate)>len(filtered):
+                        raise Exception
+                    sb = filtered[tb_cand:tb_cand+int(2*sampling_rate)]
+                    zb = so.least_squares(lambda z: np.mean(np.power(sb-z*mu2,2)),1).x[0]
+                    xb = zb*mu2
+                    xa_tmp = np.concatenate((xa,np.zeros(max([0,2*(tb_cand-ta_cand)-int(2*sampling_rate)]))))
+                    xb_tmp = np.concatenate((np.zeros(tb_cand-ta_cand),xb))
+                    x = xa_tmp[:2*(tb_cand-ta_cand)]+xb_tmp[:2*(tb_cand-ta_cand)]
+                    s = filtered[ta_cand:ta_cand+2*(tb_cand-ta_cand)]
+                    eps = s - x
+
+                    if (np.mean(np.power(eps,2)) < residual_threshold*np.mean(np.power(s,2))) & (max([za,zb])<2*min([za,zb])):
+                        ta.append(ta_cand)
+                        tb.append(tb_cand)
+                        peak_a = ta_cand+mu_center
+                        peak_b = tb_cand+mu_center
+                        if peak_a not in peaks:
+                            peaks.append(peak_a)
+                        peaks.append(peak_b)
+                        ta_cand = tb_cand
+                        break
+                    else:
+                        continue
+
+                if ta_cand != tb_cand:
+                    ta_candidates = candidates_pos[np.logical_and(candidates_pos>ta_cand,candidates_pos<ta_cand+int(2*sampling_rate))]
+                    ta_cand = ta_candidates[np.argmax(corr[ta_candidates-corr_delay])]
+            except Exception:
+                break
+        beats = dict(peaks=np.array(peaks),ta =np.array(ta),tb=np.array(tb))
+
+        #G. re-estimation of the model with detected beat to beat intervals
+        template_extraction = long_template_extraction(signal = filtered, beats = beats, mu_center = mu_center,sampling_rate=1000.)
         try:
-            if ta_cand+int(2*sampling_rate)>len(filtered):
-                raise
-            sa = filtered[ta_cand:ta_cand+int(2*sampling_rate)]
-            za = so.least_squares(lambda z: np.mean(np.power(sa-z*mu2,2)),1).x[0]
-            xa = za*mu2
+            mu = template_extraction['long_template']
+            mu_center_new = template_extraction['long_template_center']
+            mu = mu[mu_center_new-mu_center:]
+        except KeyError:
+            mu = template_extraction['short_template']
+        peaks = beats['peaks']
+        print('iteration no ',iter,': ',len(peaks),' beats detected')
 
-
-            #2) Find candidates for tb
-            tb_candidates = candidates_pos[np.logical_and(ta_cand+int(0.4*sampling_rate)<candidates_pos,candidates_pos<ta_cand+int(2*sampling_rate))]
-            #3) find best tb or find another ta -> step 2)
-            for tb_cand in tb_candidates:
-                if tb_cand+int(2*sampling_rate)>len(filtered):
-                    raise
-                sb = filtered[tb_cand:tb_cand+int(2*sampling_rate)]
-                zb = so.least_squares(lambda z: np.mean(np.power(sb-z*mu2,2)),1).x[0]
-                xb = zb*mu2
-
-                xa_tmp = np.concatenate((xa,np.zeros(max([0,2*(tb_cand-ta_cand)-int(2*sampling_rate)]))))
-                xb_tmp = np.concatenate((np.zeros(tb_cand-ta_cand),xb))
-
-                x = xa_tmp[:2*(tb_cand-ta_cand)]+xb_tmp[:2*(tb_cand-ta_cand)]
-                s = filtered[ta_cand:ta_cand+2*(tb_cand-ta_cand)]
-
-                eps = s - x
-
-                if (np.mean(np.power(eps,2)) < 0.2*np.mean(np.power(s,2))) & (max([za,zb])<2*min([za,zb])):
-                    # IBI.append((ta_cand,tb_cand))
-                    peaks.append(ta_cand+int(len(mu)/2))
-                    peaks.append(tb_cand+int(len(mu)/2))
-                    ta_cand = tb_cand
-                    break
-                else:
-                    continue
-
-            if ta_cand != tb_cand:
-                ta_candidates = candidates_pos[np.logical_and(candidates_pos>ta_cand,candidates_pos<ta_cand+int(2*sampling_rate))]
-                ta_cand = ta_candidates[np.argmax(corr[ta_candidates])]
-        except :
-            break
-    #G. re-estimation of the model with detected beat to beat intervals
-# a completer en prenant en compte Novel Methods for Estimating the Ballistocardiogram Signal Using a Simultaneously Acquired Electrocardiogram
     #H. Accounting for abrupt changes of the heartbeat shape
-    # a completer
+    # to complete, with four different instances of the beat-to-beat detection method
 
     #I. Post-preprocessing
-    # a completer
-
-    peaks = np.unique(np.array(peaks))
+    # slightly different in our case : we added a smoother rather than the non linear filter explained in the paper
 
     if show:
         # extract templates
         templates, peaks = extract_heartbeats(signal=filtered,
                                                peaks=peaks,
                                                sampling_rate=sampling_rate,
-                                               before=0.4,
-                                               after=0.4)
+                                               before=0.6,
+                                               after=0.2)
         # compute heart rate
         hr_idx, hr = st.get_heart_rate(beats=peaks,
                                        sampling_rate=sampling_rate,
@@ -523,18 +558,29 @@ def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length 
                           path=None,
                           show=True)
 
-    # return utils.ReturnTuple((template,peaks),('template','peaks'))
+    return utils.ReturnTuple((mu,peaks),('template','peaks'))
 
 
 def heart_valve_signal(signal = None, sampling_rate=1000.):
     """Heart valve signal filtering.
 
-    Follows the approach by Friedrich et al. []_.
+    Follows the approach by Friedrich et al. [Frie10]_.
 
+    Parameters
+    ----------
+    signal : array
+        Input unfiltered BCG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+
+    Returns
+    -------
+    hvs : array
+        Heart valve signal.
 
     References
     ----------
-    .. [] Heart Rate Estimation on a Beat-to-Beat Basis via
+    .. [Frie10] Heart Rate Estimation on a Beat-to-Beat Basis via
     Ballistocardiography - A hybrid Approach.
     David Friedrich, Xavier L. Aubert, Hartmut Führ and Andreas Brauers
 
@@ -562,11 +608,25 @@ def heart_valve_signal(signal = None, sampling_rate=1000.):
 def modified_heart_valve_signal(signal = None, sampling_rate=1000.):
     """Heart valve signal filtering.
 
-    Follows the approach by Bruser et al. []_.
+    Follows the approach by Bruser et al. [Brus11]_.
+
+    Parameters
+    ----------
+    signal : array
+        Input unfiltered BCG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+
+    Returns
+    -------
+    hvs : array
+        Heart valve signal.
+    center_frequency : float
+        Auto-tuned center frequency of the bandpass filter.
 
     References
     ----------
-    .. [] C. Bruser and K. Stadlthanner and S. de Waele and S. Leonhardt,
+    .. [Brus11] C. Bruser and K. Stadlthanner and S. de Waele and S. Leonhardt,
     "Adaptive Beat-to-Beat Heart Rate Estimation in Ballistocardiograms",
     IEEE Transactions on Information Technology in Biomedicine, 2011
 
@@ -599,6 +659,109 @@ def modified_heart_valve_signal(signal = None, sampling_rate=1000.):
 
     return utils.ReturnTuple((hvs,center_frequency),('hvs','center_frequency'))
 
+def long_template_extraction(signal = None, beats = None, mu_center=None, sampling_rate=1000.):
+    """Long template extraction.
+
+    Follows the approach by Inan et al. [Inan09]_.
+
+    Parameters
+    ----------
+    signal : array
+        Input unfiltered BCG signal.
+    beats : dict
+        'ta':start indices of heart beat interval
+        'tb':stop indices of heart beat interval
+        'peaks': peaks positions.
+    mu_center : int
+        Inner position reference of the template.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+
+    Returns
+    -------
+    short_template : array
+        Template result when there is no detected heartbeat quadruplet
+    amplitudes: array
+        Relative amplitude of heartbeats
+    long_template:
+        Template result when there is at least one detected heartbeat quadruplet
+    long_template_center:
+        Template inner position reference.
+
+    References
+    ----------
+    .. [Inan09] O. T. Inan, M. Etemadi, R. M. Wiard, G. T. A. Kovacs,
+    "Novel Methods for Estimating the Ballistocardiogram Signal Using a Simultaneously Acquired Electrocardiogram",
+    31st Annual International Conference of the IEEE EMBS Minneapolis, Minnesota, USA, September 2-6, 2009
+
+    """
+
+    ## Esimation of BCG Heartbeat Amplitudes
+    ta = beats['ta']
+    tb = beats['tb']
+    t = np.append(ta,tb[-1])
+    T = tb-ta
+    Tmin = np.min(T)
+    T = np.insert(T,0,0)
+    x = np.array([signal[tn:tn+Tmin] for tn in t])
+    s = np.mean(x,axis=0)
+
+    ## Modified Ensemble Averaging for Extracting Long-Window Pulse Response
+    # first find the longest segment with adjacent IBIs.
+    is_adjacent = (tb[:-1] == ta[1:])
+    are_adjacent_beats = [list([g[0] for g in group]) for key,group in groupby(enumerate(is_adjacent),lambda x:x[1]) if key == True]
+    adjacent_beats_indices = np.array([seg.append(seg[-1]+1) or seg for seg in are_adjacent_beats])
+    adjacent_beats_len = np.array([len(seg) for seg in adjacent_beats_indices])
+
+    # if it's long enough find quadruplet templates
+    if max(adjacent_beats_len)<4-1:
+        return utils.ReturnTuple((s,),('short_template',))
+
+    longest_segment_index = np.argmax(adjacent_beats_len)
+    ta = ta[adjacent_beats_indices[longest_segment_index]]
+    tb = tb[adjacent_beats_indices[longest_segment_index]]
+    t = np.append(ta,tb[-1])
+    T = tb-ta
+    Tmin = min(T)
+    Tmax = max(T)
+    T = np.insert(T,0,0)
+    x = np.array([signal[tn:tn+Tmin] for tn in t])
+    s = np.mean(x,axis=0)
+    Rss = matchTemplate(s.astype('float32'),s.astype('float32'),TM_CCORR)
+    a = np.array([matchTemplate(xn.astype('float32'),s.astype('float32'),TM_CCORR)/Rss for xn in x]).flatten()
+    K = 4*Tmax
+    N = len(t)
+    x_tilde = []
+    for tn in t:
+        if (tn>Tmax)&(tn+3*Tmax<len(signal)):
+            x_tilde.append(signal[tn-Tmax:tn+3*Tmax])
+    x_tilde = np.array(x_tilde)
+    hcon = np.mean(x_tilde,axis=0)
+
+    h = np.zeros(K)
+    for n in range(1,N-2):
+        h += x_tilde[n]
+        delay = -T[n]+Tmax
+        sn_1 = delay_and_pad(signal = s, delay = delay, desired_len = K)
+        h -= a[n-1]*sn_1
+        delay = T[n+1]+Tmax
+        sn1 = delay_and_pad(signal = s, delay = delay, desired_len = K)
+        h -= a[n+1]*sn1
+        delay = T[n+2]+T[n+1]+Tmax
+        sn2 = delay_and_pad(signal = s, delay = delay, desired_len = K)
+        h -= a[n+2]*sn2
+
+    h /= N-3
+    mu_center += Tmax
+    return utils.ReturnTuple((s,a,h,mu_center),('short_template','amplitudes','long_template','long_template_center'))
+
+def delay_and_pad(signal = None, delay = None, desired_len = None):
+    if delay < 0:
+        raise TypeError("Please specify a positive delay.")
+    elif delay > desired_len-len(signal):
+        raise TypeError("Please specify a shorter delay.")
+    else:
+        return np.pad(signal,(delay,desired_len-len(signal)-delay),'constant',constant_values = (0,0))
 
 def correct_peaks(signal=None, peaks=None, sampling_rate=1000., tol=0.3):
     return ecg.correct_rpeaks(signal=signal,
