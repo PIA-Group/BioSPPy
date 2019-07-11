@@ -25,6 +25,83 @@ from . import tools as st
 from .. import plotting, utils
 
 
+def get_rpks(filtered, sampling_rate):
+    rpeaks = None
+    if filtered is not None:
+        # segment
+        rpeaks, = hamilton_segmenter(signal=filtered, sampling_rate=sampling_rate)
+
+        # correct R-peak locations
+        rpeaks, = correct_rpeaks(signal=filtered,
+                                 rpeaks=rpeaks,
+                                 sampling_rate=sampling_rate,
+                                 tol=0.05)
+
+    if rpeaks is not None:# extract templates
+        # extract templates
+        _, rpeaks = extract_heartbeats(signal=filtered,
+                                               rpeaks=rpeaks,
+                                               sampling_rate=sampling_rate,
+                                               before=0.2,
+                                               after=0.4)
+
+
+
+    return rpeaks
+
+
+def get_filt_ecg(signal=None, sampling_rate=1000.):
+    """Process a raw ECG signal and extract relevant signal features using
+    default parameters.
+
+    Parameters
+    ----------
+    signal : array
+        Raw ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    show : bool, optional
+        If True, show a summary plot.
+
+    Returns
+    -------
+    ts : array
+        Signal time axis reference (seconds).
+    filtered : array
+        Filtered ECG signal.
+    rpeaks : array
+        R-peak location indices.
+    templates_ts : array
+        Templates time axis reference (seconds).
+    templates : array
+        Extracted heartbeat templates.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
+    """
+
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input signal.")
+
+    # ensure numpy
+    signal = np.array(signal)
+
+    sampling_rate = float(sampling_rate)
+
+    # filter signal
+    order = int(0.3 * sampling_rate)
+    filtered, _, _ = st.filter_signal(signal=signal,
+                                      ftype='FIR',
+                                      band='bandpass',
+                                      order=order,
+                                      frequency=[3, 45],
+                                      sampling_rate=sampling_rate)
+
+    return filtered
+
+
 def ecg(signal=None, sampling_rate=1000., show=True):
     """Process a raw ECG signal and extract relevant signal features using
     default parameters.
@@ -63,26 +140,13 @@ def ecg(signal=None, sampling_rate=1000., show=True):
 
     # ensure numpy
     signal = np.array(signal)
-
     sampling_rate = float(sampling_rate)
 
     # filter signal
-    order = int(0.3 * sampling_rate)
-    filtered, _, _ = st.filter_signal(signal=signal,
-                                      ftype='FIR',
-                                      band='bandpass',
-                                      order=order,
-                                      frequency=[3, 45],
-                                      sampling_rate=sampling_rate)
+    filtered = get_filt_ecg(signal)
 
-    # segment
-    rpeaks, = hamilton_segmenter(signal=filtered, sampling_rate=sampling_rate)
-
-    # correct R-peak locations
-    rpeaks, = correct_rpeaks(signal=filtered,
-                             rpeaks=rpeaks,
-                             sampling_rate=sampling_rate,
-                             tol=0.05)
+    # R-peaks
+    rpeaks = get_rpks(filtered, sampling_rate)
 
     # extract templates
     templates, rpeaks = extract_heartbeats(signal=filtered,

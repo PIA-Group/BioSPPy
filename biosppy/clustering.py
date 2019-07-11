@@ -694,6 +694,57 @@ def centroid_templates(data=None, clusters=None, ntemplates=1):
     return utils.ReturnTuple((templates,), ('templates',))
 
 
+def metrics_templates(data=None,
+                    clusters=None,
+                    metric_args=None):
+    """ Returns templates for the input cluster data.
+
+    Parameters
+    ----------
+    data : array
+        An m by n array of m data samples in an n-dimensional space.
+
+    clusters : dict, optional
+        Dictionary with the sample indices (rows from `data`) for each cluster.
+
+    metric_args : dict, optional
+        Additional keyword arguments to pass to the distance function.
+
+    Returns
+    -------
+    templates : array
+        Selected templates from the input data.
+
+    """
+
+    # check inputs
+    if data is None:
+        raise TypeError("Please specify input data.")
+
+    if clusters is None:
+        clusters = {0: np.arange(len(data), dtype='int')}
+
+    # cluster labels
+    ks = list(clusters)
+
+    # remove the outliers' cluster, if present
+    if '-1' in ks:
+        ks.remove('-1')
+
+    templates = []
+
+    for i, k in enumerate(ks): # iterate over clusters
+        c = np.array(clusters[k])
+        if metric_args == 'mean':
+            templates.append(np.mean(data[c], axis=0))
+        elif metric_args == 'medoid':
+            templates.append(data[c][_medoid_distance(data[c])[0][0],:])
+
+    templates = np.array(templates)
+
+    return utils.ReturnTuple((templates,), ('templates',))
+
+
 def outliers_dbscan(data=None,
                     min_samples=5,
                     eps=0.5,
@@ -973,6 +1024,35 @@ def _mean_distance(data, metric='euclidean', metric_args=None):
     # sort
     indices = np.argsort(mdist)
 
+    return indices, mdist
+
+
+def _medoid_distance(data, metric='euclidean'):
+    """Compute the sorted medoid distance between the input samples.
+
+    Parameters
+    ----------
+    data : array
+        An m by n array of m data samples in an n-dimensional space.
+    metric : str, optional
+        Distance metric (see scipy.spatial.distance).
+    Returns
+    -------
+    indices : array
+        Indices that sort the computed mean distances.
+    mdist : array
+        Mean distance characterizing each data sample.
+
+    """
+
+    D = metrics.pdist(data, metric=metric)
+    D = metrics.squareform(D)
+
+    # compute mean
+    mdist = D.sum(axis=0)
+
+    # sort
+    indices = np.argsort(mdist)
     return indices, mdist
 
 

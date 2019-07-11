@@ -23,6 +23,65 @@ from . import tools as st
 from .. import plotting, utils
 
 
+def get_filt_eda(signal, sampling_rate=1000.):
+    """ Filter for the EDA data.
+
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    sampling_rate : float
+        Sampling frequency.
+    Returns
+    -------
+    filtered : list
+        Filtered signal.
+    """
+    sampling_rate = float(sampling_rate)
+
+    # filter signal
+    aux, _, _ = st.filter_signal(signal=signal,
+                                 ftype='butter',
+                                 band='lowpass',
+                                 order=4,
+                                 frequency=1,
+                                 sampling_rate=sampling_rate)
+
+    # smooth
+    sm_size = int(0.75 * sampling_rate)
+    filtered, _ = st.smoother(signal=aux,
+                              kernel='boxzen',
+                              size=sm_size,
+                              mirror=True)
+    return filtered
+
+
+def get_scr(signal, sampling_rate):
+    """ Returns Electrodermal Response.
+
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    sampling_rate : float
+        Sampling frequency.
+    Returns
+    -------
+    edr : list
+        Electrodermal events data.
+    """
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input signal.")
+
+    # differentiation
+    df = np.diff(signal)
+    # smooth
+    size = int(1. * sampling_rate)
+    edr, _ = st.smoother(signal=df, kernel='bartlett', size=size, mirror=True)
+    return edr
+
+
 def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
     """Process a raw EDA signal and extract relevant signal features using
     default parameters.
@@ -60,22 +119,8 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
     # ensure numpy
     signal = np.array(signal)
 
-    sampling_rate = float(sampling_rate)
-
-    # filter signal
-    aux, _, _ = st.filter_signal(signal=signal,
-                                 ftype='butter',
-                                 band='lowpass',
-                                 order=4,
-                                 frequency=5,
-                                 sampling_rate=sampling_rate)
-
-    # smooth
-    sm_size = int(0.75 * sampling_rate)
-    filtered, _ = st.smoother(signal=aux,
-                              kernel='boxzen',
-                              size=sm_size,
-                              mirror=True)
+    # Get filtered signal
+    filtered = get_filt_eda(signal)
 
     # get SCR info
     onsets, peaks, amps = kbk_scr(signal=filtered,
@@ -108,16 +153,13 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
 def basic_scr(signal=None, sampling_rate=1000.):
     """Basic method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
-
     Follows the approach in [Gamb08]_.
-
     Parameters
     ----------
     signal : array
         Input filterd EDA signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
-
     Returns
     -------
     onsets : array
@@ -126,12 +168,10 @@ def basic_scr(signal=None, sampling_rate=1000.):
         Indices of the SRC peaks.
     amplitudes : array
         SCR pulse amplitudes.
-
     References
     ----------
     .. [Gamb08] Hugo Gamboa, "Multi-modal Behavioral Biometrics Based on HCI
        and Electrophysiology", PhD thesis, Instituto Superior T{\'e}cnico, 2008
-
     """
 
     # check inputs
@@ -187,7 +227,7 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
         Sampling frequency (Hz).
     min_amplitude : float, optional
         Minimum treshold by which to exclude SCRs.
-    
+
     Returns
     -------
     onsets : array
@@ -209,12 +249,8 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
-    # differentiation
-    df = np.diff(signal)
-
-    # smooth
-    size = int(1. * sampling_rate)
-    df, _ = st.smoother(signal=df, kernel='bartlett', size=size, mirror=True)
+    # Get SCR signal
+    df = get_scr(signal, sampling_rate)
 
     # zero crosses
     zeros, = st.zero_cross(signal=df, detrend=False)
@@ -236,7 +272,6 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
             ZC += [zeros[i + 1]]
             pks += [zeros[i] + np.argmax(df[zeros[i]:zeros[i + 1]])]
 
-    scrs = np.array(scrs)
     amps = np.array(amps)
     ZC = np.array(ZC)
     pks = np.array(pks)
@@ -247,3 +282,104 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
     names = ('onsets', 'peaks', 'amplitudes')
 
     return utils.ReturnTuple(args, names)
+
+
+def get_eda_param(signal, min_amplitude=0.08):
+    """ Returns characteristic EDA events.
+
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    min_amplitude : float, optional
+        Minimum treshold by which to exclude SCRs.
+    Returns
+    -------
+    onsets : array
+        Indices of the SCR onsets.
+    peaks : array
+        Indices of the SRC peaks.
+    amplitudes : array
+        SCR pulse amplitudes.
+    end : array
+        Indices of the SCR end.
+    """
+
+    zeros = st.find_extrema(signal=signal, mode='min')[0]
+    scrs, amps, onsets, pks, end, wind = [], [], [], [], [], []
+    for i in range(0, len(zeros) - 1, 1):
+        s = signal[zeros[i]:zeros[i + 1]]
+        ext = st.find_extrema(signal=s, mode='max')[0]
+        for _ in ext:
+            if s[_] - s[0] > min_amplitude:
+                b = zeros[i] + _
+                pks += [b]
+                onsets += [zeros[i]]
+                end += [zeros[i + 1]]
+
+    return onsets, pks, amps, end
+
+
+def edr_times(signal, onsets, pks):
+    """ Returns characteristic EDA events.
+
+    Parameters
+    ----------
+    signal : array
+        Input signal.
+    onsets : array
+        Indices of the SCR onsets.
+    peaks : array
+        Indices of the SRC peaks.
+
+    Returns
+    -------
+    half : list
+        Indices where edr data drops to 0.5 of the edr events peak amplitudes.
+    six : list
+        Indices where edr data drops to 0.63 of the edr events peak amplitudes.
+    half_rise : list
+        Half Rise times, i.e. time between onset and 50% amplitude.
+    half_rec : list
+        Half Recovery times, i.e. time between peak and 63% amplitude.
+    six_rise : list
+        63 % rise times, i.e. time between onset and 63% amplitude.
+    six_rec : list
+        63 % recovery times, i.e. time between peak and 50% amplitude.
+
+    """
+    a = np.array(signal[pks[:]] - signal[onsets[:]])
+    n_p_1 = 0
+    n_p_2 = 0
+    half = []
+    six = []
+    li = min(len(onsets), len(pks))
+
+    half_rise = []
+    half_rec = []
+    six_rec = []
+    six_rise = []
+    for i in range(li):
+        n_p_1 += 1
+        n_p_2 += 1
+        half_rec_amp = 0.5 * (a[i] + signal[onsets[i]])
+        six_rec_amp = 0.37 * (a[i] + signal[onsets[i]])
+        try:
+            wind = np.array(signal[pks[i]:onsets[i + 1]])
+        except:
+            wind = np.array(signal[pks[i]:])
+        for ts_idx in range(len(wind)):
+            if wind[ts_idx] <= half_rec_amp:
+                half += [pks[i] + ts_idx for n in range(n_p_2)]
+                half_rise += [half[-n] - onsets[i] for n in range(n_p_2, 0, -1)]
+                half_rec += [half[i-n] - pks[i] for n in range(n_p_2, 0, -1)]
+                n_p_1 = 0
+                break
+        for ts_idx in range(len(wind)):
+            if wind[ts_idx] <= six_rec_amp:
+                six += [pks[i] + ts_idx for n in range(n_p_2)]
+                six_rise += [six[-n] - onsets[i] for n in range(n_p_2, 0, -1)]
+                six_rec += [six[-n] - pks[i] for n in range(n_p_2, 0, -1)]
+                n_p_2 = 0
+                break
+    return half, six, half_rise, half_rec, six_rise, six_rec

@@ -370,6 +370,7 @@ class ReturnTuple(tuple):
                 seen.add(name)
 
         self._names = names
+        self._values = values
 
     def as_dict(self):
         """Convert to an ordered dictionary.
@@ -435,3 +436,14 @@ class ReturnTuple(tuple):
         """
 
         return list(self._names)
+
+    def values(self):
+        """Return the varibale values.
+
+        Returns
+        -------
+        out : list
+            The values in the mapping.
+
+        """
+        return list(self._values)

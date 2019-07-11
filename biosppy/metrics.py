@@ -18,7 +18,7 @@ import six
 import numpy as np
 import scipy.spatial.distance as ssd
 from scipy import linalg
-
+import numba
 
 def pcosine(u, v):
     """Computes the Cosine distance (positive space) between 1-D arrays.
@@ -169,3 +169,33 @@ def squareform(X, force="no", checks=True):
     """
 
     return ssd.squareform(X, force, checks)
+
+
+@numba.jit
+def matrix_eucd_dist(signal, templates):
+    """ Creates a distance matrix from the data to the templates using the Euclidean Distance.
+
+        Parameters
+        ----------
+        signal : array
+            Segmented data.
+
+        templates: array
+            Set of templates.
+
+        Returns
+        -------
+        dist_matrix : array
+            Distance matrix
+
+    """
+    lx_s = len(signal)
+    lx_c = len(templates)
+    dist_matrix_custom = np.zeros((lx_s, lx_c))
+    for i in range(lx_s):
+        for j in range(lx_c):
+            dist_matrix_custom[i, j] = np.sqrt(np.sum((signal[i] - templates[j]) ** 2))
+
+    dist_matrix = np.nan_to_num(np.array(dist_matrix_custom))
+
+    return dist_matrix

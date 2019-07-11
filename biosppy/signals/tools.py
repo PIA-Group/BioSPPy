@@ -1099,7 +1099,7 @@ def find_extrema(signal=None, mode='both'):
        https://en.wikipedia.org/wiki/Fermat%27s_theorem_(stationary_points)
 
     """
-
+    signal = np.array(signal)
     # check inputs
     if signal is None:
         raise TypeError("Please specify an input signal.")
@@ -2177,3 +2177,43 @@ def median_waves(data=None, size=None, step=None):
     waves = np.array(waves)
     
     return utils.ReturnTuple((waves, ), ('waves', ))
+
+
+def signal_energy(sign, time):
+    """Computes the energy of the signal. For that, first is made the segmentation of the signal in 10 windows
+    and after it's considered that the energy of the signal is the sum of all calculated points in each window.
+    Parameters
+    ----------
+    sign: ndarray
+        input from which max frequency is computed.
+    Returns
+    -------
+    energy: float list
+       signal energy.
+    time_energy: float list
+        signal time energy
+    """
+    try:
+        window_len = len(sign)
+
+        # window for energy calculation
+        if window_len < 10:
+            window = 1
+        else:
+            window = window_len//10  # each window of the total signal will have 10 windows
+
+        energy = np.zeros(window_len//window)
+        time_energy = np.zeros(window_len//window)
+
+        i = 0
+        for a in range(0, len(sign) - window, window):
+            energy[i] = np.sum(np.array(sign[a:a+window])**2)
+            interval_time = time[int(a+(window//2))]
+            time_energy[i] = interval_time
+            i += 1
+        return list(energy), list(time_energy)
+    except:
+        energy = None
+        time_energy = None
+
+        return utils.ReturnTuple((energy, time_energy), ('energy', 'time_energy'))
