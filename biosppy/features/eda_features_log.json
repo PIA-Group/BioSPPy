@@ -1,0 +1,38 @@
+{
+    "onsets": {
+            "description": "Signal EDR events onsets.",
+            "use": "yes"
+        },
+    "pks": {
+            "description": "Signal EDR events peaks.",
+            "use": "yes"
+        },
+    "amps": {
+            "description": "Signal EDR events Amplitudes.",
+            "use": "yes"
+        },
+    "phasic_rate": {
+            "description": "Signal EDR events rate in 60s.",
+            "use": "yes"
+        },
+    "rise_ts": {
+            "description": "Rise times, i.e. onset-peak time difference.",
+            "use": "yes"
+        },
+    "half_rise": {
+            "description": "Half Rise times, i.e. time between onset and 50% amplitude.",
+            "use": "yes"
+        },
+    "half_rec": {
+            "description": "Half Recovery times, i.e. time between peak and 63% amplitude.",
+            "use": "yes"
+        },
+    "six_rise": {
+            "description": "63 % rise times, i.e. time between onset and 63% amplitude.",
+            "use": "yes"
+        },
+    "six_rec": {
+            "description": "63 % recovery times, i.e. time between peak and 50% amplitude.",
+            "use": "yes"
+        }
+}

@@ -3,7 +3,7 @@ import pyhrv
 from .. import utils
 from .. import ecg
 from .. import tools as st
-
+import json
 
 def pNN(nni, TH):
     """Compute the percentage of the number of times the HRV differed by more than 50ms.
@@ -28,6 +28,7 @@ def pNN(nni, TH):
     args = (p,)
     names = ('pNN',)
     return utils.ReturnTuple(args, names)
+
 
 def ecg_features(signal=None, sampling_rate=1000.):
     """Compute ECG characteristic metrics describing the signal.
@@ -108,67 +109,135 @@ def ecg_features(signal=None, sampling_rate=1000.):
     Gomes, Pedro & Margaritoff, Petra & Plácido da Silva, Hugo. (2019). pyHRV: Development and Evaluation of an Open-Source Python Toolbox for Heart Rate Variability (HRV).
     """
     signal = np.array(signal)
+    dict = json.load(open('ecg_features_log.json'))
+    args, names = [], []
 
     try:
         rpeaks = np.array(ecg.get_rpks(signal, sampling_rate))
     except:
         rpeaks = None
 
+    if dict['rpeaks']['use'] == 'yes':
+        args += [rpeaks]
+        names += ['rpeaks']
+
     try:
         nni = pyhrv.tools.nn_intervals(signal[rpeaks].astype(float))
     except:
         nni = None
 
-    try:
-        _, hr = st.get_heart_rate(beats=rpeaks, sampling_rate=sampling_rate, smooth=True, size=3)
-    except:
-        hr = None
+    if dict['nni']['use'] == 'yes':
+        args += [nni]
+        names += ['nni']
 
-    pnn20 = pNN(nni, 20)[0]
+    if dict['hr']['use'] == 'yes':
+        try:
+            _, hr = st.get_heart_rate(beats=rpeaks, sampling_rate=sampling_rate, smooth=True, size=3)
+        except:
+            hr = None
+        args += [hr]
+        names += ['hr']
 
-    pnn50 = pNN(nni, 50)[0]
+    if dict['pnn20']['use'] == 'yes':
+        pnn20 = pNN(nni, 20)[0]
+        args += [pnn20]
+        names += ['pnn20']
 
-    try:
-        sdnn_index = pyhrv.time_domain.sdnn_index(nni)[0]
-    except:
-        sdnn_index = None
+    if dict['pnn50']['use'] == 'yes':
+        pnn50 = pNN(nni, 50)[0]
+        args += [pnn50]
+        names += ['pnn50']
 
-    try:
-        sdann = pyhrv.time_domain.sdann(nni)[0]
-    except:
-        sdann = None
+    if dict['sdnn_index']['use'] == 'yes':
+        try:
+            sdnn_index = pyhrv.time_domain.sdnn_index(nni)[0]
+        except:
+            sdnn_index = None
+        args += [sdnn_index]
+        names += ['sdnn_index']
+
+    if dict['sdann']['use'] == 'yes':
+        try:
+            sdann = pyhrv.time_domain.sdann(nni)[0]
+        except:
+            sdann = None
+        args += [sdann]
+        names += ['sdann']
 
     # Spectral features
     try:
         freq_param = pyhrv.frequency_domain.welch_psd(nni, mode='dev', show=False, show_param=False, legend=False)[0]
 
-        fft_peak_VLF = freq_param['fft_peak'][0]
-        fft_peak_LF = freq_param['fft_peak'][1]
-        fft_peak_HF = freq_param['fft_peak'][2]
+        if dict['fft_peak_VLF']['use'] == 'yes':
+            fft_peak_VLF = freq_param['fft_peak'][0]
+            args += [fft_peak_VLF]
+            names += ['fft_peak_VLF']
 
-        fft_abs_VLF = freq_param['fft_abs'][0]
-        fft_abs_LF = freq_param['fft_abs'][1]
-        fft_abs_HF = freq_param['fft_abs'][2]
+        if dict['fft_peak_LF']['use'] == 'yes':
+            fft_peak_LF = freq_param['fft_peak'][1]
+            args += [fft_peak_LF]
+            names += ['fft_peak_LF']
 
-        fft_rel_VLF = freq_param['fft_rel'][0]
-        fft_rel_LF = freq_param['fft_rel'][1]
-        fft_rel_HF = freq_param['fft_rel'][2]
+        if dict['fft_peak_HF']['use'] == 'yes':
+            fft_peak_HF = freq_param['fft_peak'][2]
+            args += [fft_peak_HF]
+            names += ['fft_peak_HF']
 
-        fft_log_VLF = freq_param['fft_log'][0]
-        fft_log_LF = freq_param['fft_log'][1]
-        fft_log_HF = freq_param['fft_log'][2]
+        if dict['fft_abs_VLF']['use'] == 'yes':
+            fft_abs_VLF = freq_param['fft_abs'][0]
+            args += [fft_abs_VLF]
+            names += ['fft_abs_VLF']
 
-        fft_total = freq_param['fft_total']
-        fft_ratio = freq_param['fft_ratio']
+        if dict['fft_abs_LF']['use'] == 'yes':
+            fft_abs_LF = freq_param['fft_abs'][1]
+            args += [fft_abs_LF]
+            names += ['fft_abs_LF']
 
+        if dict['fft_abs_HF']['use'] == 'yes':
+            fft_abs_HF = freq_param['fft_abs'][2]
+            args += [fft_abs_HF]
+            names += ['fft_abs_HF']
+
+        if dict['fft_rel_VLF']['use'] == 'yes':
+            fft_rel_VLF = freq_param['fft_rel'][0]
+            args += [fft_rel_VLF]
+            names += ['fft_rel_VLF']
+
+        if dict['fft_rel_LF']['use'] == 'yes':
+            fft_rel_LF = freq_param['fft_rel'][1]
+            args += [fft_rel_LF]
+            names += ['fft_rel_LF']
+
+        if dict['fft_rel_HF']['use'] == 'yes':
+            fft_rel_HF = freq_param['fft_rel'][2]
+            args += [fft_rel_HF]
+            names += ['fft_rel_HF']
+
+        if dict['fft_log_VLF']['use'] == 'yes':
+            fft_log_VLF = freq_param['fft_log'][0]
+            args += [fft_log_VLF]
+            names += ['fft_log_VLF']
+
+        if dict['fft_log_LF']['use'] == 'yes':
+            fft_log_LF = freq_param['fft_log'][1]
+            args += [fft_log_LF]
+            names += ['fft_log_LF']
+
+        if dict['fft_log_HF']['use'] == 'yes':
+            fft_log_HF = freq_param['fft_log'][2]
+            args += [fft_log_HF]
+            names += ['fft_log_HF']
+
+        if dict['fft_total']['use'] == 'yes':
+            fft_total = freq_param['fft_total']
+            args += [fft_total]
+            names += ['fft_total']
+
+        if dict['fft_ratio']['use'] == 'yes':
+            fft_ratio = freq_param['fft_ratio']
+            args += [fft_ratio]
+            names += ['fft_ratio']
     except:
         fft_peak_VLF, fft_peak_LF, fft_peak_HF, fft_abs_VLF, fft_abs_LF, fft_abs_HF, fft_rel_VLF, fft_rel_LF, fft_rel_HF, fft_log_VLF, fft_log_LF, fft_log_HF, fft_total, fft_ratio = [None] * 14
 
-    # output
-    args = (rpeaks, nni, hr , pnn20, pnn50, sdnn_index, sdann, fft_peak_VLF, fft_peak_LF, fft_peak_HF, fft_abs_VLF, fft_abs_LF, fft_abs_HF,
-            fft_rel_VLF, fft_rel_LF, fft_rel_HF, fft_log_VLF, fft_log_LF, fft_log_HF, fft_total, fft_ratio)
-
-    names = ('rpeaks', 'nni', 'hr' , 'pnn20', 'pnn50', 'sdnn_index', 'sdann', 'fft_peak_VLF', 'fft_peak_LF', 'fft_peak_HF', 'fft_abs_VLF', 'fft_abs_LF', 'fft_abs_HF',
-            'fft_rel_VLF', 'fft_rel_LF', 'fft_rel_HF', 'fft_log_VLF', 'fft_log_LF', 'fft_log_HF', 'fft_total', 'fft_ratio')
-
-    return utils.ReturnTuple(args, names)
+    return utils.ReturnTuple(tuple(args), tuple(names))

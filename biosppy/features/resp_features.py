@@ -1,6 +1,7 @@
 import numpy as np
 from .. import utils
 from .. import tools as st
+import json
 
 
 def get_restrate(zeros, sampling_rate):
@@ -241,13 +242,15 @@ def resp_features(signal=None, sampling_rate=1000.):
     exhale : list
         Exhalation volume.
     inhExhRatio : list
-        Ration between Inhalation and Exhalation
+        Ratio between Inhalation and Exhalation.
     inhale_dur : list
         Inhalation time duration.
     exhale_dur : list
         Exhalation time duration.
     """
     signal = np.array(signal)
+    dict = json.load(open('resp_features_log.json'))
+    args, names = [], []
 
     # Zero crossings
     try:
@@ -255,40 +258,58 @@ def resp_features(signal=None, sampling_rate=1000.):
     except:
         zeros = None
 
+    if dict['zeros']['use'] == 'yes':
+        args += [zeros]
+        names += ['zeros']
+
     min = st.find_extrema(signal, 'min')
-    # Respiration rate
-    try:
-        hr = get_restrate(zeros, sampling_rate)[0]
-    except:
-        hr = None
+    if dict['hr']['use'] == 'yes':
+        # Respiration rate
+        try:
+            hr = get_restrate(zeros, sampling_rate)[0]
+        except:
+            hr = None
+        args += [hr]
+        names += ['hr']
 
     try:
         inhale = calc_inhale(signal, min)[0]
     except:
         inhale = None
 
+    if dict['inhale']['use'] == 'yes':
+        args += [inhale]
+        names += ['inhale']
     try:
         exhale = calc_exhale(signal, min)[0]
     except:
         exhale = None
+    if dict['exhale']['use'] == 'yes':
+        args += [exhale]
+        names += ['exhale']
 
-    try:
-        inhExhRatio = calc_inhExhRatio(inhale, exhale)[0]
-    except:
-        inhExhRatio = None
+    if dict['inhExhRatio']['use'] == 'yes':
+        try:
+            inhExhRatio = calc_inhExhRatio(inhale, exhale)[0]
+        except:
+            inhExhRatio = None
+        args += [inhExhRatio]
+        names += ['inhExhRatio']
 
-    try:
-        inhale_dur = calc_inhdur(signal, min)[0]
-    except:
-        inhale_dur = None
+    if dict['inhale_dur']['use'] == 'yes':
+        try:
+            inhale_dur = calc_inhdur(signal, min)[0]
+        except:
+            inhale_dur = None
+        args += [inhale_dur]
+        names += ['inhale_dur']
 
-    try:
-        exhale_dur = calc_exhdur(signal, min)[0]
-    except:
-        exhale_dur = None
+    if dict['exhale_dur']['use'] == 'yes':
+        try:
+            exhale_dur = calc_exhdur(signal, min)[0]
+        except:
+            exhale_dur = None
+        exhale_dur += [exhale_dur]
+        exhale_dur += ['exhale_dur']
 
-    # output
-    args = (zeros, hr, inhale, exhale, inhExhRatio, inhale_dur, exhale_dur)
-    names = ('zeros', 'hr', 'inhale', 'exhale', 'inhExhRatio', 'inhale_dur', 'exhale_dur')
-
-    return utils.ReturnTuple(args, names)
+    return utils.ReturnTuple(tuple(args), tuple(names))

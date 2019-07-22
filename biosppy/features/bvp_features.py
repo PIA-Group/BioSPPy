@@ -2,6 +2,7 @@ import numpy as np
 from .. import utils
 from .. import bvp
 from .. import tools as st
+import json
 
 
 def bvp_features(signal=None, sampling_rate=1000.):
@@ -24,21 +25,25 @@ def bvp_features(signal=None, sampling_rate=1000.):
 
     # ensure numpy array
     signal = np.array(signal)
+    dict = json.load(open('bvp_features_log.json'))
+    args, names = [], []
 
-    # onsets
-    try:
-        ons = bvp.find_onsets(signal, sampling_rate)['onsets']
-    except:
-        ons = None
+    if dict['ons']['use'] == 'yes':
+        # onsets
+        try:
+            ons = bvp.find_onsets(signal, sampling_rate)['onsets']
+        except:
+            ons = None
+        args += [ons]
+        names += ['onsets']
 
-    # heart rate
-    try:
-        _, hr = st.get_heart_rate(beats=ons, sampling_rate=sampling_rate, smooth=True, size=3)
-    except:
-        hr = None
+    if dict['hr']['use'] == 'yes':
+        # heart rate
+        try:
+            _, hr = st.get_heart_rate(beats=ons, sampling_rate=sampling_rate, smooth=True, size=3)
+        except:
+            hr = None
+        args += [hr]
+        names += ['hr']
 
-    # output
-    args = (ons, hr)
-    names = ('onsets', 'hr')
-
-    return utils.ReturnTuple(args, names)
+    return utils.ReturnTuple(tuple(args), tuple(names))

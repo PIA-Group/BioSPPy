@@ -1,0 +1,66 @@
+{
+    "spectral_maxpeaks": {
+            "description": "Number of peaks in the spectrum signal.",
+            "use": "yes"
+        },
+    "spect_var": {
+            "description": "Amount of the variation of the spectrum across time.",
+            "use": "yes"
+        },
+    "curve_distance": {
+            "description": "Euclidean distance between the cumulative sum of the signal spectrum and evenly spaced numbers across the signal lenght.",
+            "use": "yes"
+        },
+    "spectral_roll_off": {
+            "description": "Frequency so 95% of the signal energy is below that value.",
+            "use": "yes"
+        },
+    "spectral_roll_on": {
+            "description": "Frequency so 5% of the signal energy is below that value.",
+            "use": "yes"
+        },
+    "spectral_dec": {
+            "description": "Amount of decreasing in the spectral amplitude.",
+            "use": "yes"
+        },
+    "spectral_slope": {
+            "description": "Amount of decreasing in the spectral amplitude.",
+            "use": "yes"
+        },
+    "spectral_centroid": {
+            "description": "Centroid of the signal spectrum.",
+            "use": "yes"
+        },
+    "spectral_spread": {
+            "description": "Variance of the signal spectrum i.e. how it spreads around its mean value.",
+            "use": "yes"
+        },
+    "spectral_kurtosis": {
+            "description": "Kurtosis of the signal spectrum i.e. describes the flatness of the spectrum distribution.",
+            "use": "yes"
+        },
+    "spectral_skewness": {
+            "description": "Skewness of the signal spectrum i.e. describes the asymmetry of the spectrum distribution.",
+            "use": "yes"
+        },
+    "max_frequency": {
+            "description": "Maximum frequency of the signal spectrum maximum amplitude.",
+            "use": "yes"
+        },
+    "fundamental_frequency": {
+            "description": "Fundamental frequency of the signal.",
+            "use": "yes"
+        },
+    "max_power_spectrum": {
+            "description": "Spectrum maximum value.",
+            "use": "yes"
+        },
+    "mean_power_spectrum": {
+            "description": "Spectrum mean value.",
+            "use": "yes"
+        },
+    "spectral_hist_": {
+            "description": "Histogram of the signal spectrum.",
+            "use": "yes"
+        }
+}

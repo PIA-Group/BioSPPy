@@ -4,6 +4,9 @@ from . import bvp_features, ecg_features, eda_features, nonlinear_geo_features, 
 import pandas_profiling
 from sklearn.model_selection import cross_val_score
 import time
+from .. import signals
+import json
+
 
 def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, save=True):
     """ Returns a feature vector describing the signal.
@@ -47,7 +50,7 @@ def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, 
     t0 = time.time()
     for wind_idx, wind_sig in enumerate(signal):
         # Statistical Features
-        _f = statistic_features.signal_stats(wind_sig, hist=True)
+        _f = statistic_features.signal_stats(wind_sig)
         labels_name = [str(sig_lab + i) for i in _f.keys()]
         row_feat = _f.values()
         # Temporal Features
@@ -55,29 +58,67 @@ def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, 
         labels_name += [str(sig_lab + i) for i in _f.keys()]
         row_feat += _f.values()
         # Spectral Features
-        _f = spectral_features.signal_spectral(wind_sig, sampling_rate, hist=True)
+        _f = spectral_features.signal_spectral(wind_sig, sampling_rate)
         labels_name += [str(sig_lab + i) for i in _f.keys()]
         row_feat += _f.values()
+
+        # # Features on Spectrum
+        # f, spectrum = signals.tools.power_spectrum(signal, sampling_rate=sampling_rate)
+        # # Statistical Features
+        # _f = statistic_features.signal_stats(spectrum)
+        # labels_name = [str(sig_lab + '_on_spectrum_' + i) for i in _f.keys()]
+        # row_feat = _f.values()
+        # # Temporal Features
+        # _f = temporal_features.signal_temp(spectrum, sampling_rate)
+        # labels_name += [str(sig_lab + '_on_spectrum_' + i) for i in _f.keys()]
+        # row_feat += _f.values()
+
         # Sensor Specific Features
         if 'EDA' in sig_lab:
-            if wind_sig is not []:
-                # On SCR Signal
-                eda_f = eda_features.eda_features(wind_sig)
-                for item in eda_f.keys():
-                    _f = statistic_features.signal_stats(eda_f[item], hist=False)
-                    labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
-                    row_feat += [i for i in _f.values()]
+            scr = signals.eda.get_scr(wind_sig, sampling_rate)
+            # Statistical Features
+            _f = statistic_features.signal_stats(scr)
+            labels_name = [str(sig_lab + '_EDR_' + i) for i in _f.keys()]
+            row_feat = _f.values()
+            # Temporal Features
+            _f = temporal_features.signal_temp(scr, sampling_rate)
+            labels_name += [str(sig_lab + '_EDR_' + i) for i in _f.keys()]
+            row_feat += _f.values()
+            # Spectral Features
+            _f = spectral_features.signal_spectral(scr, sampling_rate)
+            labels_name += [str(sig_lab + '_EDR_' + i) for i in _f.keys()]
+            row_feat += _f.values()
 
-                    _f = temporal_features.signal_temp(eda_f[item], sampling_rate)
-                    labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
-                    row_feat += [i for i in _f.values()]
-                # Non-liner and geometric features
-                _f = nonlinear_geo_features.nonlinear_geo_features(eda_f['onsets'], wind_sig)
-                labels_name += [str(sig_lab + i) for i in _f.keys()]
-                row_feat += _f.values()
-        elif 'ECG' in sig_lab:
+            # Features on EDR Spectrum
+            f, spectrum = signals.tools.power_spectrum(scr, sampling_rate=sampling_rate)
+            # Statistical Features
+            _f = statistic_features.signal_stats(spectrum)
+            labels_name = [str(sig_lab + '_on_spectrum_' + i) for i in _f.keys()]
+            row_feat = _f.values()
+            # Temporal Features
+            _f = temporal_features.signal_temp(spectrum, sampling_rate)
+            labels_name += [str(sig_lab + '_on_spectrum_' + i) for i in _f.keys()]
+            row_feat += _f.values()
+
+            # On SCR Signal
+            eda_f = eda_features.eda_features(wind_sig, sampling_rate)
+            for item in eda_f.keys():
+                _f = statistic_features.signal_stats(eda_f[item], hist=False)
+                labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
+                row_feat += [i for i in _f.values()]
+
+                _f = temporal_features.signal_temp(eda_f[item], sampling_rate)
+                labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
+                row_feat += [i for i in _f.values()]
+
+            # Non-liner and geometric features
+            onsets = signals.eda.get_eda_param(wind_sig, sampling_rate)[0]
+            _f = nonlinear_geo_features.nonlinear_geo_features(onsets, wind_sig)
+            labels_name += [str(sig_lab + i) for i in _f.keys()]
+            row_feat += _f.values()
+        if 'ECG' in sig_lab:
             if wind_sig is not []:
-                ecg_f = ecg_features.ecg_features(wind_sig)
+                ecg_f = ecg_features.ecg_features(wind_sig, sampling_rate)
                 for item in ecg_f.keys():
                     if item == 'nn_intervals':
                         _f = statistic_features.signal_stats(ecg_f[item], hist=False)
@@ -106,12 +147,13 @@ def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, 
                     else:
                         labels_name += [sig_lab + item]
                         row_feat += [ecg_f[item]]
-                _f = nonlinear_geo_features.nonlinear_geo_features(ecg_f['rpeaks'], wind_sig)
+                rpeaks = np.array(signals.ecg.get_rpks(wind_sig, sampling_rate))
+                _f = nonlinear_geo_features.nonlinear_geo_features(rpeaks, wind_sig)
                 labels_name += [str(sig_lab + i) for i in _f.keys()]
                 row_feat += _f.values()
         elif 'BVP' in sig_lab:
             if wind_sig is not []:
-                bvp_f = bvp_features.bvp_features(wind_sig)
+                bvp_f = bvp_features.bvp_features(wind_sig, sampling_rate)
                 for item in bvp_f.keys():
                     _f = statistic_features.signal_stats(bvp_f[item], hist=False)
                     labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
@@ -120,12 +162,13 @@ def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, 
                     _f = temporal_features.signal_temp(bvp_f[item], sampling_rate)
                     labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
                     row_feat += [i for i in _f.values()]
-                _f = nonlinear_geo_features.nonlinear_geo_features(bvp_f['onsets'], wind_sig)
+                ons = signals.bvp.find_onsets(wind_sig, sampling_rate)['onsets']
+                _f = nonlinear_geo_features.nonlinear_geo_features(ons, wind_sig)
                 labels_name += [str(sig_lab + i) for i in _f.keys()]
                 row_feat += _f.values()
         if 'Resp' in sig_lab:
             if wind_sig is not []:
-                resp_f = resp_features.resp_features(wind_sig)
+                resp_f = resp_features.resp_features(wind_sig, sampling_rate)
                 for item in resp_f.keys():
                     _f = statistic_features.signal_stats(resp_f[item], hist=False)
                     labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
@@ -134,20 +177,21 @@ def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, 
                     _f = temporal_features.signal_temp(resp_f[item], sampling_rate)
                     labels_name += [str(sig_lab + item + '_' + i) for i in _f.keys()]
                     row_feat += [i for i in _f.values()]
-                _f = nonlinear_geo_features.nonlinear_geo_features(resp_f['zeros'], signal)
+                zeros, = signals.tools.zero_cross(signal=signal, detrend=True)
+                _f = nonlinear_geo_features.nonlinear_geo_features(zeros, signal)
                 labels_name += [str(sig_lab + i) for i in _f.keys()]
                 row_feat += _f.values()
         if not wind_idx:
             segdata = wind_sig
-            feat_val = np.nan_to_num(np.array(row_feat)).reshape(1, -1)
+            feat_val = np.nan_to_num(row_feat).reshape(1, -1)
         else:
             segdata = np.vstack((segdata, wind_sig))
-            feat_val = np.vstack((feat_val, np.nan_to_num(np.array(row_feat)).reshape(1, -1)))
+            feat_val = np.vstack((feat_val, np.nan_to_num(row_feat).reshape(1, -1)))
     print("<END Feature Extraction>")
     print('Time: ', time.time()-t0, ' seconds')
     d = {str(lab): feat_val[:, idx] for idx, lab in enumerate(labels_name)}
     df = pd.DataFrame(data=d, columns=labels_name)
-    df = df.replace([np.inf, -np.inf, np.nan], 0.0)
+    df = df.replace([np.inf, -np.inf, np.nan, None], 0.0)
     if save:
         df.to_csv('Features.csv', sep=',', encoding='utf-8', index_label="Sample")
     return df, segdata
@@ -168,7 +212,7 @@ def remove_correlatedFeatures(df, threshold=0.85):
         Feature dataframe without high correlated features.
 
     """
-    df = df.replace([np.inf, -np.inf, np.nan], 0.0)
+    df = df.replace([np.inf, -np.inf, np.nan, None], 0.0)
     profile = pandas_profiling.ProfileReport(df)
     reject = profile.get_rejected_variables(threshold=threshold)
     for rej in reject:
@@ -247,3 +291,5 @@ def FSE(X_train, y_train, features_descrition, classifier, CV=10):
     print("*** Feature selection finished ***")
 
     return np.array(FS_idx), np.array(FS_lab), FS_X_train
+
+

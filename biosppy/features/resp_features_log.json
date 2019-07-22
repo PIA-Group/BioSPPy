@@ -1,0 +1,30 @@
+{
+    "zeros": {
+            "description": "Signal zero crossing indexes.",
+            "use": "yes"
+        },
+    "hr": {
+            "description": "Respiration rate.",
+            "use": "yes"
+        },
+    "inhale": {
+            "description": "Inhalation volume.",
+            "use": "yes"
+        },
+    "exhale": {
+            "description": "Exhalation volume.",
+            "use": "yes"
+        },
+    "inhExhRatio": {
+            "description": "Ratio between Inhalation and Exhalation.",
+            "use": "yes"
+        },
+    "inhale_dur": {
+            "description": "Inhalation time duration.",
+            "use": "yes"
+        },
+    "exhale_dur": {
+            "description": "Exhalation time duration.",
+            "use": "yes"
+        }
+}

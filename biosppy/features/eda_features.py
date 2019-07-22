@@ -2,6 +2,7 @@ import numpy as np
 import pyhrv
 from .. import utils
 from .. import eda
+import json
 
 
 def eda_features(signal=None, sampling_rate=1000.):
@@ -45,6 +46,8 @@ def eda_features(signal=None, sampling_rate=1000.):
     """
     # ensure numpy
     signal = np.array(signal)
+    dict = json.load(open('eda_features_log.json'))
+    args, names = [], []
 
     # get EDR signal
     try:
@@ -54,24 +57,47 @@ def eda_features(signal=None, sampling_rate=1000.):
 
     # onsets, pks, amps
     onsets, pks, amps, _ = eda.get_eda_param(scr, sampling_rate)
+    if dict['onsets']['use'] == 'yes':
+        args += [onsets]
+        names += ['onsets']
+    if dict['pks']['use'] == 'yes':
+        args += [pks]
+        names += ['pks']
+    if dict['amps']['use'] == 'yes':
+        args += [amps]
+        names += ['amps']
 
     # phasic_rate
-    try:
-        phasic_rate = sampling_rate * (60. / np.diff(pks))
-    except:
-        phasic_rate = None
+    if dict['phasic_rate']['use'] == 'yes':
+        try:
+            phasic_rate = sampling_rate * (60. / np.diff(pks))
+        except:
+            phasic_rate = None
+        args += [phasic_rate]
+        names += ['phasic_rate']
 
-    # rise_ts
-    try:
-        rise_ts = list(np.array(pks - onsets))
-    except:
-        rise_ts = None
+    if dict['rise_ts']['use'] == 'yes':
+        # rise_ts
+        try:
+            rise_ts = list(np.array(pks - onsets))
+        except:
+            rise_ts = None
+        args += [rise_ts]
+        names += ['rise_ts']
 
     # half, six, half_rise, half_rec, six_rec
     _, _, half_rise, half_rec, six_rise, six_rec = eda.edr_times(scr, onsets, pks)
+    if dict['half_rise']['use'] == 'yes':
+        args += [half_rise]
+        names += ['half_rise']
+    if dict['half_rec']['use'] == 'yes':
+        args += [half_rec]
+        names += ['half_rec']
+    if dict['six_rise']['use'] == 'yes':
+        args += [six_rise]
+        names += ['six_rise']
+    if dict['six_rec']['use'] == 'yes':
+        args += [six_rec]
+        names += ['six_rec']
 
-    # output
-    args = (onsets, pks, amps, phasic_rate, rise_ts, half_rise, half_rec, six_rise, six_rec)
-    names = ('onsets', 'peaks', 'amplitudes', 'phasic_rate', 'rise_ts', 'half_rise', 'half_rec', 'six_rise', 'six_rec')
-
-    return utils.ReturnTuple(args, names)
+    return utils.ReturnTuple(tuple(args), tuple(names))

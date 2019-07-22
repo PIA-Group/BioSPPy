@@ -1,0 +1,82 @@
+{
+    "maxAmp": {
+            "description": "Signal maximum amplitude.",
+            "use": "yes"
+        },
+    "minAmp": {
+            "description": "Signal minimum amplitude.",
+            "use": "yes"
+        },
+    "max": {
+            "description": "Signal max value.",
+            "use": "yes"
+        },
+    "min": {
+            "description": "Signal min value.",
+            "use": "yes"
+        },
+    "dist": {
+            "description": "Length of the signal.",
+            "use": "yes"
+        },
+    "autocorr": {
+            "description": "Signal autocorrelation.",
+            "use": "yes"
+        },
+    "zero_cross": {
+            "description": "Number of times the sinal crosses the zero axis.",
+            "use": "yes"
+        },
+    "meanadiff": {
+            "description": "Mean absolute differences.",
+            "use": "yes"
+        },
+    "medadiff": {
+            "description": "Median absolute differences.",
+            "use": "yes"
+        },
+    "mindiff": {
+            "description": "Min differences.",
+            "use": "yes"
+        },
+    "maxdiff": {
+            "description": "Maximum differences.",
+            "use": "yes"
+        },
+    "sadiff": {
+            "description": "Sum of absolute differences..",
+            "use": "yes"
+        },
+    "meandiff": {
+            "description": "Mean of differences.",
+            "use": "yes"
+        },
+    "meddiff": {
+            "description": "Median of differences.",
+            "use": "yes"
+        },
+    "temp_centroid": {
+            "description": "Temporal centroid.",
+            "use": "yes"
+        },
+    "total_energy": {
+            "description": "Total energy.",
+            "use": "yes"
+        },
+    "minpeaks": {
+            "description": "Number of minimum peaks.",
+            "use": "yes"
+        },
+    "maxpeaks": {
+            "description": "Number of maximum peaks..",
+            "use": "yes"
+    },
+        "temp_dev": {
+            "description": "Temporal deviation.",
+            "use": "yes"
+        },
+    "counter": {
+            "description": "Length of the signal.",
+            "use": "yes"
+        }
+}

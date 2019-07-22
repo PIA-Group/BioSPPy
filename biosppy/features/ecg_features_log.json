@@ -1,0 +1,86 @@
+{
+    "rpeaks": {
+            "description": "R-peak location indices.",
+            "use": "yes"
+        },
+    "nni": {
+            "description": "NN intervals in ms or s.",
+            "use": "yes"
+        },   
+    "hr": {
+            "description": "Instantaneous heart rate in bpm.",
+            "use": "yes"
+        }, 
+    "pnn20": {
+            "description": "Ratio between NN20 and total number of NN intervals in percentage.",
+            "use": "yes"
+        },
+    "pnn50": {
+            "description": "Ratio between NN50 and total number of NN intervals in percentage.",
+            "use": "yes"
+        }, 
+    "sdnn_index": {
+            "description": "Mean of the standard deviations of all the NN intervals for each 5 min segment.",
+            "use": "yes"
+        }, 
+    "sdann": {
+            "description": "Standard deviation of the average NN intervals for each 5 min segment.",
+            "use": "yes"
+        },
+    "fft_peak_VLF": {
+            "description": "Peak frequencies of the very low frequency bands [0.00Hz - 0.04Hz] in Hz.",
+            "use": "yes"
+        },
+    "fft_peak_LF": {
+            "description": "Peak frequencies of the low frequency bands [0.04Hz - 0.15Hz] in Hz.",
+            "use": "yes"
+        }, 
+    "fft_peak_HF": {
+            "description": "Peak frequencies of the high low frequency bands [0.15Hz - 0.40Hz] in Hz.",
+            "use": "yes"
+        }, 
+    "fft_abs_VLF": {
+            "description": "Absolute powers of the very low frequency bands [0.00Hz - 0.04Hz] in ms^2.",
+            "use": "yes"
+        }, 
+    "fft_abs_LF": {
+            "description": "Absolute powers of the low frequency bands [0.04Hz - 0.15Hz] in ms^2.",
+            "use": "yes"
+        },
+    "fft_abs_HF": {
+            "description": "Absolute powers of the high frequency bands [0.15Hz - 0.40Hz] in ms^2.",
+            "use": "yes"
+        }, 
+    "fft_rel_VLF": {
+            "description": "Relative powers of the very low frequency bands [0.00Hz - 0.04Hz] in %.",
+            "use": "yes"
+        }, 
+    "fft_rel_LF": {
+            "description": "Relative powers of the low frequency bands [0.04Hz - 0.15Hz] in %.",
+            "use": "yes"
+        },
+    "fft_rel_HF": {
+            "description": "Relative powers of the high frequency bands [0.15Hz - 0.40Hz] in %.",
+            "use": "yes"
+        },
+    "fft_log_VLF": {
+            "description": "Logarithmic powers of the very low frequency bands [0.00Hz - 0.04Hz].",
+            "use": "yes"
+        }, 
+    "fft_log_LF": {
+            "description": "Logarithmic powers of the low frequency bands [0.04Hz - 0.15Hz].",
+            "use": "yes"
+        }, 
+    "fft_log_HF": {
+            "description": "Logarithmic powers of the high frequency bands [0.15Hz - 0.40Hz].",
+            "use": "yes"
+        }, 
+    "fft_total": {
+            "description": "Total power over all frequency bands in ms^2.",
+            "use": "yes"
+        }, 
+    "fft_ratio": {
+            "description": "LF/HF ratio.",
+            "use": "yes"
+        } 
+}

@@ -1,6 +1,7 @@
 import numpy as np
 from .. import utils
 from .. import tools as st
+import json
 
 
 def spectral_roll(f, ff, cum_ff, TH):
@@ -37,7 +38,7 @@ def spectral_roll(f, ff, cum_ff, TH):
     return utils.ReturnTuple(args, names)
 
 
-def signal_spectral(signal, FS, hist=True):
+def signal_spectral(signal, FS):
     """Compute spectral metrics describing the signal.
         Parameters
         ----------
@@ -93,7 +94,13 @@ def signal_spectral(signal, FS, hist=True):
         mean_power_spectrum : float
             Spectrum mean value.
 
-        _hist : list
+        spectral_skewness : float
+            Spectrum Skewness.
+
+        spectral_kurtosis : float
+            Spectrum Kurtosis.
+
+        spectral_hist_ : list
             Histogram of the signal spectrum.
 
         References
@@ -115,57 +122,80 @@ def signal_spectral(signal, FS, hist=True):
     spect_diff = np.diff(spectrum)
     energy, _ = st.signal_energy(spectrum, f)[:]
 
-    # spectral_maxpeaks
-    try:
-        spectral_maxpeaks = np.sum([1 for nd in range(len(spect_diff[:-1])) if (spect_diff[nd+1]<0 and spect_diff[nd]>0)])
-    except:
-        spectral_maxpeaks = None
+    dict = json.load(open('spectral_features_log.json'))
+    args, names = [], []
 
-    # spect_variation
-    try:
-        corr = np.convolve(energy)
-        corr /= np.max(np.abs(corr))
-    except:
-        spect_var = None
+    if dict['spectral_maxpeaks']['use'] == 'yes':
+        # spectral_maxpeaks
+        try:
+            spectral_maxpeaks = np.sum([1 for nd in range(len(spect_diff[:-1])) if (spect_diff[nd+1]<0 and spect_diff[nd]>0)])
+        except:
+            spectral_maxpeaks = None
+        args += [spectral_maxpeaks]
+        names += ['spectral_maxpeaks']
 
-    # curve_distance
-    try:
-        curve_distance = np.sum(np.linspace(0, cum_ff[-1], len(cum_ff)) - cum_ff)
-    except:
-        curve_distance = None
+    if dict['spect_var']['use'] == 'yes':
+        # spect_variation
+        try:
+            spect_var = np.convolve(energy)
+            spect_var /= np.max(np.abs(spect_var))
+        except:
+            spect_var = None
+        args += [spect_var]
+        names += ['spect_var']
 
-    # spectral_roll_off
-    try:
-        spectral_roll_off = spectral_roll(f, spectrum, cum_ff, 0.95)[0]
-    except:
-        spectral_roll_off = None
+    if dict['curve_distance']['use'] == 'yes':
+        # curve_distance
+        try:
+            curve_distance = np.sum(np.linspace(0, cum_ff[-1], len(cum_ff)) - cum_ff)
+        except:
+            curve_distance = None
+        args += [curve_distance]
+        names += ['curve_distance']
 
-    # spectral_roll_on
-    try:
-        spectral_roll_on = spectral_roll(f, spectrum, cum_ff, 0.05)[0]
-    except:
-        spectral_roll_on = None
+    if dict['spectral_roll_off']['use'] == 'yes':
+        # spectral_roll_off
+        try:
+            spectral_roll_off = spectral_roll(f, spectrum, cum_ff, 0.95)[0]
+        except:
+            spectral_roll_off = None
+        args += [spectral_roll_off]
+        names += ['spectral_roll_off']
 
-    # spectral_decrease
-    try:
-        spectral_dec = (1/np.sum(spectrum)) * np.sum((spectrum[:] - spectrum[1])/np.linspace(1, len(spectrum), len(spectrum),1))
-    except:
-        spectral_dec = None
+    if dict['spectral_roll_on']['use'] == 'yes':
+        # spectral_roll_on
+        try:
+            spectral_roll_on = spectral_roll(f, spectrum, cum_ff, 0.05)[0]
+        except:
+            spectral_roll_on = None
+        args += [spectral_roll_on]
+        names += ['spectral_roll_on']
 
-    # spectral_slope
-    sum_f = np.sum(f)
-    len_f = len(f)
-    try:
-        spectral_slope = (len_f * np.dot(f, spectrum) - sum_f * np.sum(spectrum)) / (len_f * np.dot(f, f) - sum_f ** 2)
-    except:
-        spectral_slope = None
+    if dict['spectral_dec']['use'] == 'yes':
+        # spectral_decrease
+        try:
+            spectral_dec = (1/np.sum(spectrum)) * np.sum((spectrum[:] - spectrum[1])/np.linspace(1, len(spectrum), len(spectrum),1))
+        except:
+            spectral_dec = None
+        args += [spectral_dec]
+        names += ['spectral_dec']
 
-    # spectral_centroid
+    if dict['spectral_slope']['use'] == 'yes':
+        # spectral_slope
+        sum_f = np.sum(f)
+        len_f = len(f)
+        try:
+            spectral_slope = (len_f * np.dot(f, spectrum) - sum_f * np.sum(spectrum)) / (len_f * np.dot(f, f) - sum_f ** 2)
+        except:
+            spectral_slope = None
+        args += [spectral_slope]
+        names += ['spectral_slope']
+
     sum_spectrum = np.sum(spectrum)
-    norm_spectrum = None
+    norm_spectrum = spectrum / sum_spectrum
+    # spectral_centroid
     try:
-        norm_spectrum = spectrum / sum_spectrum
-        spectral_centroid = np.dot(f, spectrum/sum_spectrum)
+        spectral_centroid = np.dot(f, norm_spectrum)
     except:
         spectral_centroid = None
 
@@ -175,65 +205,90 @@ def signal_spectral(signal, FS, hist=True):
     except:
         spectral_spread = None
 
-    # spectral_kurtosis
-    try:
-        spectral_kurtosis = np.sum(((f - spectral_centroid) ** 4) * norm_spectrum) / (spectral_spread**2)
-    except:
-        spectral_kurtosis = None
+    if dict['spectral_spread']['use'] == 'yes':
+        args += [spectral_spread]
+        names += ['spectral_spread']
 
-    # spectral_skewness
-    try:
-        spectral_skewness = np.sum(((f - spectral_centroid) ** 3) * norm_spectrum) / (spectral_spread ** (3 / 2))
-    except:
-        spectral_skewness = None
-
-    # max_frequency
-    try:
-        max_frequency = f[np.where(cum_ff > cum_ff[-1]*0.95)[0][0]]
-    except:
-        max_frequency = None
-
-    # fundamental_frequency
-    try:
-        fundamental_frequency = f[np.where(cum_ff > cum_ff[-1]*0.5)[0][0]]
-    except:
-        fundamental_frequency = None
-
-    # max_power_spectrum
-    try:
-        max_power_spectrum = np.max(spectrum)
-    except:
-        max_power_spectrum = None
-
-    # mean_power_spectrum
-    try:
-        mean_power_spectrum = np.mean(spectrum)
-    except:
-        mean_power_spectrum = None
-
-    # histogram
-    if hist:
+    if dict['spectral_kurtosis']['use'] == 'yes':
+        # spectral_kurtosis
         try:
-            _hist = list(np.histogram(spectrum, bins=int(np.sqrt(len(spectrum))), density=True)[0])
+            spectral_kurtosis = np.sum(((f - spectral_centroid) ** 4) * norm_spectrum) / (spectral_spread**2)
         except:
-            _hist = [None] * int(np.sqrt(len(spectrum)))
+            spectral_kurtosis = None
+        args += [spectral_kurtosis]
+        names += ['spectral_kurtosis']
 
-    # output
-    args = (
-        spectral_maxpeaks, spect_var, curve_distance, spectral_roll_off, spectral_roll_on, spectral_dec, spectral_slope,
-        spectral_kurtosis, spectral_skewness, spectral_spread, spectral_centroid, max_frequency, fundamental_frequency, max_power_spectrum, mean_power_spectrum)
+    if dict['spectral_skewness']['use'] == 'yes':
+        # spectral_skewness
+        try:
+            spectral_skewness = np.sum(((f - spectral_centroid) ** 3) * norm_spectrum) / (spectral_spread ** (3 / 2))
+        except:
+            spectral_skewness = None
+        args += [spectral_skewness]
+        names += ['spectral_skewness']
 
-    if hist:
-        ar = list(args)
-        ar += [i for i in _hist]
-        args = tuple(ar)
+    if dict['max_frequency']['use'] == 'yes':
+        # max_frequency
+        try:
+            max_frequency = f[np.where(cum_ff > cum_ff[-1]*0.95)[0][0]]
+        except:
+            max_frequency = None
+        args += [max_frequency]
+        names += ['max_frequency']
 
-    names = ('spectral_maxpeaks', 'spect_var', 'curve_distance', 'spectral_roll_off', 'spectral_roll_on', 'spectral_decrease',
-             'spectral_slope', 'spectral_kurtosis', 'spectral_skewness', 'spectral_spread', 'spectral_centroid', 'max_frequency', 'fundamental_frequency', 'max_power_spectrum', 'mean_power_spectrum')
+    if dict['fundamental_frequency']['use'] == 'yes':
+        # fundamental_frequency
+        try:
+            fundamental_frequency = f[np.where(cum_ff > cum_ff[-1]*0.5)[0][0]]
+        except:
+            fundamental_frequency = None
+        args += [fundamental_frequency]
+        names += ['fundamental_frequency']
 
-    if hist:
-        n = list(names)
-        n += ['spectral_histbin_' + str(i) for i in range(len(_hist))]
-        names = tuple(n)
+    # if dict['max_power_spectrum']['use'] == 'yes':
+    #     # max_power_spectrum
+    #     try:
+    #         max_power_spectrum = np.max(spectrum)
+    #     except:
+    #         max_power_spectrum = None
+    #     args += max_power_spectrum
+    #     names += 'max_power_spectrum'
 
-    return utils.ReturnTuple(args, names)
+    # if dict['mean_power_spectrum']['use'] == 'yes':
+    #     # mean_power_spectrum
+    #     try:
+    #         mean_power_spectrum = np.mean(spectrum)
+    #     except:
+    #         mean_power_spectrum = None
+    #     args += mean_power_spectrum
+    #     names += 'mean_power_spectrum'
+    #
+    # if dict['spectral_skewness']['use'] == 'yes':
+    #     try:
+    #         spectral_skewness = np.mean(spectrum)
+    #     except:
+    #         spectral_skewness = None
+    #     args += spectral_skewness
+    #     names += 'spectral_skewness'
+    #
+    # if dict['spectral_kurtosis']['use'] == 'yes':
+    #     try:
+    #         spectral_kurtosis = np.mean(spectrum)
+    #     except:
+    #         spectral_kurtosis = None
+    #     args += spectral_kurtosis
+    #     names += 'spectral_kurtosis'
+
+    # if dict['spectral_hist_']['use'] == 'yes':
+    #     # histogram
+    #     try:
+    #         _hist = list(np.histogram(spectrum, bins=int(np.sqrt(len(spectrum))), density=True)[0])
+    #     except:
+    #         if len(signal) > 1:
+    #             _hist = [None] * int(np.sqrt(len(signal)))
+    #         else:
+    #             _hist = [None]
+    #     args += [i for i in _hist]
+    #     names += ['spectral_hist_' + str(i) for i in range(len(_hist))]
+
+    return utils.ReturnTuple(tuple(args), tuple(names))

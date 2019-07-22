@@ -1,0 +1,50 @@
+{
+    "mean": {
+            "description": "Mean of the signal.",
+            "use": "yes"
+        },
+    "median": {
+            "description": "Median of the signal.",
+            "use": "yes"
+        },
+    "var": {
+            "description": "Signal variance (unbiased).",
+            "use": "yes"
+        },
+    "std": {
+            "description": "Standard signal deviation (unbiased).",
+            "use": "yes"
+        },
+    "abs_dev": {
+            "description": "Absolute signal deviation.",
+            "use": "yes"
+        },
+    "kurtosis": {
+            "description": "Signal kurtosis (unbiased).",
+            "use": "yes"
+        },
+    "skewness": {
+            "description": "Signal skewness (unbiased).",
+            "use": "yes"
+        },
+    "iqr": {
+            "description": "Interquartile Range.",
+            "use": "yes"
+        },
+    "meanadev": {
+            "description": "Mean absolute deviation.",
+            "use": "yes"
+        },
+    "medadev": {
+            "description": "Median absolute deviation.",
+            "use": "yes"
+        },
+    "rms": {
+            "description": "Root Mean Square.",
+            "use": "yes"
+        },
+    "statistic_hist": {
+            "description": "Histogram.",
+            "use": "yes"
+        }
+}

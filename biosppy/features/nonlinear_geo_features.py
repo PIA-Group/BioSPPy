@@ -1,6 +1,7 @@
 import numpy as np
 import pyhrv
 from .. import utils
+import json
 
 
 def nonlinear_geo_features(flag, signal):
@@ -53,6 +54,9 @@ def nonlinear_geo_features(flag, signal):
 
     """
     signal = np.array(signal)
+    dict = json.load(open('nonlinear_geo_features_log.json'))
+    args, names = [], []
+
     try:
         flag_int = signal[pyhrv.tools.nn_intervals(flag)].astype(np.float)
     except:
@@ -63,16 +67,42 @@ def nonlinear_geo_features(flag, signal):
         _, sd1, sd2, sd12, poincarea = pyhrv.nonlinear.poincare(flag_int, show=False, plot=False, legend=False)[:]
     except:
         sd1, sd2, sd12, poincarea = None, None, None, None
+    if dict['sd1']['use'] == 'yes':
+        args += [sd1]
+        names += ['sd1']
 
-    try:
-        sample_entropy = pyhrv.nonlinear.sample_entropy(flag_int)[0]
-    except:
-        sample_entropy = None
+    if dict['sd2']['use'] == 'yes':
+        args += [sd2]
+        names += ['sd2']
+
+    if dict['sd12']['use'] == 'yes':
+        args += [sd12]
+        names += ['sd12']
+
+    if dict['poincarea']['use'] == 'yes':
+        args += [poincarea]
+        names += ['poincarea']
+
+    if dict['sample_entropy']['use'] == 'yes':
+        try:
+            sample_entropy = pyhrv.nonlinear.sample_entropy(flag_int)[0]
+        except:
+            sample_entropy = None
+        args += [sample_entropy]
+        names += ['sample_entropy']
 
     try:
         _, dfa_alpha1, dfa_alpha2 = pyhrv.nonlinear.dfa(flag_int, show=False, legend=False)[:]
     except:
         dfa_alpha1, dfa_alpha2 = None, None
+
+    if dict['dfa_alpha1']['use'] == 'yes':
+        args += [dfa_alpha1]
+        names += ['dfa_alpha1']
+
+    if dict['dfa_alpha2']['use'] == 'yes':
+        args += [dfa_alpha2]
+        names += ['dfa_alpha2']
 
     # Geometrical features
     try:
@@ -83,15 +113,23 @@ def nonlinear_geo_features(flag, signal):
     except:
         tinn_n, tinn_m, tinn = None, None, None
 
-    try:
-        triangular_index = pyhrv.time_domain.triangular_index(flag_int, show=False, plot=False, legend=False)[0]
-    except:
-        triangular_index = None
+    if dict['tinn']['use'] == 'yes':
+        args += [tinn]
+        names += ['tinn']
+    if dict['tinn_n']['use'] == 'yes':
+        args += [tinn_n]
+        names += ['tinn_n']
+    if dict['tinn_m']['use'] == 'yes':
+        args += [tinn_m]
+        names += ['tinn_m']
 
-    # output
-    args = (sd1, sd2, sd12, poincarea, sample_entropy, dfa_alpha1, dfa_alpha2, tinn_n, tinn_m, tinn, triangular_index)
+    if dict['triangular_index']['use'] == 'yes':
+        try:
+            triangular_index = pyhrv.time_domain.triangular_index(flag_int, show=False, plot=False, legend=False)[0]
+        except:
+            triangular_index = None
+        args += [triangular_index]
+        names += ['triangular_index']
 
-    names = ('sd1', 'sd2', 'sd12', 'poincarea', 'sample_entropy', 'dfa_alpha1', 'dfa_alpha2', 'tinn_n', 'tinn_m', 'tinn', 'triangular_index')
-
-    return utils.ReturnTuple(args, names)
+    return utils.ReturnTuple(tuple(args), tuple(names))
     

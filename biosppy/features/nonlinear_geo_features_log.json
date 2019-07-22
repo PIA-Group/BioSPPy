@@ -1,0 +1,46 @@
+{
+    "sd1": {
+            "description": "Standard deviation of the major axis in the Poincaré Plot.",
+            "use": "yes"
+        },
+    "sd2": {
+            "description": "Standard deviation of the minor axis in the Poincaré Plot.",
+            "use": "yes"
+        },
+    "sd12": {
+            "description": "Ratio between SD2 and SD1 (SD2/SD1).",
+            "use": "yes"
+        },
+    "poincarea": {
+            "description": "Area of the Poincaré Plot fitted ellipse.",
+            "use": "yes"
+        },
+    "sample_entropy": {
+            "description": "Sample entropy of the NNI series.",
+            "use": "yes"
+        },
+    "dfa_alpha1": {
+            "description": "Alpha value of the short term Detrended Fluctuation Analysis of an NNI series.",
+            "use": "yes"
+        },
+    "dfa_alpha2": {
+            "description": "Alpha value of the long term Detrended Fluctuation Analysis of an NNI series.",
+            "use": "yes"
+        },
+    "tinn_n": {
+            "description": "N value of the TINN computation.",
+            "use": "yes"
+        },
+    "tinn_m": {
+            "description": "M value of the TINN computation.",
+            "use": "yes"
+        },
+    "tinn": {
+            "description": "Baseline width of the NNI histogram based on the triangular Interpolation (TINN).",
+            "use": "yes"
+        },
+    "triangular_index": {
+            "description": "Ratio between the total number of NNIs and the maximum of the NNI histogram distribution.",
+            "use": "yes"
+        }
+}

@@ -1,0 +1,10 @@
+{
+    "ons": {
+            "description": "Signal onsets.",
+            "use": "yes"
+        },
+    "hr": {
+            "description": "Bvp heart rate.",
+            "use": "yes"
+        }
+}
