@@ -23,7 +23,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
+def eda(signal=None, sampling_rate=1000., path=None, show=True, min_amplitude=0.1):
     """Process a raw EDA signal and extract relevant signal features using
     default parameters.
 
@@ -33,6 +33,8 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
         Raw EDA signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
     min_amplitude : float, optional
@@ -95,7 +97,7 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
                           onsets=onsets,
                           peaks=peaks,
                           amplitudes=amps,
-                          path=None,
+                          path=path,
                           show=True)
 
     # output

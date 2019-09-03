@@ -618,7 +618,7 @@ class BaseClassifier(object):
 
         return subjects
 
-    def evaluate(self, data, thresholds=None, show=False):
+    def evaluate(self, data, thresholds=None, path=None, show=False):
         """Assess the performance of the classifier in both authentication and
         identification scenarios.
 
@@ -628,6 +628,8 @@ class BaseClassifier(object):
             Dictionary holding test data for each subject.
         thresholds : array, optional
             Classifier thresholds to use.
+        path : str, optional
+            If provided, the plot will be saved to the specified file.
         show : bool, optional
             If True, show a summary plot.
 
@@ -693,7 +695,8 @@ class BaseClassifier(object):
 
         if show:
             # plot
-            plotting.plot_biometrics(assess, self.EER_IDX, show=True)
+            plotting.plot_biometrics(
+                assess, self.EER_IDX, path=path, show=True)
 
         return out
 
