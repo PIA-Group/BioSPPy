@@ -695,8 +695,10 @@ class BaseClassifier(object):
 
         if show:
             # plot
-            plotting.plot_biometrics(
-                assess, self.EER_IDX, path=path, show=True)
+            plotting.plot_biometrics(assess,
+                                     self.EER_IDX,
+                                     path=path,
+                                     show=True)
 
         return out
 
