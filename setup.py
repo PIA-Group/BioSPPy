@@ -40,6 +40,7 @@ REQUIRED = [
     'scipy',
     'shortuuid',
     'six',
+    'joblib'
 ]
 
 # What packages are optional?
