@@ -54,6 +54,7 @@ This should produce a plot similar to the one below.
 - scipy
 - shortuuid
 - six
+- joblib
 
 ## Citing
 Please use the following if you need to cite BioSPPy:
