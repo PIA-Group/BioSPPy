@@ -44,6 +44,8 @@ This should produce a plot similar to the one below.
 
 [![Image](https://github.com/PIA-Group/BioSPPy/raw/master/docs/images/ECG_summary.png "ECG Summary Plot")]()
 
+Signal modalities Classification example: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1MGYTQuRDX9xnJHWbGrPBBDtO5vLMRN3r]
+
 ## Dependencies
 
 - bidict
