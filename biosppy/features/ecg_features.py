@@ -165,79 +165,111 @@ def ecg_features(signal=None, sampling_rate=1000.):
         names += ['sdann']
 
     # Spectral features
+    freq_param = pyhrv.frequency_domain.welch_psd(nni, mode='dev', show=False, show_param=False, legend=False)[0]
     try:
         freq_param = pyhrv.frequency_domain.welch_psd(nni, mode='dev', show=False, show_param=False, legend=False)[0]
+    except:
+        print("Error in line 173")
 
+    try:
         if dict['fft_peak_VLF']['use'] == 'yes':
             fft_peak_VLF = freq_param['fft_peak'][0]
-            args += [fft_peak_VLF]
-            names += ['fft_peak_VLF']
-
+    except:
+        fft_peak_VLF = None
+    args += [fft_peak_VLF]
+    names += ['fft_peak_VLF']
+    try:
         if dict['fft_peak_LF']['use'] == 'yes':
             fft_peak_LF = freq_param['fft_peak'][1]
-            args += [fft_peak_LF]
-            names += ['fft_peak_LF']
-
+    except:
+        fft_peak_LF = None
+    args += [fft_peak_LF]
+    names += ['fft_peak_LF']
+    try:
         if dict['fft_peak_HF']['use'] == 'yes':
             fft_peak_HF = freq_param['fft_peak'][2]
-            args += [fft_peak_HF]
-            names += ['fft_peak_HF']
-
+    except:
+        fft_peak_HF = None
+    args += [fft_peak_HF]
+    names += ['fft_peak_HF']
+    try:
         if dict['fft_abs_VLF']['use'] == 'yes':
             fft_abs_VLF = freq_param['fft_abs'][0]
-            args += [fft_abs_VLF]
-            names += ['fft_abs_VLF']
-
+    except:
+        fft_abs_VLF = None
+    args += [fft_abs_VLF]
+    names += ['fft_abs_VLF']
+    try:
         if dict['fft_abs_LF']['use'] == 'yes':
             fft_abs_LF = freq_param['fft_abs'][1]
-            args += [fft_abs_LF]
-            names += ['fft_abs_LF']
-
+    except:
+        fft_abs_LF = None
+    args += [fft_abs_LF]
+    names += ['fft_abs_LF']
+    try:
         if dict['fft_abs_HF']['use'] == 'yes':
             fft_abs_HF = freq_param['fft_abs'][2]
-            args += [fft_abs_HF]
-            names += ['fft_abs_HF']
-
+    except:
+        fft_abs_HF = None
+    args += [fft_abs_HF]
+    names += ['fft_abs_HF']
+    try:
         if dict['fft_rel_VLF']['use'] == 'yes':
             fft_rel_VLF = freq_param['fft_rel'][0]
-            args += [fft_rel_VLF]
-            names += ['fft_rel_VLF']
-
+    except:
+        fft_rel_VLF = None
+    args += [fft_rel_VLF]
+    names += ['fft_rel_VLF']
+    try:
         if dict['fft_rel_LF']['use'] == 'yes':
             fft_rel_LF = freq_param['fft_rel'][1]
-            args += [fft_rel_LF]
-            names += ['fft_rel_LF']
-
+    except:
+        fft_rel_LF = None
+    args += [fft_rel_LF]
+    names += ['fft_rel_LF']
+    try:
         if dict['fft_rel_HF']['use'] == 'yes':
             fft_rel_HF = freq_param['fft_rel'][2]
-            args += [fft_rel_HF]
-            names += ['fft_rel_HF']
-
+    except:
+        fft_rel_HF = None
+    args += [fft_rel_HF]
+    names += ['fft_rel_HF']
+    try:
         if dict['fft_log_VLF']['use'] == 'yes':
             fft_log_VLF = freq_param['fft_log'][0]
-            args += [fft_log_VLF]
-            names += ['fft_log_VLF']
-
+    except:
+        fft_log_VLF = None
+    args += [fft_log_VLF]
+    names += ['fft_log_VLF']
+    try:
         if dict['fft_log_LF']['use'] == 'yes':
             fft_log_LF = freq_param['fft_log'][1]
-            args += [fft_log_LF]
-            names += ['fft_log_LF']
-
+    except:
+        fft_log_LF = None
+    args += [fft_log_LF]
+    names += ['fft_log_LF']
+    try:
         if dict['fft_log_HF']['use'] == 'yes':
             fft_log_HF = freq_param['fft_log'][2]
-            args += [fft_log_HF]
-            names += ['fft_log_HF']
-
+    except:
+        fft_log_HF = None
+    args += [fft_log_HF]
+    names += ['fft_log_HF']
+    try:
         if dict['fft_total']['use'] == 'yes':
             fft_total = freq_param['fft_total']
-            args += [fft_total]
-            names += ['fft_total']
-
+    except:
+        fft_total = None
+    args += [fft_total]
+    names += ['fft_total']
+    try:
         if dict['fft_ratio']['use'] == 'yes':
             fft_ratio = freq_param['fft_ratio']
-            args += [fft_ratio]
-            names += ['fft_ratio']
     except:
-        fft_peak_VLF, fft_peak_LF, fft_peak_HF, fft_abs_VLF, fft_abs_LF, fft_abs_HF, fft_rel_VLF, fft_rel_LF, fft_rel_HF, fft_log_VLF, fft_log_LF, fft_log_HF, fft_total, fft_ratio = [None] * 14
+        fft_ratio = None
+    args += [fft_ratio]
+    names += ['fft_ratio']
+
+
 
     return utils.ReturnTuple(tuple(args), tuple(names))
