@@ -78,5 +78,14 @@
     "counter": {
             "description": "Length of the signal.",
             "use": "yes"
-        }
+        },
+      "temp_curve_distance": {
+        "description": "Euclidean distance of the signal's cumulative sum to the respective linear regression. Source:TSFEL library",
+        "use": "yes"
+
+      },
+        "temp_curve_distance_vol": {
+        "description": "Volume of the signal's cumulative sum to the respective linear regression. Source:TSFEL library",
+        "use": "yes"
+      }
 }
