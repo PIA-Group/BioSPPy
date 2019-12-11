@@ -110,13 +110,14 @@ def signal_spectral(signal, FS):
 
         """
     # check inputs
-    if signal is None or signal == []:
+    if signal is None or np.array(signal) == []:
         print("Signal is empty.")
 
     # ensure numpy
     signal = np.array(signal)
     # f, spectrum = st.welch_spectrum(signal, sampling_rate=FS)
-    f, spectrum = st.power_spectrum(signal, sampling_rate=FS)
+    # f, spectrum = st.power_spectrum(signal, sampling_rate=FS)
+    f, spectrum = st.welch_spectrum(signal, size=len(signal)//2, sampling_rate=FS)
 
     cum_ff = np.cumsum(spectrum)
     spect_diff = np.diff(spectrum)
