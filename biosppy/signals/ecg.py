@@ -17,6 +17,7 @@ from __future__ import absolute_import, division, print_function
 from six.moves import range, zip
 
 # 3rd party
+import math
 import numpy as np
 import scipy.signal as ss
 
@@ -1237,7 +1238,7 @@ def ASI_segmentor(signal=None, sampling_rate=1000.):
     
     rpeaks = []
     i = 1
-    tf = len(singal)
+    tf = len(signal)
     Ramptotal = 0
     
     # Double derivative squared
