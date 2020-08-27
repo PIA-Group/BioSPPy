@@ -69,7 +69,7 @@ def abp(signal=None, sampling_rate=1000., show=True):
                                       sampling_rate=sampling_rate)
 
     # find onsets
-    onsets, _ = find_onsets_elgendi2013(signal=filtered, sampling_rate=sampling_rate)
+    onsets, _ = find_onsets_zong2003(signal=filtered, sampling_rate=sampling_rate)
 
     # compute heart rate
     hr_idx, hr = st.get_heart_rate(beats=onsets,
@@ -101,7 +101,7 @@ def abp(signal=None, sampling_rate=1000., show=True):
     return utils.ReturnTuple(args, names)
 
 
-def find_onsets_zong03(signal=None, sampling_rate=1000., sm_size=None, size=None,
+def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=None,
                 alpha=2., wrange=None, d1_th=0, d2_th=None):
     """Determine onsets of ABP pulses.
     Skips corrupted signal parts.
