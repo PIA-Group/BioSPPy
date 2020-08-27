@@ -16,6 +16,7 @@ from six.moves import range
 
 # 3rd party
 import numpy as np
+import scipy
 
 # local
 from . import tools as st
