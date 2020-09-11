@@ -43,7 +43,7 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
     ts : array
         Signal time axis reference (seconds).
     filtered : array
-        Filtered BVP signal.
+        Filtered EEG signal.
     features_ts : array
         Features time axis reference (seconds).
     theta : array

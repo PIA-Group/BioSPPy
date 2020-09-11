@@ -44,7 +44,7 @@ covered by `biosppy`.
 Blood Volume Pulse
 ------------------
 
-Blood Volume Pulse (BVP) signals are...
+Photoplethysmogram (PPG) signals are...
 
 Electrocardiogram
 -----------------

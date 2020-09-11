@@ -10,7 +10,17 @@ Modules
 .. contents::
    :local:
 
+.. automodule:: biosppy.signals.abp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. automodule:: biosppy.signals.bvp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+.. automodule:: biosppy.signals.ppg
     :members:
     :undoc-members:
     :show-inheritance:

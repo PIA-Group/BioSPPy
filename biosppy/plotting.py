@@ -209,6 +209,99 @@ def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
         plt.close(fig)
 
 
+def plot_ppg(ts=None,
+             raw=None,
+             filtered=None,
+             onsets=None,
+             heart_rate_ts=None,
+             heart_rate=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.ppg.ppg.
+
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw PPG signal.
+    filtered : array
+        Filtered PPG signal.
+    onsets : array
+        Indices of PPG pulse onsets.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+
+    """
+
+    fig = plt.figure()
+    fig.suptitle('PPG Summary')
+
+    # raw signal
+    ax1 = fig.add_subplot(311)
+
+    ax1.plot(ts, raw, linewidth=MAJOR_LW, label='Raw')
+
+    ax1.set_ylabel('Amplitude')
+    ax1.legend()
+    ax1.grid()
+
+    # filtered signal with onsets
+    ax2 = fig.add_subplot(312, sharex=ax1)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+
+    ax2.plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered')
+    ax2.vlines(ts[onsets], ymin, ymax,
+               color='m',
+               linewidth=MINOR_LW,
+               label='Onsets')
+
+    ax2.set_ylabel('Amplitude')
+    ax2.legend()
+    ax2.grid()
+
+    # heart rate
+    ax3 = fig.add_subplot(313, sharex=ax1)
+
+    ax3.plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label='Heart Rate')
+
+    ax3.set_xlabel('Time (s)')
+    ax3.set_ylabel('Heart Rate (bpm)')
+    ax3.legend()
+    ax3.grid()
+
+    # make layout tight
+    fig.tight_layout()
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
+
+
 def plot_bvp(ts=None,
              raw=None,
              filtered=None,
@@ -301,6 +394,98 @@ def plot_bvp(ts=None,
         # close
         plt.close(fig)
 
+
+def plot_abp(ts=None,
+             raw=None,
+             filtered=None,
+             onsets=None,
+             heart_rate_ts=None,
+             heart_rate=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.abp.abp.
+
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw ABP signal.
+    filtered : array
+        Filtered ABP signal.
+    onsets : array
+        Indices of ABP pulse onsets.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+
+    """
+
+    fig = plt.figure()
+    fig.suptitle('ABP Summary')
+
+    # raw signal
+    ax1 = fig.add_subplot(311)
+
+    ax1.plot(ts, raw, linewidth=MAJOR_LW, label='Raw')
+
+    ax1.set_ylabel('Amplitude')
+    ax1.legend()
+    ax1.grid()
+
+    # filtered signal with onsets
+    ax2 = fig.add_subplot(312, sharex=ax1)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+
+    ax2.plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered')
+    ax2.vlines(ts[onsets], ymin, ymax,
+               color='m',
+               linewidth=MINOR_LW,
+               label='Onsets')
+
+    ax2.set_ylabel('Amplitude')
+    ax2.legend()
+    ax2.grid()
+
+    # heart rate
+    ax3 = fig.add_subplot(313, sharex=ax1)
+
+    ax3.plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label='Heart Rate')
+
+    ax3.set_xlabel('Time (s)')
+    ax3.set_ylabel('Heart Rate (bpm)')
+    ax3.legend()
+    ax3.grid()
+
+    # make layout tight
+    fig.tight_layout()
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
 
 def plot_eda(ts=None,
              raw=None,
@@ -507,7 +692,7 @@ def plot_resp(ts=None,
               resp_rate=None,
               path=None,
               show=False):
-    """Create a summary plot from the output of signals.bvp.bvp.
+    """Create a summary plot from the output of signals.ppg.ppg.
 
     Parameters
     ----------

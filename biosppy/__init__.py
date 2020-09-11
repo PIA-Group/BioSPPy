@@ -16,4 +16,4 @@ from __future__ import absolute_import, division, print_function
 from .__version__ import __version__
 
 # allow lazy loading
-from .signals import bvp, ecg, eda, eeg, emg, resp, tools
+from .signals import abp, bvp, ppg, ecg, eda, eeg, emg, resp, tools

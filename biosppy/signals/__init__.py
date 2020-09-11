@@ -5,7 +5,7 @@ biosppy.signals
 
 This package provides methods to process common
 physiological signals (biosignals):
-    * Blood Volume Pulse (BVP)
+    * Photoplethysmogram (PPG)
     * Electrocardiogram (ECG)
     * Electrodermal Activity (EDA)
     * Electroencephalogram (EEG)
@@ -20,4 +20,4 @@ physiological signals (biosignals):
 from __future__ import absolute_import, division, print_function
 
 # allow lazy loading
-from . import bvp, ecg, eda, eeg, emg, resp, tools
+from . import abp, bvp, ppg, ecg, eda, eeg, emg, resp, tools
