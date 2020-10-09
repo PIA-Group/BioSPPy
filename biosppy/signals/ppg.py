@@ -223,3 +223,154 @@ def find_onsets_elgendi2013(signal=None, sampling_rate=1000., peakwindow=0.111, 
     names = ('onsets', 'params')
 
     return utils.ReturnTuple(args, names)
+
+
+def find_onsets_kavsaoglu2016(
+    signal=None, sampling_rate=1000., alpha=0.2, beta=4, init_bpm=90, min_delay=0.6
+):
+    """
+    Determines onsets of PPG pulses.
+
+    Parameters
+    ----------
+    signal : array
+        Input filtered PPG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    alpha : float, optional
+        Low-pass filter factor.
+        Avoids abrupt changes of BPM.
+    beta : int, float, optional
+        Number of segments by pulse.
+        Width of each segment = Period of pulse according to current BPM / beta
+    init_bpm : int, float, optional
+        Initial BPM.
+        Higher value results in a smaller segment width.
+    min_delay : float
+        Minimum delay between peaks as percentage of current BPM pulse period.
+        Avoids false positives
+
+    Returns
+    ----------
+    onsets : array
+        Indices of PPG pulse onsets.
+    window_marks : array
+        Indices of segments window boundaries.
+    params : dict
+        Input parameters of the function
+
+
+    References
+    ----------
+    - Kavsaoğlu, Ahmet & Polat, Kemal & Bozkurt, Mehmet. (2016). An innovative peak detection algorithm for
+    photoplethysmography signals: An adaptive segmentation method. TURKISH JOURNAL OF ELECTRICAL ENGINEERING
+    & COMPUTER SCIENCES. 24. 1782-1796. 10.3906/elk-1310-177.
+
+    Notes
+    ---------------------
+    This algorithm is an adaption of the one described on Kavsaoğlu et al. (2016).
+    This version takes into account a minimum delay between peaks and builds upon the adaptive segmentation
+    by using a low-pass filter for BPM changes. This way, even if the algorithm wrongly detects a peak, the
+    BPM value will stay relatively constant so the next pulse can be correctly segmented.
+
+    """
+
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input signal.")
+
+    if alpha <= 0 or alpha > 1:
+        raise TypeError("The value of alpha must be in the range: ]0, 1].")
+
+    if beta <= 0:
+        raise TypeError("The number of divisions by pulse should be greater than 0.")
+
+    if init_bpm <= 0:
+        raise TypeError("Provide a valid BPM value for initial estimation.")
+
+    if min_delay < 0 or min_delay > 1:
+        raise TypeError(
+            "The minimum delay percentage between peaks must be between 0 and 1"
+        )
+
+    # current bpm
+    bpm = init_bpm
+
+    # current segment window width
+    window = int(sampling_rate * (60 / bpm) / beta)
+
+    # onsets array
+    onsets = []
+
+    # window marks array - stores the boundaries of each segment
+    window_marks = []
+
+    # buffer for peak indices
+    idx_buffer = [-1, -1, -1]
+
+    # buffer to store the previous 3 values for onset detection
+    min_buffer = [0, 0, 0]
+
+    # signal pointer
+    i = 0
+    while i + window < len(signal):
+        # remove oldest values
+        idx_buffer.pop(0)
+        min_buffer.pop(0)
+
+        # add the index of the minimum value of the current segment to buffer
+        idx_buffer.append(int(i + np.argmin(signal[i : i + window])))
+
+        # add the minimum value of the current segment to buffer
+        min_buffer.append(signal[idx_buffer[-1]])
+
+        if (
+            # the buffer has to be filled with valid values
+            idx_buffer[0] > -1
+            # the center value of the buffer must be smaller than its neighbours
+            and (min_buffer[1] < min_buffer[0] and min_buffer[1] <= min_buffer[2])
+            # if an onset was previously detected, guarantee that the new onset respects the minimum delay
+            and (
+                len(onsets) == 0
+                or (idx_buffer[1] - onsets[-1]) / sampling_rate >= min_delay * 60 / bpm
+            )
+        ):
+            # store the onset
+            onsets.append(idx_buffer[1])
+
+            # if more than one onset was detected, update the bpm and the segment width
+            if len(onsets) > 1:
+                # calculate new bpm from the latest two onsets
+                new_bpm = int(60 * sampling_rate / (onsets[-1] - onsets[-2]))
+
+                # update the bpm value
+                bpm = alpha * new_bpm + (1 - alpha) * bpm
+
+                # update the segment window width
+                window = int(sampling_rate * (60 / bpm) / beta)
+
+        # update the signal pointer
+        i += window
+
+        # store window segment boundaries index
+        window_marks.append(i)
+
+    onsets = np.array(onsets, dtype="int")
+    window_marks = np.array(window_marks, dtype="int")
+
+    # output
+    params = {
+        "signal": signal,
+        "sampling_rate": sampling_rate,
+        "alpha": alpha,
+        "beta": beta,
+        "init_bpm": init_bpm,
+        "min_delay": min_delay,
+    }
+
+    args = (onsets, window_marks, params)
+    names = ("onsets", "window_marks", "params")
+
+    return utils.ReturnTuple(args, names)
+
+
