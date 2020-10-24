@@ -1203,7 +1203,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
 
 
 
-def ASI_segmentor(signal=None, sampling_rate=1000.):
+def ASI_segmenter(signal=None, sampling_rate=1000.):
 
     """ECG R-peak segmentation algorithm.
 
