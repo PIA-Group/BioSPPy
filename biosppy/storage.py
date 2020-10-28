@@ -25,7 +25,7 @@ import zipfile
 import h5py
 import numpy as np
 import shortuuid
-from sklearn.externals import joblib
+import joblib
 
 # local
 from . import utils
