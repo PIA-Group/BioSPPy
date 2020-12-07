@@ -226,7 +226,13 @@ def find_onsets_elgendi2013(signal=None, sampling_rate=1000., peakwindow=0.111, 
 
 
 def find_onsets_kavsaoglu2016(
-    signal=None, sampling_rate=1000., alpha=0.2, beta=4, init_bpm=90, min_delay=0.6
+    signal=None,
+    sampling_rate=1000.0,
+    alpha=0.2,
+    beta=4,
+    init_bpm=90,
+    min_delay=0.6,
+    max_BPM=150,
 ):
     """
     Determines onsets of PPG pulses.
@@ -249,6 +255,9 @@ def find_onsets_kavsaoglu2016(
     min_delay : float
         Minimum delay between peaks as percentage of current BPM pulse period.
         Avoids false positives
+    max_bpm : int, float, optional
+        Maximum BPM.
+        Maximum value accepted as valid BPM.
 
     Returns
     ----------
@@ -293,6 +302,9 @@ def find_onsets_kavsaoglu2016(
             "The minimum delay percentage between peaks must be between 0 and 1"
         )
 
+    if max_BPM >= 248:
+        raise TypeError("The maximum BPM must assure the person is alive")
+
     # current bpm
     bpm = init_bpm
 
@@ -329,10 +341,13 @@ def find_onsets_kavsaoglu2016(
             idx_buffer[0] > -1
             # the center value of the buffer must be smaller than its neighbours
             and (min_buffer[1] < min_buffer[0] and min_buffer[1] <= min_buffer[2])
-            # if an onset was previously detected, guarantee that the new onset respects the minimum delay
+            # if an onset was previously detected, guarantee that the new onset respects the minimum delay, minimum BPM and maximum BPM
             and (
                 len(onsets) == 0
-                or (idx_buffer[1] - onsets[-1]) / sampling_rate >= min_delay * 60 / bpm
+                or (
+                    (idx_buffer[1] - onsets[-1]) / sampling_rate >= min_delay * 60 / bpm
+                    and (idx_buffer[1] - onsets[-1]) / sampling_rate > 60 / max_BPM
+                )
             )
         ):
             # store the onset
@@ -366,11 +381,11 @@ def find_onsets_kavsaoglu2016(
         "beta": beta,
         "init_bpm": init_bpm,
         "min_delay": min_delay,
+        "max_bpm": max_BPM,
     }
 
     args = (onsets, window_marks, params)
     names = ("onsets", "window_marks", "params")
 
     return utils.ReturnTuple(args, names)
-
 
