@@ -229,7 +229,7 @@ def find_onsets_kavsaoglu2016(
     signal=None,
     sampling_rate=1000.0,
     alpha=0.2,
-    beta=4,
+    k=4,
     init_bpm=90,
     min_delay=0.6,
     max_BPM=150,
@@ -246,9 +246,9 @@ def find_onsets_kavsaoglu2016(
     alpha : float, optional
         Low-pass filter factor.
         Avoids abrupt changes of BPM.
-    beta : int, float, optional
+    k : int, float, optional
         Number of segments by pulse.
-        Width of each segment = Period of pulse according to current BPM / beta
+        Width of each segment = Period of pulse according to current BPM / k
     init_bpm : int, float, optional
         Initial BPM.
         Higher value results in a smaller segment width.
@@ -291,7 +291,7 @@ def find_onsets_kavsaoglu2016(
     if alpha <= 0 or alpha > 1:
         raise TypeError("The value of alpha must be in the range: ]0, 1].")
 
-    if beta <= 0:
+    if k <= 0:
         raise TypeError("The number of divisions by pulse should be greater than 0.")
 
     if init_bpm <= 0:
@@ -309,7 +309,7 @@ def find_onsets_kavsaoglu2016(
     bpm = init_bpm
 
     # current segment window width
-    window = int(sampling_rate * (60 / bpm) / beta)
+    window = int(sampling_rate * (60 / bpm) / k)
 
     # onsets array
     onsets = []
@@ -362,7 +362,7 @@ def find_onsets_kavsaoglu2016(
                 bpm = alpha * new_bpm + (1 - alpha) * bpm
 
                 # update the segment window width
-                window = int(sampling_rate * (60 / bpm) / beta)
+                window = int(sampling_rate * (60 / bpm) / k)
 
         # update the signal pointer
         i += window
@@ -378,7 +378,7 @@ def find_onsets_kavsaoglu2016(
         "signal": signal,
         "sampling_rate": sampling_rate,
         "alpha": alpha,
-        "beta": beta,
+        "k": k,
         "init_bpm": init_bpm,
         "min_delay": min_delay,
         "max_bpm": max_BPM,
@@ -388,4 +388,3 @@ def find_onsets_kavsaoglu2016(
     names = ("onsets", "window_marks", "params")
 
     return utils.ReturnTuple(args, names)
-
