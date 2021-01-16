@@ -17,6 +17,7 @@ from six.moves import range
 import six
 
 # 3rd party
+import sys
 import numpy as np
 import scipy.signal as ss
 from scipy import interpolate, optimize
@@ -1324,6 +1325,8 @@ def pearson_correlation(x=None, y=None):
         If the input signals do not have the same length.
 
     """
+    
+    print("tools.pearson_correlation is deprecated, use stats.pearson_correlation instead", file=sys.stderr)
 
     # check inputs
     if x is None:
