@@ -21,6 +21,7 @@ from . import utils
 # 3rd party
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import pearsonr, ttest_rel, ttest_ind
 
 
 def pearson_correlation(x=None, y=None):
@@ -41,8 +42,12 @@ def pearson_correlation(x=None, y=None):
 
     Returns
     -------
-    rxy : float
+    r : float
         Pearson correlation coefficient, ranging between -1 and +1.
+    pvalue : float
+        Two-tailed p-value. The p-value roughly indicates the probability of
+        an uncorrelated system producing datasets that have a Pearson correlation
+        at least as extreme as the one computed from these datasets.
 
     Raises
     ------
@@ -67,23 +72,9 @@ def pearson_correlation(x=None, y=None):
     if n != len(y):
         raise ValueError("Input signals must have the same length.")
 
-    mx = np.mean(x)
-    my = np.mean(y)
+    r, pvalue = pearsonr(x, y)
 
-    Sxy = np.sum(x * y) - n * mx * my
-    Sxx = np.sum(np.power(x, 2)) - n * mx ** 2
-    Syy = np.sum(np.power(y, 2)) - n * my ** 2
-
-    rxy = Sxy / (np.sqrt(Sxx) * np.sqrt(Syy))
-
-    if not np.isnan(rxy):
-        # avoid propagation of numerical errors
-        if rxy > 1.0:
-            rxy = 1.0
-        elif rxy < -1.0:
-            rxy = -1.0
-
-    return rxy
+    return r, pvalue
 
 
 def linear_regression(x=None, y=None):
@@ -127,17 +118,18 @@ def linear_regression(x=None, y=None):
         raise ValueError("Input signals must have the same length.")
 
     coeffs = np.polyfit(x, y, 1)
+    f = np.poly1d(coeffs)
 
     x_min = x.min()
     x_max = x.max()
 
-    y_x_min = coeffs[0] * x_min + coeffs[1]
-    y_x_max = coeffs[0] * x_max + coeffs[1]
+    y_min = f(x_min)
+    y_max = f(x_max)
 
     plt.scatter(x, y)
     plt.plot(
         [x_min, x_max],
-        [y_x_min, y_x_max],
+        [y_min, y_max],
         c="orange",
         label="y={:.3f}x+{:.3f}".format(coeffs[0], coeffs[1]),
     )
@@ -147,3 +139,102 @@ def linear_regression(x=None, y=None):
     plt.legend()
 
     return coeffs
+
+
+def paired_test(x=None, y=None):
+    """
+    Perform the Student's paired t-test on the arrays x and y.
+    This is a two-sided test for the null hypothesis that 2 related
+    or repeated samples have identical average (expected) values.
+
+    Parameters
+    ----------
+    x : array
+        First input signal.
+    y : array
+        Second input signal.
+
+    Returns
+    -------
+    statistic : float
+        t-statistic. The t-statistic is used in a t-test to determine
+        if you should support or reject the null hypothesis.
+    pvalue : float
+        Two-sided p-value.
+
+    Raises
+    ------
+    ValueError
+        If the input signals do not have the same length.
+
+    """
+
+    # check inputs
+    if x is None:
+        raise TypeError("Please specify the first input signal.")
+
+    if y is None:
+        raise TypeError("Please specify the second input signal.")
+
+    # ensure numpy
+    x = np.array(x)
+    y = np.array(y)
+
+    n = len(x)
+
+    if n != len(y):
+        raise ValueError("Input signals must have the same length.")
+
+    statistic, pvalue = ttest_rel(x, y)
+
+    return statistic, pvalue
+
+
+def unpaired_test(x=None, y=None):
+    """
+    Perform the Student's unpaired t-test on the arrays x and y.
+    This is a two-sided test for the null hypothesis that 2 independent
+    samples have identical average (expected) values. This test assumes
+    that the populations have identical variances by default.
+
+    Parameters
+    ----------
+    x : array
+        First input signal.
+    y : array
+        Second input signal.
+
+    Returns
+    -------
+    statistic : float
+        t-statistic. The t-statistic is used in a t-test to determine
+        if you should support or reject the null hypothesis.
+    pvalue : float
+        Two-sided p-value.
+
+    Raises
+    ------
+    ValueError
+        If the input signals do not have the same length.
+
+    """
+
+    # check inputs
+    if x is None:
+        raise TypeError("Please specify the first input signal.")
+
+    if y is None:
+        raise TypeError("Please specify the second input signal.")
+
+    # ensure numpy
+    x = np.array(x)
+    y = np.array(y)
+
+    n = len(x)
+
+    if n != len(y):
+        raise ValueError("Input signals must have the same length.")
+
+    statistic, pvalue = ttest_ind(x, y)
+
+    return statistic, pvalue
