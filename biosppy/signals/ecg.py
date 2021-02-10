@@ -17,6 +17,7 @@ from __future__ import absolute_import, division, print_function
 from six.moves import range, zip
 
 # 3rd party
+import math
 import numpy as np
 import scipy.signal as ss
 
@@ -1199,3 +1200,85 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
     rpeaks = np.array(rpeaks, dtype='int')
 
     return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+
+
+
+def ASI_segmenter(signal=None, sampling_rate=1000.):
+
+    """ECG R-peak segmentation algorithm.
+
+    Parameters
+    ----------
+    signal : array
+        Input ECG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+
+    Returns
+    -------
+    rpeaks : array
+        R-peak location indices.
+
+    References
+    ----------
+    Modification by Tiago Rodrigues, based on:
+    [R. Gutiérrez-rivas 2015] Novel Real-Time Low-Complexity QRS Complex Detector
+                            Based on Adaptive Thresholding. Vol. 15,no. 10, pp. 6036–6043, 2015.
+    [D. Sadhukhan]  R-Peak Detection Algorithm for Ecg using Double Difference
+                    And RRInterval Processing. Procedia Technology, vol. 4, pp. 873–877, 2012.
+    
+    """
+
+        
+    N  = round (3*sampling_rate/128)
+    Nd = N-1  
+    Pth = (0.7*sampling_rate)/128+4.7
+    Rmin = 0.26
+    
+    
+    rpeaks = []
+    i = 1
+    tf = len(signal)
+    Ramptotal = 0
+    
+    # Double derivative squared
+    diff_ecg = [signal[i] - signal[i - Nd] for i in range(Nd, len(signal))]
+    ddiff_ecg = [diff_ecg[i] - diff_ecg[i - 1] for i in range(1, len(diff_ecg))]
+    squar = np.square(ddiff_ecg)
+        
+    # Integrate moving window
+    b = np.array(np.ones(N))
+    a=[1]
+    processed_ecg = ss.lfilter(b, a, squar)
+    
+    
+    # R-peak finder FSM
+    while i < tf - sampling_rate:   # ignore last second of recording 
+        
+        # State 1: looking for maximum
+        tf1 = round (i + Rmin*sampling_rate)
+        Rpeakamp = 0
+        while i < tf1:           
+            # Rpeak amplitude and position 
+            if processed_ecg[i] > Rpeakamp:
+                Rpeakamp = processed_ecg[i]
+                rpeakpos = i + 1
+            i+=1
+            
+        Ramptotal = (19/20)*Ramptotal + (1/20)*Rpeakamp
+        rpeaks.append(rpeakpos)
+                
+        # State 2: waiting state
+        d = tf1 - rpeakpos
+        tf2 = i + round(0.2*250 - d)
+        while i <= tf2:
+            i+=1
+            
+        #State 3: decreasing threshold
+        Thr = Ramptotal
+        while processed_ecg[i] < Thr:
+            Thr = Thr*math.exp(-Pth/sampling_rate)
+            i+=1
+            
+    return utils.ReturnTuple((rpeaks,), ('rpeaks',))
+

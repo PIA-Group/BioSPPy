@@ -1,7 +1,7 @@
 # Simple Text Format
 # Sampling Rate (Hz):= 1000.00
 # Resolution:= 12
-# Labels:= BVP
+# Labels:= PPG
 2065.0
 2066.0
 2066.0
