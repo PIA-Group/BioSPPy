@@ -12,7 +12,7 @@ physiological signals (biosignals):
     * Electromyogram (EMG)
     * Respiration (Resp)
 
-:copyright: (c) 2015-2018 by Instituto de Telecomunicacoes
+:copyright: (c) 2015-2021 by Instituto de Telecomunicacoes
 :license: BSD 3-clause, see LICENSE for more details.
 """
 
