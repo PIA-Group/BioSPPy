@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-biosppy
--------
+biosppy.signals
+---------------
 
-A toolbox for biosignal processing written in Python.
+This package provides methods to synthesize common
+physiological signals (biosignals):
+    * Electrocardiogram (ECG)
 
 :copyright: (c) 2015-2021 by Instituto de Telecomunicacoes
 :license: BSD 3-clause, see LICENSE for more details.
@@ -12,9 +14,5 @@ A toolbox for biosignal processing written in Python.
 # compat
 from __future__ import absolute_import, division, print_function
 
-# get version
-from .__version__ import __version__
-
 # allow lazy loading
-from .signals import abp, bvp, ppg, ecg, eda, eeg, emg, resp, tools
-from .synthesizers import ecg
+from . import ecg
