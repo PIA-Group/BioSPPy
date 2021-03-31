@@ -24,7 +24,7 @@ from biosppy.signals import tools as st
 from .. import plotting, utils
 
 
-def B(Kb, l):
+def B(l, Kb):
     """Generates the amplitude values of the first isoelectric line (B segment) of the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -32,6 +32,8 @@ def B(Kb, l):
     If the parameter introduced doesn't make sense in this context, an error will raise.
     Parameters
     ----------
+    l  : float
+        Inverse of the sampling rate.
     Kb : int
         B segment width (miliseconds).
     Returns
@@ -53,7 +55,7 @@ def B(Kb, l):
     return B_segment
 
 
-def P(Ap, Kp, i):
+def P(i, Ap, Kp):
     """Generates the amplitude values of the P wave in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -61,6 +63,8 @@ def P(Ap, Kp, i):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    i  : int
+        Sampling rate.
     Ap : int
         P wave amplitude (milivolts).
     Kp : int
@@ -87,7 +91,7 @@ def P(Ap, Kp, i):
     return P_wave
 
 
-def Pq(Kpq, l):
+def Pq(l, Kpq):
     """Generates the amplitude values of the PQ segment in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -95,6 +99,8 @@ def Pq(Kpq, l):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    l  : float
+        Inverse of the sampling rate.
     Kpq : int
         PQ segment width (miliseconds).
     Returns
@@ -116,7 +122,7 @@ def Pq(Kpq, l):
     return PQ_segment
 
 
-def Q1(Aq, Kq1, i):
+def Q1(i, Aq, Kq1):
     """Generates the amplitude values of the first 5/6 of the Q wave in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -124,7 +130,9 @@ def Q1(Aq, Kq1, i):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
-    Aq : int
+    i   : int
+        Sampling rate.
+    Aq  : int
         Q wave amplitude (milivolts).
     Kq1 : int
         First 5/6 of the Q wave width (miliseconds).
@@ -150,7 +158,7 @@ def Q1(Aq, Kq1, i):
     return Q1_wave
 
 
-def Q2(Aq, Kq2, i):
+def Q2(i, Aq, Kq2):
     """Generates the amplitude values of the last 1/6 of the Q wave in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -158,7 +166,9 @@ def Q2(Aq, Kq2, i):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
-    Aq : int
+    i   : int
+        Sampling rate.
+    Aq  : int
         Q wave amplitude (milivolts).
     Kq2 : int
         Last 1/6 of the Q wave width (miliseconds).
@@ -184,7 +194,7 @@ def Q2(Aq, Kq2, i):
     return Q2_wave
 
 
-def R(Ar, Kr, i):
+def R(i, Ar, Kr):
     """Generates the amplitude values of the R wave in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -192,6 +202,8 @@ def R(Ar, Kr, i):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    i  : int
+        Sampling rate.
     Ar : int
         R wave amplitude (milivolts).
     Kr : int
@@ -218,7 +230,7 @@ def R(Ar, Kr, i):
     return R_wave
 
 
-def S(As, Ks, Kcs, i, k=0):
+def S(i, As, Ks, Kcs, k=0):
     """Generates the amplitude values of the S wave in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -226,6 +238,8 @@ def S(As, Ks, Kcs, i, k=0):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    i  : int
+        Sampling rate.
     As : int
         S wave amplitude (milivolts).
     Ks : int
@@ -276,7 +290,7 @@ def S(As, Ks, Kcs, i, k=0):
     return S
 
 
-def St(As, Ks, Kcs, sm, Kst, i, k=0):
+def St(i, As, Ks, Kcs, sm, Kst, k=0):
     """Generates the amplitude values of the ST segment in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -284,6 +298,8 @@ def St(As, Ks, Kcs, sm, Kst, i, k=0):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    i  : int
+        Sampling rate.
     As : int
         S wave amplitude (milivolts).
     Ks : int
@@ -315,14 +331,14 @@ def St(As, Ks, Kcs, sm, Kst, i, k=0):
     else:
         if k == 0:
             k = np.arange(0, Kst, i)
-            a = -S(As, Ks, Kcs, Ks - Kcs, i) * (k / sm) + S(As, Ks, Kcs, Ks - Kcs, i)
+            a = -S(i, As, Ks, Kcs, Ks - Kcs) * (k / sm) + S(i, As, Ks, Kcs, Ks - Kcs)
             ST = a.tolist()
         else:
-            ST = -S(As, Ks, Kcs, Ks - Kcs, i) * (k / sm) + S(As, Ks, Kcs, Ks - Kcs, i)
+            ST = -S(i, As, Ks, Kcs, Ks - Kcs) * (k / sm) + S(i, As, Ks, Kcs, Ks - Kcs)
     return ST
 
 
-def T(As, Ks, Kcs, sm, Kst, At, Kt, i, k=0):
+def T(i, As, Ks, Kcs, sm, Kst, At, Kt, k=0):
     """Generates the amplitude values of the T wave in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -330,6 +346,8 @@ def T(As, Ks, Kcs, sm, Kst, At, Kt, i, k=0):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    i  : int
+        Sampling rate.
     As : int
         S wave amplitude (milivolts).
     Ks : int
@@ -368,19 +386,19 @@ def T(As, Ks, Kcs, sm, Kst, At, Kt, i, k=0):
             a = (
                 -At * np.cos((1.48 * np.pi * k + 15) / Kt)
                 + At
-                + St(As, Ks, Kcs, sm, Kst, Kst, i)
+                + St(i, As, Ks, Kcs, sm, Kst, Kst)
             )
             T = a.tolist()
         else:
             T = (
                 -At * np.cos((1.48 * np.pi * k + 15) / Kt)
                 + At
-                + St(As, Ks, Kcs, sm, Kst, Kst, i)
+                + St(i, As, Ks, Kcs, sm, Kst, Kst)
             )
     return T
 
 
-def I(As, Ks, Kcs, sm, Kst, At, Kt, si, Ki, i):
+def I(i, As, Ks, Kcs, sm, Kst, At, Kt, si, Ki):
     """Generates the amplitude values of the final isoelectric segment (I segment) in the ECG signal.
 
     Follows the approach by Dolinský, Andráš, Michaeli and Grimaldi [Model03].
@@ -388,6 +406,8 @@ def I(As, Ks, Kcs, sm, Kst, At, Kt, si, Ki, i):
     If the parameters introduced don't make sense in this context, an error will raise.
     Parameters
     ----------
+    i  : int
+        Sampling rate.
     As : int
         S wave amplitude (milivolts).
     Ks : int
@@ -421,7 +441,7 @@ def I(As, Ks, Kcs, sm, Kst, At, Kt, si, Ki, i):
         raise Exception("Warning! si is out of boundaries.")
     else:
         k = np.arange(0, Ki, i)
-        a = T(As, Ks, Kcs, sm, Kst, At, Kt, Kt) * (si / (k + 10))
+        a = T(i, As, Ks, Kcs, sm, Kst, At, Kt, Kt) * (si / (k + 10))
         I_segment = a.tolist()
     return I_segment
 
@@ -515,7 +535,7 @@ def ecg(
 
     ECGtotal = np.array([])
     for i in range(beats):
-        ECGwave = ecg(sampling_rate=sampling_rate, var=0.1)
+        ECGwave, _, _ = ecg(sampling_rate=sampling_rate, var=0.1)
         ECGtotal = np.concatenate((ECGtotal, ECGwave))
     t = np.arange(0, len(ECGtotal)) / sampling_rate
 
@@ -587,18 +607,18 @@ def ecg(
     l = int(1 / i)
 
     B_to_S = (
-        B(Kb, l)
-        + P(Ap, Kp, i)
-        + Pq(Kpq, l)
-        + Q1(Aq, Kq1, i)
-        + Q2(Aq, Kq2, i)
-        + R(Ar, Kr, i)
-        + S(As, Ks, Kcs, i)
+        B(l, Kb)
+        + P(i, Ap, Kp)
+        + Pq(l, Kpq)
+        + Q1(i, Aq, Kq1)
+        + Q2(i, Aq, Kq2)
+        + R(i, Ar, Kr)
+        + S(i, As, Ks, Kcs)
     )
     St_to_I = (
-        St(As, Ks, Kcs, sm, Kst, i)
-        + T(As, Ks, Kcs, sm, Kst, At, Kt, i)
-        + I(As, Ks, Kcs, sm, Kst, At, Kt, si, Ki, i)
+        St(i, As, Ks, Kcs, sm, Kst)
+        + T(i, As, Ks, Kcs, sm, Kst, At, Kt)
+        + I(i, As, Ks, Kcs, sm, Kst, At, Kt, si, Ki)
     )
 
     # The signal is filtered in two different sizes
