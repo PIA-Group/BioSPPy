@@ -3,6 +3,13 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.7.0
+-------------
+
+Released on May 7th 2021
+
+- GitHub and PyPI versions synced.
+
 Version 0.6.1
 -------------
 
