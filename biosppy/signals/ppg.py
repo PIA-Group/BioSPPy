@@ -17,6 +17,8 @@ from six.moves import range
 # 3rd party
 import numpy as np
 import scipy.signal as ss
+import matplotlib.pyplot as plt
+from scipy.stats import gaussian_kde
 
 # local
 from . import tools as st
@@ -386,5 +388,181 @@ def find_onsets_kavsaoglu2016(
 
     args = (onsets, window_marks, params)
     names = ("onsets", "window_marks", "params")
+
+    return utils.ReturnTuple(args, names)
+
+
+def ppg_segmentation(filtered,
+                     sampling_rate=1000.,
+                     show=False,
+                     show_mean=False,
+                     selection=False,
+                     peak_threshold=None):
+    """"Segments a filtered PPG signal. Segmentation filtering is achieved by
+    taking into account segments selected by peak height and pulse morphology.
+
+    Parameters
+    ----------
+    filtered : array
+        Filtered PPG signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+    show : bool, optional
+        If True, show a plot with segments. Segments are clipped.
+    show_mean : bool, optional
+        If True, shows the mean pulse on top of segments.
+    selection : bool, optional
+        If True, performs selection with peak height and pulse morphology.
+    peak_threshold : int, float, optional
+        If `selection` is True, selects peaks with height greater than defined
+        threshold.
+
+    Returns
+    -------
+    segments : array
+        Start and end indices for each detected pulse segment.
+    selected_segments : array
+        Start and end indices for each selected pulse segment.
+    mean_pulse_ts : array
+        Mean pulse time axis reference (seconds).
+    mean_pulse : array
+        Mean wave of clipped PPG pulses.
+    onsets : array
+        Indices of PPG pulse onsets. Onsets are found based on minima.
+    peaks : array
+        Indices of PPG pulse peaks. 'Elgendi2013' algorithm is used.
+
+    """
+
+    # check inputs
+    if filtered is None:
+        raise TypeError("Please specify an input signal.")
+
+    # ensure numpy
+    filtered = np.array(filtered)
+
+    sampling_rate = float(sampling_rate)
+
+    # find peaks (last peak is rejected)
+    peaks, _ = find_onsets_elgendi2013(filtered)
+    nb_segments = len(peaks) - 1
+
+    # find minima
+    minima = (np.diff(np.sign(np.diff(filtered))) > 0).nonzero()[0]
+
+    # find onsets
+    onsets = []
+
+    for i in peaks:
+        # find the lower closest number to the peak
+        onsets.append(minima[minima < i].max())
+
+    onsets = np.array(onsets, dtype='int')
+
+    if len(peaks) == 0 or len(onsets) == 0:
+        raise TypeError("No peaks or onsets detected.")
+
+    # define peak threshold with peak density function (for segment selection),
+    # where the maximum value is choosen.
+    if peak_threshold == None and selection:
+        density = gaussian_kde(filtered[peaks])
+        xs = np.linspace(0, max(filtered[peaks]), 1000)
+        density.covariance_factor = lambda : .25
+        density._compute_covariance()
+        peak_threshold = xs[np.argmax(density(xs))]
+
+    # segments array with start and end indexes, and segment selection
+    segments = np.zeros((nb_segments, 2), dtype='int')
+    segments_sel = []
+
+    for i in range(nb_segments):
+
+        # assign start and end of each segment
+        segments[i, 0] = onsets[i]
+        segments[i, 1] = onsets[i + 1]
+
+        # search segments with at least 4 max+min (standard waveform) and
+        # peak height greater than threshold for pulse selection
+        if selection:
+            seg = filtered[segments[i, 0] : segments[i, 1]]
+            if max(seg) > peak_threshold:
+                if len(np.where(np.diff(np.sign(np.diff(seg))))[0]) > 3:
+                    segments_sel.append(i)
+
+            if len(segments_sel) == 0 :
+                print('Warning: Suitable waves not found. [-0.1, 0.4]s cut from peak is made.')
+
+    # find earliest onset-peak duration (ensure minimal shift of 0.1s)
+    shifts = peaks - onsets
+
+    cut1 = 0.1*sampling_rate
+    if len(segments_sel) > 0 and selection:
+        shifts_sel = np.take(shifts, segments_sel)
+        shifts_sel = shifts_sel[shifts_sel > 0.1*sampling_rate]
+        cut1 = min(shifts_sel)
+
+    # find shortest peak-end duration (ensure minimal duration of 0.4s)
+    cut2 = 0.4*sampling_rate
+    ep_d = segments[:, 1] - peaks[0 : len(segments)]
+    if len(segments_sel) > 0 and selection:
+        ep_d_sel = np.take(ep_d, segments_sel)
+        ep_d_sel = ep_d_sel[ep_d_sel > 0.4*sampling_rate]
+        cut2 = min(ep_d_sel)
+
+    # clipping segments
+    c_segments = np.zeros((nb_segments, 2), dtype=int)
+    for i in range(nb_segments):
+        c_segments[i, 0] = peaks[i] - cut1
+        c_segments[i, 1] = peaks[i] + cut2
+
+    cut_length = c_segments[0, 1] - c_segments[0, 0]
+
+
+    # time axis
+    mean_pulse_ts = np.arange(0, cut_length/sampling_rate, 1./sampling_rate)
+
+    # plot
+    if show:
+        # figure layout
+        fig, ax = plt.subplots()
+        fig.suptitle('PPG Segments', fontweight='bold', x=0.51)
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Amplitude (a.u.)')
+
+    # sum of segments to plot mean wave pulse
+    sum_segments = np.zeros(cut_length)
+
+    # transparency factor to plot segments (alpha)
+    b = 1 - np.log(1. - 0.01)
+    alpha = np.exp(-nb_segments + b) + 0.01
+    if alpha > 1:
+        alpha = 1
+
+    # plot segments
+    if selection:
+        for i in segments_sel:
+            wave = filtered[c_segments[i, 0] : c_segments[i, 1]]
+            if show:
+                ax.plot(mean_pulse_ts, wave, color='tab:blue', alpha=alpha)
+            sum_segments = sum_segments + wave
+            ax.set_title(f'[selection only, {len(segments_sel)} segment(s)]')
+
+    else:
+        for i in range(nb_segments):
+            wave = filtered[c_segments[i, 0] : c_segments[i, 1]]
+            if show:
+                ax.plot(mean_pulse_ts, wave, color='tab:blue', alpha=alpha)
+                ax.set_title(f'[{nb_segments} segment(s)]')
+            sum_segments = sum_segments + wave
+
+    # plot mean pulse
+    mean_pulse = sum_segments/len(segments_sel)
+    if show and show_mean:
+        ax.plot(mean_pulse_ts, mean_pulse, color='tab:orange', label='Mean wave')
+        ax.legend()
+
+    # output
+    args = (segments, segments[segments_sel], mean_pulse_ts, mean_pulse, onsets, peaks)
+    names = ('segments', 'selected_segments', 'mean_pulse_ts', 'mean_pulse', 'onsets', 'peaks')
 
     return utils.ReturnTuple(args, names)
