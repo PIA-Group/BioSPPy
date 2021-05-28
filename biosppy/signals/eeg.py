@@ -23,7 +23,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
+def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
     """Process raw EEG signals and extract relevant signal features using
     default parameters.
 
@@ -35,6 +35,8 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
         Sampling frequency (Hz).
     labels : list, optional
         Channel labels.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
 
@@ -140,7 +142,7 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
                           gamma=gamma,
                           plf_pairs=plf_pairs,
                           plf=plf,
-                          path=None,
+                          path=path,
                           show=True)
 
     # output
