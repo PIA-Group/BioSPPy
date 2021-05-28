@@ -29,7 +29,7 @@ from .. import plotting, utils
 from scipy.signal import argrelextrema
 
 
-def ecg(signal=None, sampling_rate=1000., show=True):
+def ecg(signal=None, sampling_rate=1000., path=None, show=True):
     """Process a raw ECG signal and extract relevant signal features using
     default parameters.
 
@@ -39,6 +39,8 @@ def ecg(signal=None, sampling_rate=1000., show=True):
         Raw ECG signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
 
@@ -118,7 +120,7 @@ def ecg(signal=None, sampling_rate=1000., show=True):
                           templates=templates,
                           heart_rate_ts=ts_hr,
                           heart_rate=hr,
-                          path=None,
+                          path=path,
                           show=True)
 
     # output

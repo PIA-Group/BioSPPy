@@ -21,7 +21,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def resp(signal=None, sampling_rate=1000., show=True):
+def resp(signal=None, sampling_rate=1000., path=None, show=True):
     """Process a raw Respiration signal and extract relevant signal features
     using default parameters.
 
@@ -31,6 +31,8 @@ def resp(signal=None, sampling_rate=1000., show=True):
         Raw Respiration signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
 
@@ -104,7 +106,7 @@ def resp(signal=None, sampling_rate=1000., show=True):
                            zeros=zeros,
                            resp_rate_ts=ts_rate,
                            resp_rate=rate,
-                           path=None,
+                           path=path,
                            show=True)
 
     # output

@@ -21,7 +21,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def emg(signal=None, sampling_rate=1000., show=True):
+def emg(signal=None, sampling_rate=1000., path=None, show=True):
     """Process a raw EMG signal and extract relevant signal features using
     default parameters.
 
@@ -31,6 +31,8 @@ def emg(signal=None, sampling_rate=1000., show=True):
         Raw EMG signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
 
@@ -78,7 +80,7 @@ def emg(signal=None, sampling_rate=1000., show=True):
                           filtered=filtered,
                           processed=None,
                           onsets=onsets,
-                          path=None,
+                          path=path,
                           show=True)
 
     # output
