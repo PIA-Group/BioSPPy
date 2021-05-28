@@ -23,7 +23,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
+def eda(signal=None, sampling_rate=1000.0, show=True, min_amplitude=0.1):
     """Process a raw EDA signal and extract relevant signal features using
     default parameters.
 
@@ -63,24 +63,23 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
     sampling_rate = float(sampling_rate)
 
     # filter signal
-    aux, _, _ = st.filter_signal(signal=signal,
-                                 ftype='butter',
-                                 band='lowpass',
-                                 order=4,
-                                 frequency=5,
-                                 sampling_rate=sampling_rate)
+    aux, _, _ = st.filter_signal(
+        signal=signal,
+        ftype="butter",
+        band="lowpass",
+        order=4,
+        frequency=5,
+        sampling_rate=sampling_rate,
+    )
 
     # smooth
     sm_size = int(0.75 * sampling_rate)
-    filtered, _ = st.smoother(signal=aux,
-                              kernel='boxzen',
-                              size=sm_size,
-                              mirror=True)
+    filtered, _ = st.smoother(signal=aux, kernel="boxzen", size=sm_size, mirror=True)
 
     # get SCR info
-    onsets, peaks, amps = kbk_scr(signal=filtered,
-                                  sampling_rate=sampling_rate,
-                                  min_amplitude=min_amplitude)
+    onsets, peaks, amps = kbk_scr(
+        signal=filtered, sampling_rate=sampling_rate, min_amplitude=min_amplitude
+    )
 
     # get time vectors
     length = len(signal)
@@ -89,23 +88,25 @@ def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
 
     # plot
     if show:
-        plotting.plot_eda(ts=ts,
-                          raw=signal,
-                          filtered=filtered,
-                          onsets=onsets,
-                          peaks=peaks,
-                          amplitudes=amps,
-                          path=None,
-                          show=True)
+        plotting.plot_eda(
+            ts=ts,
+            raw=signal,
+            filtered=filtered,
+            onsets=onsets,
+            peaks=peaks,
+            amplitudes=amps,
+            path=None,
+            show=True,
+        )
 
     # output
     args = (ts, filtered, onsets, peaks, amps)
-    names = ('ts', 'filtered', 'onsets', 'peaks', 'amplitudes')
+    names = ("ts", "filtered", "onsets", "peaks", "amplitudes")
 
     return utils.ReturnTuple(args, names)
 
 
-def basic_scr(signal=None, sampling_rate=1000.):
+def basic_scr(signal=None, sampling_rate=1000.0):
     """Basic method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
 
@@ -139,8 +140,8 @@ def basic_scr(signal=None, sampling_rate=1000.):
         raise TypeError("Please specify an input signal.")
 
     # find extrema
-    pi, _ = st.find_extrema(signal=signal, mode='max')
-    ni, _ = st.find_extrema(signal=signal, mode='min')
+    pi, _ = st.find_extrema(signal=signal, mode="max")
+    ni, _ = st.find_extrema(signal=signal, mode="min")
 
     # sanity check
     if len(pi) == 0 or len(ni) == 0:
@@ -159,21 +160,21 @@ def basic_scr(signal=None, sampling_rate=1000.):
     i3 = ni[:li]
 
     # indices
-    i0 = i1 - (i3 - i1) / 2.
+    i0 = i1 - (i3 - i1) / 2.0
     if i0[0] < 0:
         i0[0] = 0
 
     # amplitude
-    a = np.array([np.max(signal[i1[i]:i3[i]]) for i in range(li)])
+    a = np.array([np.max(signal[i1[i] : i3[i]]) for i in range(li)])
 
     # output
     args = (i3, i1, a)
-    names = ('onsets', 'peaks', 'amplitudes')
+    names = ("onsets", "peaks", "amplitudes")
 
     return utils.ReturnTuple(args, names)
 
 
-def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
+def kbk_scr(signal=None, sampling_rate=1000.0, min_amplitude=0.1):
     """KBK method to extract Skin Conductivity Responses (SCR) from an
     EDA signal.
 
@@ -187,7 +188,7 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
         Sampling frequency (Hz).
     min_amplitude : float, optional
         Minimum treshold by which to exclude SCRs.
-    
+
     Returns
     -------
     onsets : array
@@ -213,37 +214,37 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
     df = np.diff(signal)
 
     # smooth
-    size = int(1. * sampling_rate)
-    df, _ = st.smoother(signal=df, kernel='bartlett', size=size, mirror=True)
+    size = int(1.0 * sampling_rate)
+    df, _ = st.smoother(signal=df, kernel="bartlett", size=size, mirror=True)
 
     # zero crosses
-    zeros, = st.zero_cross(signal=df, detrend=False)
-    if np.all(df[:zeros[0]] > 0):
+    (zeros,) = st.zero_cross(signal=df, detrend=False)
+    if np.all(df[: zeros[0]] > 0):
         zeros = zeros[1:]
-    if np.all(df[zeros[-1]:] > 0):
+    if np.all(df[zeros[-1] :] > 0):
         zeros = zeros[:-1]
-
-    # exclude SCRs with small amplitude
-    thr = min_amplitude * np.max(df)
 
     scrs, amps, ZC, pks = [], [], [], []
     for i in range(0, len(zeros) - 1, 2):
-        scrs += [df[zeros[i]:zeros[i + 1]]]
-        aux = scrs[-1].max()
-        if aux > thr:
-            amps += [aux]
-            ZC += [zeros[i]]
-            ZC += [zeros[i + 1]]
-            pks += [zeros[i] + np.argmax(df[zeros[i]:zeros[i + 1]])]
+        scrs += [df[zeros[i] : zeros[i + 1]]]
+        ZC += [zeros[i]]
+        ZC += [zeros[i + 1]]
+        pks += [zeros[i] + np.argmax(df[zeros[i] : zeros[i + 1]])]
+        amps += [signal[pks[-1]] - signal[ZC[-2]]]
 
-    scrs = np.array(scrs)
-    amps = np.array(amps)
-    ZC = np.array(ZC)
-    pks = np.array(pks)
-    onsets = ZC[::2]
+    # exclude SCRs with small amplitude
+    thr = min_amplitude * np.max(amps)
+    idx = np.where(amps > thr)
+
+    scrs = np.array(scrs, dtype=np.object)[idx]
+    amps = np.array(amps)[idx]
+    ZC = np.array(ZC)[np.array(idx) * 2]
+    pks = np.array(pks, dtype=int)[idx]
+
+    onsets = ZC[0].astype(int)
 
     # output
     args = (onsets, pks, amps)
-    names = ('onsets', 'peaks', 'amplitudes')
+    names = ("onsets", "peaks", "amplitudes")
 
     return utils.ReturnTuple(args, names)
