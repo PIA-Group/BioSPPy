@@ -148,9 +148,9 @@ def basic_scr(signal=None, sampling_rate=1000.0):
         raise ValueError("Could not find SCR pulses.")
 
     # pair vectors
-    if ni[0] < pi[0]:
+    if ni[0] > pi[0]:
         ni = ni[1:]
-    if pi[-1] > ni[-1]:
+    if pi[-1] < ni[-1]:
         pi = pi[:-1]
     if len(pi) > len(ni):
         pi = pi[:-1]
@@ -160,15 +160,15 @@ def basic_scr(signal=None, sampling_rate=1000.0):
     i3 = ni[:li]
 
     # indices
-    i0 = i1 - (i3 - i1) / 2.0
+    i0 = np.array((i1 + i3) / 2.0, dtype=int)
     if i0[0] < 0:
         i0[0] = 0
 
     # amplitude
-    a = np.array([np.max(signal[i1[i] : i3[i]]) for i in range(li)])
+    a = signal[i0] - signal[i3]
 
     # output
-    args = (i3, i1, a)
+    args = (i3, i0, a)
     names = ("onsets", "peaks", "amplitudes")
 
     return utils.ReturnTuple(args, names)
