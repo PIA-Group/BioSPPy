@@ -21,9 +21,10 @@ import numpy as np
 # local
 from . import tools as st
 from .. import plotting, utils
+import matplotlib.pyplot as plt
 
 
-def get_filt_eda(signal, sampling_rate=1000.):
+def get_filt_eda(signal, sampling_rate=1000., sm_size=0.75):
     """ Filter for the EDA data.
 
     Parameters
@@ -40,23 +41,31 @@ def get_filt_eda(signal, sampling_rate=1000.):
     sampling_rate = float(sampling_rate)
 
     # filter signal
-    aux, _, _ = st.filter_signal(signal=signal,
-                                 ftype='butter',
-                                 band='lowpass',
-                                 order=4,
-                                 frequency=1,
-                                 sampling_rate=sampling_rate)
+    try:
+        if sampling_rate > 1:
+            signal, _, _ = st.filter_signal(signal=signal,
+                                     ftype='butter',
+                                     band='lowpass',
+                                     order=4,
+                                     frequency=1,
+                                     sampling_rate=sampling_rate)
+    except:
+        print("Error filtering EDA")
 
     # smooth
-    sm_size = int(0.75 * sampling_rate)
-    filtered, _ = st.smoother(signal=aux,
-                              kernel='boxzen',
-                              size=sm_size,
-                              mirror=True)
-    return filtered
+    try:
+        sm_size = int(sm_size * sampling_rate)
+        signal, _ = st.smoother(signal=signal,
+                                  kernel='boxzen',
+                                  size=sm_size,
+                                  mirror=True)
+    except:
+        print("Error smoothing EDA")
+        
+    return signal
 
 
-def get_scr(signal, sampling_rate):
+def get_scr(signal, sampling_rate, size=1.):
     """ Returns Electrodermal Response.
 
     Parameters
@@ -75,11 +84,13 @@ def get_scr(signal, sampling_rate):
         raise TypeError("Please specify an input signal.")
 
     # differentiation
-    df = np.diff(signal)
-    # smooth
-    size = int(1. * sampling_rate)
-    edr, _ = st.smoother(signal=df, kernel='bartlett', size=size, mirror=True)
-    return edr
+    try:
+        signal = np.diff(signal)
+        # smooth
+        size = int(size * sampling_rate)
+        signal, _ = st.smoother(signal=signal, kernel='bartlett', size=size, mirror=True)
+    except Exception as e: print(e)
+    return signal
 
 
 def eda(signal=None, sampling_rate=1000., show=True, min_amplitude=0.1):
@@ -284,7 +295,7 @@ def kbk_scr(signal=None, sampling_rate=1000., min_amplitude=0.1):
     return utils.ReturnTuple(args, names)
 
 
-def get_eda_param(signal, min_amplitude=0.08):
+def get_eda_param(signal, min_amplitude=0.08, filt=False, size=1., sampling_rate= 1000.):
     """ Returns characteristic EDA events.
 
     Parameters
@@ -304,19 +315,34 @@ def get_eda_param(signal, min_amplitude=0.08):
     end : array
         Indices of the SCR end.
     """
+    
+    signal = np.array(signal).astype(np.float)
+    # smooth
+    if filt:
+        size = int(size * sampling_rate)
+        signal, _ = st.smoother(signal=signal, kernel='bartlett', size=size, mirror=True)
+    
 
-    zeros = st.find_extrema(signal=signal, mode='min')[0]
-    scrs, amps, onsets, pks, end, wind = [], [], [], [], [], []
-    for i in range(0, len(zeros) - 1, 1):
-        s = signal[zeros[i]:zeros[i + 1]]
-        ext = st.find_extrema(signal=s, mode='max')[0]
-        for _ in ext:
-            if s[_] - s[0] > min_amplitude:
-                b = zeros[i] + _
-                pks += [b]
-                onsets += [zeros[i]]
-                end += [zeros[i + 1]]
-
+    amps, onsets, pks, end = [], [], [], []
+    zeros = st.find_extrema(signal=signal, mode='min')[0] # get zeros
+    for z in range(len(zeros)):
+        if z == len(zeros) -1:  # last zero
+            s = signal[zeros[z]:]  # signal amplitude between event
+        else:
+            s = signal[zeros[z]:zeros[z + 1]]  # signal amplitude between event
+            
+        pk = st.find_extrema(signal=s, mode='max')[0]  # get pk between events
+        #print("_pks", pks)
+        for p in pk:
+            if (s[p] - s[0]) > (min_amplitude*np.max(signal)):  # only count events with high amplitude
+                pks += [zeros[z] + p]
+                onsets += [zeros[z]]
+                amps += [s[p] - s[0]]
+                if z == len(zeros) -1:  # last zero
+                    end += [len(signal)]                    
+                else:
+                    end += [zeros[z + 1]]
+                
     return onsets, pks, amps, end
 
 

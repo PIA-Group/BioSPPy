@@ -46,7 +46,7 @@ def get_feat(signal, sig_lab, sampling_rate=1000., windows_len=5, segment=True, 
         signal = [signal[i:i + window_size] for i in range(0, len(signal), window_size)]
         if len(signal) > 1:
             signal = signal[:-1]
-    print("<START Feature Extraction>")
+    print("START Feature Extraction>")
     t0 = time.time()
     for wind_idx, wind_sig in enumerate(signal):
         # Statistical Features

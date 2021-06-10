@@ -154,15 +154,15 @@ def signal_stats(signal=None, hist=True):
             rms = None
         args += [rms]
         names += ['rms']
-
     if hist:
         if dict['statistic_hist']['use'] == 'yes':
             # histogram
             try:
-                _hist = list(np.histogram(signal, bins=int(np.sqrt(len(signal))), density=True)[0])
+                _hist = list(np.histogram(signal, bins=int(np.sqrt(len(signal))//2))[0])
+                _hist = _hist/np.sum(_hist)
             except:
                 if len(signal) > 1:
-                    _hist = [None] * int(np.sqrt(len(signal)))
+                    _hist = [None] * int(np.sqrt(len(signal))//2)
                 else:
                     _hist = [None]
             args += [i for i in _hist]

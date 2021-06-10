@@ -273,11 +273,10 @@ def consensus(data=None, k=0, linkage='average', fcn=None, grid=None):
 
     # generate coassoc
     coassoc, = create_coassoc(ensemble=ensemble, N=len(data))
-
     # extract partition
-    clusters, = coassoc_partition(coassoc=coassoc, k=k, linkage=linkage)
+    clusters, labels = coassoc_partition(coassoc=coassoc, k=k, linkage=linkage)
 
-    return utils.ReturnTuple((clusters,), ('clusters',))
+    return utils.ReturnTuple((clusters, labels), ('clusters', 'labels'))
 
 
 def consensus_kmeans(data=None,
@@ -331,13 +330,13 @@ def consensus_kmeans(data=None,
     }
 
     # run consensus
-    clusters, = consensus(data=data,
+    clusters, labels = consensus(data=data,
                           k=k,
                           linkage=linkage,
                           fcn=kmeans,
                           grid=grid)
 
-    return utils.ReturnTuple((clusters,), ('clusters',))
+    return utils.ReturnTuple((clusters, labels), ('clusters', 'labels'))
 
 
 def create_ensemble(data=None, fcn=None, grid=None):
@@ -488,11 +487,11 @@ def coassoc_partition(coassoc=None, k=0, linkage='average'):
         labels = _life_time(Z, N)
     else:
         labels = sch.fcluster(Z, k, 'maxclust')
-
+    
     # get cluster indices
     clusters = _extract_clusters(labels)
 
-    return utils.ReturnTuple((clusters,), ('clusters',))
+    return utils.ReturnTuple((clusters, labels), ('clusters', 'labels'))
 
 
 def mdist_templates(data=None,

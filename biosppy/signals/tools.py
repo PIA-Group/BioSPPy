@@ -967,36 +967,65 @@ def signal_stats(signal=None):
 
     # ensure numpy
     signal = np.array(signal)
-
     # mean
-    mean = np.mean(signal)
+    try:
+        mean = np.mean(signal)
+    except:
+        mean = 0
 
     # median
-    median = np.median(signal)
+    try:
+        median = np.median(signal)
+    except:
+        median = 0
 
     # min
-    minVal = np.min(signal)
+    try:
+        minVal = np.min(signal)
+    except:
+        minVal = 0
 
     # max
-    maxVal = np.max(signal)
+    try:
+        maxVal = np.max(signal)
+    except:
+        maxVal = 0
 
     # maximum amplitude
-    maxAmp = np.abs(signal - mean).max()
+    try:
+        maxAmp = np.abs(signal - mean).max()
+    except:
+        maxAmp = 0
 
     # variance
-    sigma2 = signal.var(ddof=1)
+    try:
+        sigma2 = signal.var(ddof=1)
+    except:
+        sigma2 = 0
 
     # standard deviation
-    sigma = signal.std(ddof=1)
+    try:
+        sigma = signal.std(ddof=1)
+    except:
+        sigma = 0
 
     # absolute deviation
-    ad = np.mean(np.abs(signal - median))
+    try:
+        ad = np.mean(np.abs(signal - median))
+    except:
+        ad = 0
 
     # kurtosis
-    kurt = stats.kurtosis(signal, bias=False)
+    try:
+        kurt = stats.kurtosis(signal, bias=False)
+    except:
+        kurt = 0
 
     # skweness
-    skew = stats.skew(signal, bias=False)
+    try:
+        skew = stats.skew(signal, bias=False)
+    except:
+        skew = 0
 
     # output
     args = (mean, median, minVal, maxVal, maxAmp, sigma2, sigma, ad, kurt, skew)

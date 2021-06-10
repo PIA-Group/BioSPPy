@@ -88,6 +88,7 @@ def signal_temp(signal, FS):
 
     # ensure numpy
     signal = np.array(signal)
+    
     dict = json.load(open('temporal_features_log.json'))
     args, names = [], []
     # assert len(signal) > 1, 'Signal size < 1'
@@ -100,7 +101,6 @@ def signal_temp(signal, FS):
         mean = np.mean(signal)
     except:
         mean = None
-
     if dict['maxAmp']['use'] == 'yes':
         # maximum amplitude
         try:
@@ -121,18 +121,18 @@ def signal_temp(signal, FS):
 
     if dict['max']['use'] == 'yes':
         try:
-            max = np.max(signal)
+            _max = np.max(signal)
         except:
-            max = None
-        args += [max]
+            _max = None
+        args += [_max]
         names += ['max']
 
     if dict['min']['use'] == 'yes':
         try:
-            min = np.min(signal)
+            _min = np.min(signal)
         except:
-            min = None
-        args += [min]
+            _min = None
+        args += [_min]
         names += ['min']
 
     if dict['dist']['use'] == 'yes':

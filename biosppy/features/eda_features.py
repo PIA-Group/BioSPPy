@@ -5,7 +5,7 @@ from .. import eda
 import json
 
 
-def eda_features(signal=None, sampling_rate=1000.):
+def eda_features(signal=None, TH=0.08, sampling_rate=1000.):
     """Compute EDA characteristic metrics describing the signal.
 
     Parameters
@@ -56,7 +56,7 @@ def eda_features(signal=None, sampling_rate=1000.):
         scr = []
 
     # onsets, pks, amps
-    onsets, pks, amps, _ = eda.get_eda_param(scr, sampling_rate)
+    onsets, pks, amps, _ = eda.get_eda_param(signal, min_amplitude=TH, sampling_rate=sampling_rate)
     if dict['onsets']['use'] == 'yes':
         args += [onsets]
         names += ['onsets']
@@ -79,14 +79,14 @@ def eda_features(signal=None, sampling_rate=1000.):
     if dict['rise_ts']['use'] == 'yes':
         # rise_ts
         try:
-            rise_ts = list(np.array(pks - onsets))
+            rise_ts = np.array(pks) - np.array(onsets)
         except:
             rise_ts = None
         args += [rise_ts]
         names += ['rise_ts']
 
     # half, six, half_rise, half_rec, six_rec
-    _, _, half_rise, half_rec, six_rise, six_rec = eda.edr_times(scr, onsets, pks)
+    _, _, half_rise, half_rec, six_rise, six_rec = eda.edr_times(signal, onsets, pks)
     if dict['half_rise']['use'] == 'yes':
         args += [half_rise]
         names += ['half_rise']

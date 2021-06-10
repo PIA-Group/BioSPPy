@@ -118,10 +118,11 @@ def signal_spectral(signal, FS):
     # f, spectrum = st.welch_spectrum(signal, sampling_rate=FS)
     # f, spectrum = st.power_spectrum(signal, sampling_rate=FS)
     f, spectrum = st.welch_spectrum(signal, size=len(signal)//2, sampling_rate=FS)
-
+    f = np.nan_to_num(f)
+    spectrum = np.nan_to_num(spectrum)
     cum_ff = np.cumsum(spectrum)
     spect_diff = np.diff(spectrum)
-    energy, _ = st.signal_energy(spectrum, f)[:]
+    energy = np.nan_to_num(st.signal_energy(spectrum, f)[:][0])
 
     dict = json.load(open('spectral_features_log.json'))
     args, names = [], []
@@ -129,7 +130,7 @@ def signal_spectral(signal, FS):
     if dict['spectral_maxpeaks']['use'] == 'yes':
         # spectral_maxpeaks
         try:
-            spectral_maxpeaks = np.sum([1 for nd in range(len(spect_diff[:-1])) if (spect_diff[nd+1]<0 and spect_diff[nd]>0)])
+            spectral_maxpeaks = np.nan_to_num(np.sum([1 for nd in range(len(spect_diff[:-1])) if (spect_diff[nd+1]<0 and spect_diff[nd]>0)]))
         except:
             spectral_maxpeaks = None
         args += [spectral_maxpeaks]
@@ -142,7 +143,7 @@ def signal_spectral(signal, FS):
             spect_var /= np.max(np.abs(spect_var))
         except:
             spect_var = None
-        args += [spect_var]
+        args += [np.nan_to_num(spect_var)]
         names += ['spect_var']
 
     if dict['curve_distance']['use'] == 'yes':
@@ -151,13 +152,13 @@ def signal_spectral(signal, FS):
             curve_distance = np.sum(np.linspace(0, cum_ff[-1], len(cum_ff)) - cum_ff)
         except:
             curve_distance = None
-        args += [curve_distance]
+        args += [np.nan_to_num(curve_distance)]
         names += ['curve_distance']
 
     if dict['spectral_roll_off']['use'] == 'yes':
         # spectral_roll_off
         try:
-            spectral_roll_off = spectral_roll(f, spectrum, cum_ff, 0.95)[0]
+            spectral_roll_off = np.nan_to_num(spectral_roll(f, spectrum, cum_ff, 0.95)[0])
         except:
             spectral_roll_off = None
         args += [spectral_roll_off]
@@ -166,7 +167,7 @@ def signal_spectral(signal, FS):
     if dict['spectral_roll_on']['use'] == 'yes':
         # spectral_roll_on
         try:
-            spectral_roll_on = spectral_roll(f, spectrum, cum_ff, 0.05)[0]
+            spectral_roll_on = np.nan_to_num(spectral_roll(f, spectrum, cum_ff, 0.05)[0])
         except:
             spectral_roll_on = None
         args += [spectral_roll_on]
@@ -175,7 +176,7 @@ def signal_spectral(signal, FS):
     if dict['spectral_dec']['use'] == 'yes':
         # spectral_decrease
         try:
-            spectral_dec = (1/np.sum(spectrum)) * np.sum((spectrum[:] - spectrum[1])/np.linspace(1, len(spectrum), len(spectrum),1))
+            spectral_dec = np.nan_to_num((1/np.sum(spectrum)) * np.sum((spectrum[:] - spectrum[1])/np.linspace(1, len(spectrum), len(spectrum), 1)))
         except:
             spectral_dec = None
         args += [spectral_dec]
@@ -186,23 +187,23 @@ def signal_spectral(signal, FS):
         sum_f = np.sum(f)
         len_f = len(f)
         try:
-            spectral_slope = (len_f * np.dot(f, spectrum) - sum_f * np.sum(spectrum)) / (len_f * np.dot(f, f) - sum_f ** 2)
+            spectral_slope = np.nan_to_num((len_f * np.dot(f, spectrum) - sum_f * np.sum(spectrum)) / (len_f * np.dot(f, f) - sum_f ** 2))
         except:
             spectral_slope = None
         args += [spectral_slope]
         names += ['spectral_slope']
 
     sum_spectrum = np.sum(spectrum)
-    norm_spectrum = spectrum / sum_spectrum
+    norm_spectrum = np.nan_to_num(spectrum / sum_spectrum)
     # spectral_centroid
     try:
-        spectral_centroid = np.dot(f, norm_spectrum)
+        spectral_centroid = np.nan_to_num(np.dot(f, norm_spectrum))
     except:
         spectral_centroid = None
 
     # spectral_spread
     try:
-        spectral_spread = np.dot(((f - spectral_centroid) ** 2), norm_spectrum)
+        spectral_spread = np.nan_to_num(np.dot(((f - spectral_centroid) ** 2), norm_spectrum))
     except:
         spectral_spread = None
 
@@ -213,7 +214,7 @@ def signal_spectral(signal, FS):
     if dict['spectral_kurtosis']['use'] == 'yes':
         # spectral_kurtosis
         try:
-            spectral_kurtosis = np.sum(((f - spectral_centroid) ** 4) * norm_spectrum) / (spectral_spread**2)
+            spectral_kurtosis = np.nan_to_num(np.sum(((f - spectral_centroid) ** 4) * norm_spectrum) / (spectral_spread**2))
         except:
             spectral_kurtosis = None
         args += [spectral_kurtosis]
@@ -222,7 +223,7 @@ def signal_spectral(signal, FS):
     if dict['spectral_skewness']['use'] == 'yes':
         # spectral_skewness
         try:
-            spectral_skewness = np.sum(((f - spectral_centroid) ** 3) * norm_spectrum) / (spectral_spread ** (3 / 2))
+            spectral_skewness = np.nan_to_num(np.sum(((f - spectral_centroid) ** 3) * norm_spectrum) / (spectral_spread ** (3 / 2)))
         except:
             spectral_skewness = None
         args += [spectral_skewness]
@@ -291,5 +292,5 @@ def signal_spectral(signal, FS):
     #             _hist = [None]
     #     args += [i for i in _hist]
     #     names += ['spectral_hist_' + str(i) for i in range(len(_hist))]
-
+    args = np.nan_to_num(args)
     return utils.ReturnTuple(tuple(args), tuple(names))
