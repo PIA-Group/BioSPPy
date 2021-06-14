@@ -40,7 +40,8 @@ REQUIRED = [
     'scipy',
     'shortuuid',
     'six',
-    'joblib'
+    'joblib',
+    'opencv-python'
 ]
 
 # What packages are optional?

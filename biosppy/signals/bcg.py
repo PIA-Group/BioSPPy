@@ -24,8 +24,6 @@ import scipy.spatial.distance as ssd
 import scipy.fftpack as sf
 import scipy.optimize as so
 from cv2 import matchTemplate,TM_CCORR_NORMED,TM_CCORR
-from plotly.offline import plot
-from plotly.graph_objs import Scatter
 import matplotlib.pyplot as plt
 from operator import itemgetter
 from itertools import groupby
