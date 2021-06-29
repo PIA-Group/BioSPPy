@@ -3,6 +3,27 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.7.3
+-------------
+
+Released on June 29th 2021
+
+- Removed BCG from master until some issues are fixed.
+
+Version 0.7.2
+-------------
+
+Released on May 14th 2021
+
+- Fixed BCG dependencies.
+
+Version 0.7.1
+-------------
+
+Released on May 14th 2021
+
+- Included BCG module.
+
 Version 0.7.0
 -------------
 
