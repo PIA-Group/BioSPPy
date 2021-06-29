@@ -73,7 +73,7 @@ def bvp(signal=None, sampling_rate=1000., path=None, show=True):
                                       sampling_rate=sampling_rate)
 
     # find onsets
-    onsets, = ppg.find_onsets_elgendi2013(signal=filtered, sampling_rate=sampling_rate)
+    onsets,_ = ppg.find_onsets_elgendi2013(signal=filtered, sampling_rate=sampling_rate)
 
     # compute heart rate
     hr_idx, hr = st.get_heart_rate(beats=onsets,
