@@ -23,6 +23,7 @@ import scipy.cluster.hierarchy as sch
 import scipy.spatial.distance as ssd
 import scipy.fftpack as sf
 import scipy.optimize as so
+# TODO replace cv2 library for something different and lighter
 from cv2 import matchTemplate,TM_CCORR_NORMED,TM_CCORR
 import matplotlib.pyplot as plt
 from operator import itemgetter
@@ -303,7 +304,7 @@ def template_matching(signal=None,filtered=None,peaks=None,sampling_rate=1000.,
     #template_matching
     corr = matchTemplate(filtered.astype('float32'),template.astype('float32'),TM_CCORR_NORMED)
     corr = corr.flatten()
-    cntr,properties = ss.find_peaks(corr,height=threshold)
+    cntr,_ = ss.find_peaks(corr,height=threshold)
     cntr += int(len(template)/2)
     peaks, = correct_peaks(signal=filtered,
                              peaks=cntr,
@@ -502,6 +503,7 @@ def adaptive_heartbeat_modelling(signal=None,sampling_rate=1000.,initial_length=
                     else:
                         continue
 
+                # TODO tb_cand is possibly unbound
                 if ta_cand != tb_cand:
                     ta_candidates = candidates_pos[np.logical_and(candidates_pos>ta_cand,candidates_pos<ta_cand+int(2*sampling_rate))]
                     ta_cand = ta_candidates[np.argmax(corr[ta_candidates-corr_delay])]
@@ -657,6 +659,7 @@ def modified_heart_valve_signal(signal = None, sampling_rate=1000.):
 
     return utils.ReturnTuple((hvs,center_frequency),('hvs','center_frequency'))
 
+# TODO sampling_rate is not accessed
 def long_template_extraction(signal = None, beats = None, mu_center=None, sampling_rate=1000.):
     """Long template extraction.
 
@@ -734,6 +737,8 @@ def long_template_extraction(signal = None, beats = None, mu_center=None, sampli
         if (tn>Tmax)&(tn+3*Tmax<len(signal)):
             x_tilde.append(signal[tn-Tmax:tn+3*Tmax])
     x_tilde = np.array(x_tilde)
+
+    # TODO hcon is not accessed
     hcon = np.mean(x_tilde,axis=0)
 
     h = np.zeros(K)
