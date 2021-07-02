@@ -1,6 +1,6 @@
 # Simple Text Format
 # Sampling Rate (Hz):= 100.00
-# Resolution:= -5
+# Resolution:= 0
 # Units:= m/s^2
 # Labels:= acc_x	acc_y	acc_z
 0.28467	-0.88965	0.22266
