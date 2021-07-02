@@ -215,7 +215,7 @@ def plot_acc(ts=None,
              sm=None,
              path=None,
              show=False):
-    """Create a summary plot from the output of signals.ecg.ecg.
+    """Create a summary plot from the output of signals.acc.acc.
 
     Parameters
     ----------
