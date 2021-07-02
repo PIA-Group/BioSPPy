@@ -65,7 +65,8 @@ def acc(signal=None, sampling_rate=100., path=None, show=True):
     sampling_rate = float(sampling_rate)
 
     # extract features
-    vm_features, sm_features = extract_acc_features(signal=signal)
+    vm_features, sm_features = extract_acc_features(signal=signal,
+                                                    sampling_rate=sampling_rate)
 
     # get time vectors
     length = len(signal)
@@ -88,39 +89,15 @@ def acc(signal=None, sampling_rate=100., path=None, show=True):
     return utils.ReturnTuple(args, names)
 
 
-def _extract_acc_features(signal=None):
+def extract_acc_features(signal=None, sampling_rate=100.0):
     """Extracts the vector magnitude and signal magnitude features from an input ACC signal, given the signal itself.
 
     Parameters
     ----------
     signal : array
         Input ACC signal.
-
-    Returns
-    -------
-    vm_features : array
-        Extracted Vector Magnitude (VM) feature.
-    sm_features : array
-        Extracted Signal Magnitude (SM) feature.
-
-    """
-    vm_features = np.zeros(signal.shape[0])
-    sm_features = np.zeros(signal.shape[0])
-
-    for i in range(signal.shape[0]):
-        vm_features[i] = np.linalg.norm(np.array([signal[i][0], signal[i][1], signal[i][2]]))
-        sm_features[i] = (abs(signal[i][0]) + abs(signal[i][1]) + abs(signal[i][2])) / 3
-
-    return vm_features, sm_features
-
-
-def extract_acc_features(signal=None):
-    """Extracts the vector magnitude and signal magnitude features from an input ACC signal, given the signal itself.
-
-    Parameters
-    ----------
-    signal : array
-        Input ACC signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
 
     Returns
     -------
@@ -135,7 +112,13 @@ def extract_acc_features(signal=None):
     if signal is None:
         raise TypeError("Please specify an input signal.")
 
-    # get heartbeats
-    vm_features, sm_features = _extract_acc_features(signal=signal)
+    # get acceleration features
+    vm_features = np.zeros(signal.shape[0])
+    sm_features = np.zeros(signal.shape[0])
+
+    for i in range(signal.shape[0]):
+        vm_features[i] = np.linalg.norm(np.array([signal[i][0], signal[i][1], signal[i][2]]))
+        sm_features[i] = (abs(signal[i][0]) + abs(signal[i][1]) + abs(signal[i][2])) / 3
 
     return utils.ReturnTuple((vm_features, sm_features), ('vm', 'sm'))
+
