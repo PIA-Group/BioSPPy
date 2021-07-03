@@ -209,6 +209,106 @@ def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
         plt.close(fig)
 
 
+def plot_acc(ts=None,
+             raw=None,
+             vm=None,
+             sm=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.acc.acc.
+
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw ACC signal.
+    vm : array
+        Vector Magnitude feature of the signal.
+    sm : array
+        Signal Magnitude feature of the signal
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+
+    """
+
+    raw_t = np.transpose(raw)
+    acc_x, acc_y, acc_z = raw_t[0], raw_t[1], raw_t[2]
+
+    fig = plt.figure()
+    fig.suptitle('ACC Summary')
+    gs = gridspec.GridSpec(6, 2)
+
+    # raw signal (acc_x)
+    ax1 = fig.add_subplot(gs[:2, 0])
+
+    ax1.plot(ts, acc_x, linewidth=MINOR_LW, label='Raw acc along X', color='C0')
+
+    ax1.set_ylabel('Amplitude ($m/s^2$)')
+    ax1.legend()
+    ax1.grid()
+
+    # raw signal (acc_y)
+    ax2 = fig.add_subplot(gs[2:4, 0], sharex=ax1)
+
+    ax2.plot(ts, acc_y, linewidth=MINOR_LW, label='Raw acc along Y', color='C1')
+
+    ax2.set_ylabel('Amplitude ($m/s^2$)')
+    ax2.legend()
+    ax2.grid()
+
+    # raw signal (acc_z)
+    ax3 = fig.add_subplot(gs[4:, 0], sharex=ax1)
+
+    ax3.plot(ts, acc_z, linewidth=MINOR_LW, label='Raw acc along Z', color='C2')
+
+    ax3.set_ylabel('Amplitude ($m/s^2$)')
+    ax3.set_xlabel('Time (s)')
+    ax3.legend()
+    ax3.grid()
+
+    # vector magnitude
+    ax4 = fig.add_subplot(gs[:3, 1], sharex=ax1)
+
+    ax4.plot(ts, vm, linewidth=MINOR_LW, label='Vector Magnitude feature', color='C3')
+
+    ax4.set_ylabel('Amplitude ($m/s^2$)')
+    ax4.legend()
+    ax4.grid()
+
+    # signal magnitude
+    ax5 = fig.add_subplot(gs[3:, 1], sharex=ax1)
+
+    ax5.plot(ts, sm, linewidth=MINOR_LW, label='Signal Magnitude feature', color='C4')
+
+    ax5.set_ylabel('Amplitude ($m/s^2$)')
+    ax5.set_xlabel('Time (s)')
+    ax5.legend()
+    ax5.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
+
+
 def plot_ppg(ts=None,
              raw=None,
              filtered=None,
