@@ -936,6 +936,9 @@ def plot_eeg(ts=None,
     nrows = MAX_ROWS
     alpha = 2.
 
+    # Get number of channels
+    nch = raw.shape[1]
+
     figs = []
 
     # raw
@@ -975,17 +978,19 @@ def plot_eeg(ts=None,
                                  ylabel='Power')
         figs.append(('_' + n.replace(' ', '_'), fig))
 
-    # PLF
-    plf_labels = ['%s vs %s' % (labels[p[0]], labels[p[1]]) for p in plf_pairs]
-    fig = _plot_multichannel(ts=features_ts,
-                             signal=plf,
-                             labels=plf_labels,
-                             nrows=nrows,
-                             alpha=alpha,
-                             title='EEG Summary - Phase-Locking Factor',
-                             xlabel='Time (s)',
-                             ylabel='PLF')
-    figs.append(('_PLF', fig))
+    # Only plot/compute plf if there is more than one channel
+    if nch > 1:
+        # PLF
+        plf_labels = ['%s vs %s' % (labels[p[0]], labels[p[1]]) for p in plf_pairs]
+        fig = _plot_multichannel(ts=features_ts,
+                                 signal=plf,
+                                 labels=plf_labels,
+                                 nrows=nrows,
+                                 alpha=alpha,
+                                 title='EEG Summary - Phase-Locking Factor',
+                                 xlabel='Time (s)',
+                                 ylabel='PLF')
+        figs.append(('_PLF', fig))
 
     # save to file
     if path is not None:

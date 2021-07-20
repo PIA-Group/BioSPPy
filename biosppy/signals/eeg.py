@@ -117,11 +117,16 @@ def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
     beta = out['beta']
     gamma = out['gamma']
 
-    # PLF features
-    _, plf_pairs, plf = get_plf_features(signal=filtered,
-                                         sampling_rate=sampling_rate,
-                                         size=0.25,
-                                         overlap=0.5)
+    # If the input EEG is single channel do not extract plf
+    # Initialises plf related vars for input and output requirement of plot_eeg function in case of nch <=1
+    plf_pairs = []
+    plf = []
+    if nch > 1:
+        # PLF features
+        _, plf_pairs, plf = get_plf_features(signal=filtered,
+                                             sampling_rate=sampling_rate,
+                                             size=0.25,
+                                             overlap=0.5)
 
     # get time vectors
     length = len(signal)
@@ -179,7 +184,6 @@ def car_reference(signal=None):
     out = signal - np.tile(avg.reshape((length, 1)), nch)
 
     return utils.ReturnTuple((out,), ('signal',))
-
 
 def get_power_features(signal=None,
                        sampling_rate=1000.,
