@@ -1376,6 +1376,114 @@ def plot_bcg(ts=None,
         # close
         plt.close(fig)
 
+def plot_pcg(ts=None,
+             raw=None,
+             filtered=None,
+             peaks=None,
+             heart_sounds=None,
+             heart_rate_ts=None,
+             inst_heart_rate=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.pcg.pcg.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw PCG signal.
+    filtered : array
+        Filtered PCG signal.
+    peaks : array
+        Peak location indices.
+    heart_sounds : array
+        Classification of peaks as S1 or S2
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    inst_heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+        
+    """
+
+    fig = plt.figure()
+    fig.suptitle('PCG Summary')
+    gs = gridspec.GridSpec(6, 2)
+
+    # raw signal
+    ax1 = fig.add_subplot(gs[:2, 0])
+
+    ax1.plot(ts, raw, linewidth=MAJOR_LW,label='raw')
+    
+    ax1.set_ylabel('Amplitude')
+    ax1.legend()
+    ax1.grid()
+
+    # filtered signal with rpeaks
+    ax2 = fig.add_subplot(gs[2:4, 0], sharex=ax1)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+    
+    ax2.plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered')
+    ax2.vlines(ts[peaks], ymin, ymax,
+                color='m',
+                linewidth=MINOR_LW,
+                label='Peaks')
+
+    ax2.set_ylabel('Amplitude')
+    ax2.legend()
+    ax2.grid()
+
+    # heart rate
+    ax3 = fig.add_subplot(gs[4:, 0], sharex=ax1)
+
+    ax3.plot(heart_rate_ts,inst_heart_rate, linewidth=MAJOR_LW, label='Heart rate')
+    
+    ax3.set_xlabel('Time (s)')
+    ax3.set_ylabel('Heart Rate (bpm)')
+    ax3.legend()
+    ax3.grid()
+    
+    # heart sounds
+    ax4 = fig.add_subplot(gs[1:5, 1])
+
+    ax4.plot(ts,filtered,linewidth=MAJOR_LW, label='PCG heart sounds')
+    for i in range(0, len(peaks)):
+
+        text = "S" + str(int(heart_sounds[i]))
+        plt.annotate(text,(ts[peaks[i]], ymax-alpha),ha='center', va='center',size = 13) 
+            
+    ax4.set_xlabel('Time (s)')
+    ax4.set_ylabel('Amplitude')
+    ax4.set_title('Heart sounds')
+    ax4.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
 
 def _plot_rates(thresholds, rates, variables,
                 lw=1,
