@@ -3,6 +3,14 @@
 
 Here you can see the full list of changes between each BioSPPy release.
 
+Version 0.8.0
+-------------
+
+Released on December 20th 2021
+
+- Added PCG module to signals.
+- Fixed some bugs.
+
 Version 0.7.3
 -------------
 

@@ -9,7 +9,7 @@ methods geared towards the analysis of biosignals.
 
 Highlights:
 
-- Support for various biosignals: BVP, ECG, EDA, EEG, EMG, PPG, Respiration
+- Support for various biosignals: BVP, ECG, EDA, EEG, EMG, PCG, PPG, Respiration
 - Signal analysis primitives: filtering, frequency analysis
 - Clustering
 - Biometrics
