@@ -23,7 +23,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def abp(signal=None, sampling_rate=1000., show=True):
+def abp(signal=None, sampling_rate=1000.0, show=True):
     """Process a raw ABP signal and extract relevant signal features using
     default parameters.
 
@@ -61,21 +61,22 @@ def abp(signal=None, sampling_rate=1000., show=True):
     sampling_rate = float(sampling_rate)
 
     # filter signal
-    filtered, _, _ = st.filter_signal(signal=signal,
-                                      ftype='butter',
-                                      band='bandpass',
-                                      order=4,
-                                      frequency=[1, 8],
-                                      sampling_rate=sampling_rate)
+    filtered, _, _ = st.filter_signal(
+        signal=signal,
+        ftype="butter",
+        band="bandpass",
+        order=4,
+        frequency=[1, 8],
+        sampling_rate=sampling_rate,
+    )
 
     # find onsets
-    onsets, _ = find_onsets_zong2003(signal=filtered, sampling_rate=sampling_rate)
+    (onsets,) = find_onsets_zong2003(signal=filtered, sampling_rate=sampling_rate)
 
     # compute heart rate
-    hr_idx, hr = st.get_heart_rate(beats=onsets,
-                                   sampling_rate=sampling_rate,
-                                   smooth=True,
-                                   size=3)
+    hr_idx, hr = st.get_heart_rate(
+        beats=onsets, sampling_rate=sampling_rate, smooth=True, size=3
+    )
 
     # get time vectors
     length = len(signal)
@@ -85,24 +86,34 @@ def abp(signal=None, sampling_rate=1000., show=True):
 
     # plot
     if show:
-        plotting.plot_abp(ts=ts,
-                          raw=signal,
-                          filtered=filtered,
-                          onsets=onsets,
-                          heart_rate_ts=ts_hr,
-                          heart_rate=hr,
-                          path=None,
-                          show=True)
+        plotting.plot_abp(
+            ts=ts,
+            raw=signal,
+            filtered=filtered,
+            onsets=onsets,
+            heart_rate_ts=ts_hr,
+            heart_rate=hr,
+            path=None,
+            show=True,
+        )
 
     # output
     args = (ts, filtered, onsets, ts_hr, hr)
-    names = ('ts', 'filtered', 'onsets', 'heart_rate_ts', 'heart_rate')
+    names = ("ts", "filtered", "onsets", "heart_rate_ts", "heart_rate")
 
     return utils.ReturnTuple(args, names)
 
 
-def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=None,
-                alpha=2., wrange=None, d1_th=0, d2_th=None):
+def find_onsets_zong2003(
+    signal=None,
+    sampling_rate=1000.0,
+    sm_size=None,
+    size=None,
+    alpha=2.0,
+    wrange=None,
+    d1_th=0,
+    d2_th=None,
+):
     """Determine onsets of ABP pulses.
     Skips corrupted signal parts.
     Based on the approach by Zong *et al.* [Zong03]_.
@@ -134,7 +145,7 @@ def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=No
     -------
     onsets : array
         Indices of ABP pulse onsets.
-    
+
     References
     ----------
     .. [Zong03] W Zong, T Heldt, GB Moody and RG Mark, "An Open-source
@@ -162,7 +173,7 @@ def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=No
     dy = np.diff(signal)
     dy[dy < 0] = 0
 
-    ssf, _ = st.smoother(signal=dy, kernel='boxcar', size=sm_size, mirror=True)
+    ssf, _ = st.smoother(signal=dy, kernel="boxcar", size=sm_size, mirror=True)
 
     # main loop
     start = 0
@@ -182,7 +193,7 @@ def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=No
         sss = sss - alpha * np.mean(sss)
 
         # find maxima
-        pk, pv = st.find_extrema(signal=sss, mode='max')
+        pk, pv = st.find_extrema(signal=sss, mode="max")
         pk = pk[np.nonzero(pv > 0)]
         pk += wrange
         dpidx = pk
@@ -196,8 +207,8 @@ def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=No
                 v, u = dpidx[-1], -1
 
             s = sq[v:u]
-            Mk, Mv = st.find_extrema(signal=s, mode='max')
-            mk, mv = st.find_extrema(signal=s, mode='min')
+            Mk, Mv = st.find_extrema(signal=s, mode="max")
+            mk, mv = st.find_extrema(signal=s, mode="min")
 
             try:
                 M = Mk[np.argmax(Mv)]
@@ -224,6 +235,6 @@ def find_onsets_zong2003(signal=None, sampling_rate=1000., sm_size=None, size=No
         if stop > length:
             stop = length
 
-    idx = np.array(idx, dtype='int')
+    idx = np.array(idx, dtype="int")
 
-    return utils.ReturnTuple((idx,), ('onsets',))
+    return utils.ReturnTuple((idx,), ("onsets",))
