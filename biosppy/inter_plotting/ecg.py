@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+"""
+biosppy.inter_plotting.ecg
+-------------------
+
+This module provides an interactive display option for the ECG plot.
+
+:copyright: (c) 2015-2018 by Instituto de Telecomunicacoes
+:license: BSD 3-clause, see LICENSE for more details.
+
+"""
+
+# Imports
 from matplotlib import gridspec
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 from matplotlib.backends.backend_wx import *
