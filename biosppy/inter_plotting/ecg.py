@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import *
 import os
+from biosppy import utils
 
 MAJOR_LW = 2.5
 MINOR_LW = 1.5
@@ -33,7 +34,7 @@ def plot_ecg(ts=None,
              heart_rate_ts=None,
              heart_rate=None,
              path=None,
-             show=False):
+             show=True):
     """Create a summary plot from the output of signals.ecg.ecg.
 
     Parameters
@@ -62,8 +63,8 @@ def plot_ecg(ts=None,
     """
 
     # creating a root widget
-    root = Tk()
-    root.resizable(False, False)  # default
+    root_tk = Tk()
+    root_tk.resizable(False, False)  # default
 
     fig_raw, axs_raw = plt.subplots(3, 1, sharex=True)
     fig_raw.set_size_inches(5, 5, forward=True)
@@ -86,9 +87,9 @@ def plot_ecg(ts=None,
 
     # adding the R-Peaks
     axs_raw[1].vlines(ts[rpeaks], ymin, ymax,
-               color='m',
-               linewidth=MINOR_LW,
-               label='R-peaks')
+                      color='m',
+                      linewidth=MINOR_LW,
+                      label='R-peaks')
 
     axs_raw[1].set_ylabel('Amplitude')
     axs_raw[1].legend(loc='upper right')
@@ -101,16 +102,14 @@ def plot_ecg(ts=None,
     axs_raw[2].legend()
     axs_raw[2].grid()
 
-
-    canvas_raw = FigureCanvasTkAgg(fig_raw, master=root)
+    canvas_raw = FigureCanvasTkAgg(fig_raw, master=root_tk)
     canvas_raw.get_tk_widget().grid(row=0, column=0, columnspan=1, rowspan=6, sticky='w')
     canvas_raw.draw()
 
-    toolbarFrame = Frame(master=root)
+    toolbarFrame = Frame(master=root_tk)
     toolbarFrame.grid(row=6, column=0, columnspan=1, sticky=W)
     toolbar = NavigationToolbar2Tk(canvas_raw, toolbarFrame)
     toolbar.update()
-
 
     fig = fig_raw
 
@@ -129,23 +128,13 @@ def plot_ecg(ts=None,
     axs_2.set_title('Templates')
     axs_2.grid()
 
-    # save to file
-    if path is not None:
-        path = utils.normpath(path)
-        root, ext = os.path.splitext(path)
-        ext = ext.lower()
-        if ext not in ['png', 'jpg']:
-            path = root + '.png'
-
-        fig.savefig(path, dpi=200, bbox_inches='tight')
-
-    grid_params = {'row': 0, 'column': 1, 'columnspan': 2, 'rowspan' : 6, 'sticky': 'w'}
+    grid_params = {'row': 0, 'column': 1, 'columnspan': 2, 'rowspan': 6, 'sticky': 'w'}
     # add an empty canvas for plotting
-    canvas_2 = FigureCanvasTkAgg(fig_2, master=root)
+    canvas_2 = FigureCanvasTkAgg(fig_2, master=root_tk)
     canvas_2.get_tk_widget().grid(**grid_params)
     canvas_2.draw()
 
-    toolbarFrame_2 = Frame(master=root)
+    toolbarFrame_2 = Frame(master=root_tk)
     toolbarFrame_2.grid(row=6, column=1, columnspan=1, sticky=W)
     toolbar_2 = NavigationToolbar2Tk(canvas_2, toolbarFrame_2)
     toolbar_2.update()
@@ -155,8 +144,23 @@ def plot_ecg(ts=None,
         base, _ = os.path.split(os.path.dirname(os.path.abspath(__file__)))
         base, _ = os.path.split(base)
         icon_path = os.path.join(base, 'docs', 'favicon.ico')
-        root.iconbitmap(icon_path)
-        root.wm_title("BioSPPy: ECG signal")
+        root_tk.iconbitmap(icon_path)
+        root_tk.wm_title("BioSPPy: ECG signal")
+
+        # save to file
+        if path is not None:
+            path = utils.normpath(path)
+            root, ext = os.path.splitext(path)
+            ext = ext.lower()
+            if ext not in ['png', 'jpg']:
+                path_block_1 = '{}-summary{}'.format(root, '.png')
+                path_block_2 = '{}-templates{}'.format(root, '.png')
+            else:
+                path_block_1 = '{}-summary{}'.format(root, ext)
+                path_block_2 = '{}-templates{}'.format(root, ext)
+
+            fig.savefig(path_block_1, dpi=200, bbox_inches='tight')
+            fig_2.savefig(path_block_2, dpi=200, bbox_inches='tight')
 
         mainloop()
 

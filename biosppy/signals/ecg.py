@@ -26,10 +26,11 @@ from scipy import stats, integrate
 # local
 from . import tools as st
 from .. import plotting, utils
+from biosppy.inter_plotting import ecg as inter_plotting
 from scipy.signal import argrelextrema
 
 
-def ecg(signal=None, sampling_rate=1000., path=None, show=True):
+def ecg(signal=None, sampling_rate=1000., path=None, show=True, interactive=True):
     """Process a raw ECG signal and extract relevant signal features using
     default parameters.
 
@@ -112,16 +113,29 @@ def ecg(signal=None, sampling_rate=1000., path=None, show=True):
 
     # plot
     if show:
-        plotting.plot_ecg(ts=ts,
-                          raw=signal,
-                          filtered=filtered,
-                          rpeaks=rpeaks,
-                          templates_ts=ts_tmpl,
-                          templates=templates,
-                          heart_rate_ts=ts_hr,
-                          heart_rate=hr,
-                          path=path,
-                          show=True)
+        if interactive:
+            inter_plotting.plot_ecg(ts=ts,
+                                    raw=signal,
+                                    filtered=filtered,
+                                    rpeaks=rpeaks,
+                                    templates_ts=ts_tmpl,
+                                    templates=templates,
+                                    heart_rate_ts=ts_hr,
+                                    heart_rate=hr,
+                                    path=path,
+                                    show=True)
+
+        else:
+            plotting.plot_ecg(ts=ts,
+                              raw=signal,
+                              filtered=filtered,
+                              rpeaks=rpeaks,
+                              templates_ts=ts_tmpl,
+                              templates=templates,
+                              heart_rate_ts=ts_hr,
+                              heart_rate=hr,
+                              path=path,
+                              show=True)
 
     # output
     args = (ts, filtered, rpeaks, ts_tmpl, templates, ts_hr, hr)
@@ -129,7 +143,6 @@ def ecg(signal=None, sampling_rate=1000., path=None, show=True):
              'heart_rate_ts', 'heart_rate')
 
     return utils.ReturnTuple(args, names)
-
 
 def _extract_heartbeats(signal=None, rpeaks=None, before=200, after=400):
     """Extract heartbeat templates from an ECG signal, given a list of
@@ -1207,7 +1220,6 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.):
     return utils.ReturnTuple((rpeaks,), ('rpeaks',))
 
 
-
 def ASI_segmenter(signal=None, sampling_rate=1000.):
     """ECG R-peak segmentation algorithm.
 
@@ -1233,11 +1245,10 @@ def ASI_segmenter(signal=None, sampling_rate=1000.):
 
     """
 
-    N = round (3*sampling_rate/128)
-    Nd = N-1  
-    Pth = (0.7*sampling_rate)/128+4.7
+    N = round(3 * sampling_rate / 128)
+    Nd = N - 1
+    Pth = (0.7 * sampling_rate) / 128 + 4.7
     Rmin = 0.26
-
 
     rpeaks = []
     i = 1
@@ -1254,34 +1265,33 @@ def ASI_segmenter(signal=None, sampling_rate=1000.):
     a = [1]
     processed_ecg = ss.lfilter(b, a, squar)
 
-
     # R-peak finder FSM
-    while i < tf - sampling_rate:   # ignore last second of recording
+    while i < tf - sampling_rate:  # ignore last second of recording
 
         # State 1: looking for maximum
-        tf1 = round(i + Rmin*sampling_rate)
+        tf1 = round(i + Rmin * sampling_rate)
         Rpeakamp = 0
         while i < tf1:
             # Rpeak amplitude and position
             if processed_ecg[i] > Rpeakamp:
                 Rpeakamp = processed_ecg[i]
                 rpeakpos = i + 1
-            i+=1
+            i += 1
 
-        Ramptotal = (19/20)*Ramptotal + (1/20)*Rpeakamp
+        Ramptotal = (19 / 20) * Ramptotal + (1 / 20) * Rpeakamp
         rpeaks.append(rpeakpos)
 
         # State 2: waiting state
         d = tf1 - rpeakpos
-        tf2 = i + round(0.2*250 - d)
+        tf2 = i + round(0.2 * 250 - d)
         while i <= tf2:
-            i+=1
+            i += 1
 
-        #State 3: decreasing threshold
+        # State 3: decreasing threshold
         Thr = Ramptotal
         while processed_ecg[i] < Thr:
-            Thr = Thr*math.exp(-Pth/sampling_rate)
-            i+=1
+            Thr = Thr * math.exp(-Pth / sampling_rate)
+            i += 1
 
     return utils.ReturnTuple((rpeaks,), ('rpeaks',))
 
@@ -1307,26 +1317,25 @@ def getQPositions(ecg_proc=None, show=False):
 
     """
 
-    template_r_position = 100 #R peek on the template is always on 100 index
+    template_r_position = 100  # R peek on the template is always on 100 index
     Q_positions = []
     Q_start_positions = []
 
     for n, each in enumerate(ecg_proc['templates']):
         # Get Q Position
-        template_left = each[0:template_r_position+1]
+        template_left = each[0:template_r_position + 1]
         mininums_from_template_left = argrelextrema(template_left, np.less)
-        #print("Q position= " + str(mininums_from_template_left[0][-1]))
+        # print("Q position= " + str(mininums_from_template_left[0][-1]))
         Q_position = ecg_proc['rpeaks'][n] - (template_r_position - mininums_from_template_left[0][-1])
         Q_positions.append(Q_position)
 
-        #Get Q start position
-        template_Q_left = each[0:mininums_from_template_left[0][-1]+1]
+        # Get Q start position
+        template_Q_left = each[0:mininums_from_template_left[0][-1] + 1]
         maximum_from_template_Q_left = argrelextrema(template_Q_left, np.greater)
-        #print("Q start position=" + str(maximum_from_template_Q_left[0][-1]))
-        #print("Q start value=" + str(template_Q_left[maximum_from_template_Q_left[0][-1]]))
+        # print("Q start position=" + str(maximum_from_template_Q_left[0][-1]))
+        # print("Q start value=" + str(template_Q_left[maximum_from_template_Q_left[0][-1]]))
         Q_start_position = ecg_proc['rpeaks'][n] - template_r_position + maximum_from_template_Q_left[0][-1]
         Q_start_positions.append(Q_start_position)
-
 
         if show:
             plt.plot(each)
@@ -1358,37 +1367,35 @@ def getSPositions(ecg_proc=None, show=False):
             Array with all S end positions on the signal
     """
 
-    template_r_position = 100 #R peek on the template is always on 100 index
+    template_r_position = 100  # R peek on the template is always on 100 index
     S_positions = []
     S_end_positions = []
     template_size = len(ecg_proc['templates'][0])
 
-
     for n, each in enumerate(ecg_proc['templates']):
-        #Get S Position
-        template_right = each[template_r_position:template_size+1]
+        # Get S Position
+        template_right = each[template_r_position:template_size + 1]
         mininums_from_template_right = argrelextrema(template_right, np.less)
         S_position = ecg_proc['rpeaks'][n] + mininums_from_template_right[0][0]
         S_positions.append(S_position)
 
-        #Get S end position
+        # Get S end position
         maximums_from_template_right = argrelextrema(template_right, np.greater)
-        #print("S end position=" + str(maximums_from_template_right[0][0]))
-        #print("S end value=" + str(template_right[maximums_from_template_right[0][0]]))
+        # print("S end position=" + str(maximums_from_template_right[0][0]))
+        # print("S end value=" + str(template_right[maximums_from_template_right[0][0]]))
         S_end_position = ecg_proc['rpeaks'][n] + maximums_from_template_right[0][0]
         S_end_positions.append(S_end_position)
-
 
         if show:
             plt.plot(each)
             plt.axvline(x=template_r_position, color='r', label='R peak')
-            plt.axvline(x=template_r_position+mininums_from_template_right[0][0], color='yellow', label='S Position')
-            plt.axvline(x=template_r_position+maximums_from_template_right[0][0], color='green', label='S end Position')
+            plt.axvline(x=template_r_position + mininums_from_template_right[0][0], color='yellow', label='S Position')
+            plt.axvline(x=template_r_position + maximums_from_template_right[0][0], color='green',
+                        label='S end Position')
             plt.legend()
             show()
 
-    return S_positions,S_end_positions
-
+    return S_positions, S_end_positions
 
 
 def getPPositions(ecg_proc=None, show=False):
@@ -1412,34 +1419,34 @@ def getPPositions(ecg_proc=None, show=False):
             Array with all P end positions on the signal
     """
 
-    template_r_position = 100 #R peek on the template is always on 100 index
-    template_p_position_max = 80 # the P will be always hapenning on the first 80 indexes of the template
+    template_r_position = 100  # R peek on the template is always on 100 index
+    template_p_position_max = 80  # the P will be always hapenning on the first 80 indexes of the template
     P_positions = []
     P_start_positions = []
     P_end_positions = []
 
     for n, each in enumerate(ecg_proc['templates']):
         # Get P position
-        template_left = each[0:template_p_position_max+1]
+        template_left = each[0:template_p_position_max + 1]
         max_from_template_left = np.argmax(template_left)
-        #print("P Position=" + str(max_from_template_left))
+        # print("P Position=" + str(max_from_template_left))
         P_position = ecg_proc['rpeaks'][n] - template_r_position + max_from_template_left
         P_positions.append(P_position)
 
-        #Get P start position
-        template_P_left = each[0:max_from_template_left+1]
+        # Get P start position
+        template_P_left = each[0:max_from_template_left + 1]
         mininums_from_template_left = argrelextrema(template_P_left, np.less)
-        #print("P start position=" + str(mininums_from_template_left[0][-1]))
+        # print("P start position=" + str(mininums_from_template_left[0][-1]))
         P_start_position = ecg_proc['rpeaks'][n] - template_r_position + mininums_from_template_left[0][-1]
         P_start_positions.append(P_start_position)
 
-        #Get P end position
-        template_P_right = each[max_from_template_left:template_p_position_max+1]
+        # Get P end position
+        template_P_right = each[max_from_template_left:template_p_position_max + 1]
         mininums_from_template_right = argrelextrema(template_P_right, np.less)
-        #print("P end position=" + str(mininums_from_template_right[0][0]+max_from_template_left))
-        P_end_position = ecg_proc['rpeaks'][n] - template_r_position + max_from_template_left + mininums_from_template_right[0][0]
+        # print("P end position=" + str(mininums_from_template_right[0][0]+max_from_template_left))
+        P_end_position = ecg_proc['rpeaks'][n] - template_r_position + max_from_template_left + \
+                         mininums_from_template_right[0][0]
         P_end_positions.append(P_end_position)
-
 
         if show:
             plt.plot(each)
@@ -1450,7 +1457,6 @@ def getPPositions(ecg_proc=None, show=False):
             plt.legend()
             show()
     return P_positions, P_start_positions, P_end_positions
-
 
 
 def getTPositions(ecg_proc=None, show=False):
@@ -1474,9 +1480,8 @@ def getTPositions(ecg_proc=None, show=False):
         Array with all T end positions on the signal
     """
 
-
-    template_r_position = 100 #R peek on the template is always on 100 index
-    template_T_position_min = 170 #the T will be always hapenning after 150 indexes of the template
+    template_r_position = 100  # R peek on the template is always on 100 index
+    template_T_position_min = 170  # the T will be always hapenning after 150 indexes of the template
     T_positions = []
     T_start_positions = []
     T_end_positions = []
@@ -1485,32 +1490,33 @@ def getTPositions(ecg_proc=None, show=False):
         # Get T position
         template_right = each[template_T_position_min:]
         max_from_template_right = np.argmax(template_right)
-        #print("T Position=" + str(template_T_position_min + max_from_template_right))
+        # print("T Position=" + str(template_T_position_min + max_from_template_right))
         T_position = ecg_proc['rpeaks'][n] - template_r_position + template_T_position_min + max_from_template_right
         T_positions.append(T_position)
 
-        #Get T start position
+        # Get T start position
         template_T_left = each[template_r_position:template_T_position_min + max_from_template_right]
         min_from_template_T_left = argrelextrema(template_T_left, np.less)
-        #print("T start position=" + str(template_r_position+min_from_template_T_left[0][-1]))
+        # print("T start position=" + str(template_r_position+min_from_template_T_left[0][-1]))
         T_start_position = ecg_proc['rpeaks'][n] + min_from_template_T_left[0][-1]
         T_start_positions.append(T_start_position)
 
-
-        #Get T end position
+        # Get T end position
         template_T_right = each[template_T_position_min + max_from_template_right:]
         mininums_from_template_T_right = argrelextrema(template_T_right, np.less)
-        #print("T end position=" + str(template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]))
-        T_end_position = ecg_proc['rpeaks'][n] - template_r_position + template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]
+        # print("T end position=" + str(template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]))
+        T_end_position = ecg_proc['rpeaks'][
+                             n] - template_r_position + template_T_position_min + max_from_template_right + \
+                         mininums_from_template_T_right[0][0]
         T_end_positions.append(T_end_position)
-
 
         if show:
             plt.plot(each)
             plt.axvline(x=template_r_position, color='r', label='R peak')
             plt.axvline(x=template_T_position_min + max_from_template_right, color='yellow', label='T Position')
             plt.axvline(x=template_r_position + min_from_template_T_left[0][-1], color='green', label='P start')
-            plt.axvline(x=(template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]), color='green', label='P end')
+            plt.axvline(x=(template_T_position_min + max_from_template_right + mininums_from_template_T_right[0][0]),
+                        color='green', label='P end')
             plt.legend()
             show()
     return T_positions, T_start_positions, T_end_positions
