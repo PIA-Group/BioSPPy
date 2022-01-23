@@ -25,9 +25,10 @@ import numpy as np
 
 # local
 from .. import plotting, utils
+from biosppy.inter_plotting import acc as inter_plotting
 
 
-def acc(signal=None, sampling_rate=100., path=None, show=True):
+def acc(signal=None, sampling_rate=100., path=None, show=True, interactive=True):
     """Process a raw ACC signal and extract relevant signal features using
     default parameters.
 
@@ -49,9 +50,13 @@ def acc(signal=None, sampling_rate=100., path=None, show=True):
     signal : array
         Raw (unfiltered) ACC signal.
     vm : array
-        Vector Magnitude feature of the signal
+        Vector Magnitude feature of the signal.
     sm : array
-        Signal Magnitude feature of the signal
+        Signal Magnitude feature of the signal.
+    freq_features : dict
+        Positive Frequency domains (Hz) of the signal.
+    amp_features : dict
+        Normalized Absolute Amplitudes of the signal.
 
     """
 
@@ -65,8 +70,8 @@ def acc(signal=None, sampling_rate=100., path=None, show=True):
     sampling_rate = float(sampling_rate)
 
     # extract features
-    vm_features, sm_features = extract_acc_features(signal=signal,
-                                                    sampling_rate=sampling_rate)
+    vm_features, sm_features = time_domain_feature_extractor(signal=signal)
+    freq_features, abs_amp_features = frequency_domain_feature_extractor(signal=signal, sampling_rate=sampling_rate)
 
     # get time vectors
     length = len(signal)
@@ -75,29 +80,35 @@ def acc(signal=None, sampling_rate=100., path=None, show=True):
 
     # plot
     if show:
-        plotting.plot_acc(ts=ts,
-                          raw=signal,
-                          vm=vm_features,
-                          sm=sm_features,
-                          path=path,
-                          show=True)
+        if interactive:
+            inter_plotting.plot_acc(ts=ts,  # plotting.plot_acc
+                                    raw=signal,
+                                    vm=vm_features,
+                                    sm=sm_features,
+                                    spectrum={'freq': freq_features, 'abs_amp': abs_amp_features},
+                                    path=path)
+        else:
+            plotting.plot_acc(ts=ts,  # plotting.plot_acc
+                              raw=signal,
+                              vm=vm_features,
+                              sm=sm_features,
+                              path=path,
+                              show=True)
 
     # output
-    args = (ts, signal, vm_features, sm_features)
-    names = ('ts', 'signal', 'vm', 'sm')
+    args = (ts, signal, vm_features, sm_features, freq_features, abs_amp_features)
+    names = ('ts', 'signal', 'vm', 'sm', 'freq', 'abs_amp')
 
     return utils.ReturnTuple(args, names)
 
 
-def extract_acc_features(signal=None, sampling_rate=100.0):
+def time_domain_feature_extractor(signal=None):
     """Extracts the vector magnitude and signal magnitude features from an input ACC signal, given the signal itself.
 
     Parameters
     ----------
     signal : array
         Input ACC signal.
-    sampling_rate : int, float, optional
-        Sampling frequency (Hz).
 
     Returns
     -------
@@ -122,3 +133,44 @@ def extract_acc_features(signal=None, sampling_rate=100.0):
 
     return utils.ReturnTuple((vm_features, sm_features), ('vm', 'sm'))
 
+
+def frequency_domain_feature_extractor(signal=None, sampling_rate=100.0):
+    """Extracts the FFT from each ACC sub-signal (x, y, z), given the signal itself.
+
+    Parameters
+    ----------
+    signal : array
+        Input ACC signal.
+    sampling_rate : int, float, optional
+        Sampling frequency (Hz).
+
+    Returns
+    -------
+    freq_features : dict
+        Dictionary of positive frequencies (Hz) for all sub-signals.
+    amp_features : dict
+        Dictionary of Normalized Absolute Amplitudes for all sub-signals.
+
+    """
+
+    # check inputs
+    if signal is None:
+        raise TypeError("Please specify an input signal.")
+
+    freq_features = {}
+    amp_features = {}
+
+    # get Normalized FFT for each sub-signal
+    for ind, axis in zip(range(signal.shape[1]), ['x', 'y', 'z']):
+        sub_signal = signal[:, ind]
+
+        n = len(sub_signal)
+        k = np.arange(n)
+        T = n / sampling_rate
+        frq = k / T
+        freq_features[axis] = frq[range(n // 2)]
+
+        amp = np.fft.fft(sub_signal) / n
+        amp_features[axis] = abs(amp[range(n // 2)])
+
+    return utils.ReturnTuple((freq_features, amp_features), ('freq', 'abs_amp'))
