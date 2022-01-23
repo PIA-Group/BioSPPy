@@ -15,4 +15,4 @@ following physiological signals (biosignals):
 from __future__ import absolute_import, division, print_function
 
 # allow lazy loading
-from . import ecg
+from . import ecg, acc

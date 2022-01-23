@@ -18,4 +18,4 @@ from .__version__ import __version__
 # allow lazy loading
 from .signals import acc, abp, bvp, ppg, pcg, ecg, eda, eeg, emg, resp, tools
 from .synthesizers import ecg
-from .inter_plotting import ecg
+from .inter_plotting import ecg, acc
