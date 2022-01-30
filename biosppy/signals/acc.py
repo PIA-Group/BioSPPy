@@ -42,6 +42,8 @@ def acc(signal=None, sampling_rate=100.0, path=None, show=True, interactive=True
         If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
+    interactive : bool, optional
+        If True, shows an interactive plot.
 
     Returns
     -------
