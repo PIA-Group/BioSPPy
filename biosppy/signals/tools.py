@@ -1360,8 +1360,8 @@ def pearson_correlation(x=None, y=None):
     my = np.mean(y)
 
     Sxy = np.sum(x * y) - n * mx * my
-    Sxx = np.sum(np.power(x, 2)) - n * mx ** 2
-    Syy = np.sum(np.power(y, 2)) - n * my ** 2
+    Sxx = np.sum(np.power(x, 2)) - n * mx**2
+    Syy = np.sum(np.power(y, 2)) - n * my**2
 
     rxy = Sxy / (np.sqrt(Sxx) * np.sqrt(Syy))
 
@@ -1454,7 +1454,6 @@ def get_heart_rate(beats=None, sampling_rate=1000.0, smooth=False, size=3):
     if beats is None:
         raise TypeError("Please specify the input beat indices.")
 
-    print(len(beats))
     if len(beats) < 2:
         raise ValueError("Not enough beats to compute heart rate.")
 

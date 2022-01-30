@@ -12,8 +12,9 @@ This module provides an interactive display option for the ECG plot.
 
 # Imports
 from matplotlib import gridspec
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-from matplotlib.backends.backend_wx import *
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+
+# from matplotlib.backends.backend_wx import *
 import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import *
@@ -25,16 +26,18 @@ MINOR_LW = 1.5
 MAX_ROWS = 10
 
 
-def plot_ecg(ts=None,
-             raw=None,
-             filtered=None,
-             rpeaks=None,
-             templates_ts=None,
-             templates=None,
-             heart_rate_ts=None,
-             heart_rate=None,
-             path=None,
-             show=True):
+def plot_ecg(
+    ts=None,
+    raw=None,
+    filtered=None,
+    rpeaks=None,
+    templates_ts=None,
+    templates=None,
+    heart_rate_ts=None,
+    heart_rate=None,
+    path=None,
+    show=True,
+):
     """Create a summary plot from the output of signals.ecg.ecg.
 
     Parameters
@@ -67,17 +70,16 @@ def plot_ecg(ts=None,
     root_tk.resizable(False, False)  # default
 
     fig_raw, axs_raw = plt.subplots(3, 1, sharex=True)
-    fig_raw.set_size_inches(5, 5, forward=True)
-    fig_raw.suptitle('ECG Summary')
+    fig_raw.suptitle("ECG Summary")
 
     # raw signal plot (1)
-    axs_raw[0].plot(ts, raw, linewidth=MAJOR_LW, label='Raw', color='C0')
-    axs_raw[0].set_ylabel('Amplitude')
+    axs_raw[0].plot(ts, raw, linewidth=MAJOR_LW, label="Raw", color="C0")
+    axs_raw[0].set_ylabel("Amplitude")
     axs_raw[0].legend()
     axs_raw[0].grid()
 
     # filtered signal with R-Peaks (2)
-    axs_raw[1].plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered', color='C0')
+    axs_raw[1].plot(ts, filtered, linewidth=MAJOR_LW, label="Filtered", color="C0")
 
     ymin = np.min(filtered)
     ymax = np.max(filtered)
@@ -86,24 +88,25 @@ def plot_ecg(ts=None,
     ymin -= alpha
 
     # adding the R-Peaks
-    axs_raw[1].vlines(ts[rpeaks], ymin, ymax,
-                      color='m',
-                      linewidth=MINOR_LW,
-                      label='R-peaks')
+    axs_raw[1].vlines(
+        ts[rpeaks], ymin, ymax, color="m", linewidth=MINOR_LW, label="R-peaks"
+    )
 
-    axs_raw[1].set_ylabel('Amplitude')
-    axs_raw[1].legend(loc='upper right')
+    axs_raw[1].set_ylabel("Amplitude")
+    axs_raw[1].legend(loc="upper right")
     axs_raw[1].grid()
 
     # heart rate (3)
-    axs_raw[2].plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label='Heart Rate')
-    axs_raw[2].set_xlabel('Time (s)')
-    axs_raw[2].set_ylabel('Heart Rate (bpm)')
+    axs_raw[2].plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label="Heart Rate")
+    axs_raw[2].set_xlabel("Time (s)")
+    axs_raw[2].set_ylabel("Heart Rate (bpm)")
     axs_raw[2].legend()
     axs_raw[2].grid()
 
     canvas_raw = FigureCanvasTkAgg(fig_raw, master=root_tk)
-    canvas_raw.get_tk_widget().grid(row=0, column=0, columnspan=1, rowspan=6, sticky='w')
+    canvas_raw.get_tk_widget().grid(
+        row=0, column=0, columnspan=1, rowspan=6, sticky="w"
+    )
     canvas_raw.draw()
 
     toolbarFrame = Frame(master=root_tk)
@@ -113,23 +116,18 @@ def plot_ecg(ts=None,
 
     fig = fig_raw
 
-    # fig_2, axs_2 = plt.subplots(6, 1)
-    fig_2 = Figure()
+    fig_2 = plt.Figure()
     gs = gridspec.GridSpec(6, 1)
 
-    # raw signal (acc_x)
-    axs_2 = fig_2.add_subplot(gs[2:4, 0])
+    axs_2 = fig_2.add_subplot(gs[:, 0])
 
-    fig_2.set_size_inches(10, 10, forward=True)
-
-    axs_2.plot(templates_ts, templates.T, 'm', linewidth=MINOR_LW, alpha=0.7)
-    axs_2.set_xlabel('Time (s)')
-    axs_2.set_ylabel('Amplitude')
-    axs_2.set_title('Templates')
+    axs_2.plot(templates_ts, templates.T, "m", linewidth=MINOR_LW, alpha=0.7)
+    axs_2.set_xlabel("Time (s)")
+    axs_2.set_ylabel("Amplitude")
+    axs_2.set_title("Templates")
     axs_2.grid()
 
-    grid_params = {'row': 0, 'column': 1, 'columnspan': 2, 'rowspan': 6, 'sticky': 'w'}
-    # add an empty canvas for plotting
+    grid_params = {"row": 0, "column": 1, "columnspan": 2, "rowspan": 6, "sticky": "w"}
     canvas_2 = FigureCanvasTkAgg(fig_2, master=root_tk)
     canvas_2.get_tk_widget().grid(**grid_params)
     canvas_2.draw()
@@ -140,11 +138,7 @@ def plot_ecg(ts=None,
     toolbar_2.update()
 
     if show:
-        # window icon and title
-        base, _ = os.path.split(os.path.dirname(os.path.abspath(__file__)))
-        base, _ = os.path.split(base)
-        icon_path = os.path.join(base, 'docs', 'favicon.ico')
-        root_tk.iconbitmap(icon_path)
+        # window title
         root_tk.wm_title("BioSPPy: ECG signal")
 
         # save to file
@@ -152,15 +146,15 @@ def plot_ecg(ts=None,
             path = utils.normpath(path)
             root, ext = os.path.splitext(path)
             ext = ext.lower()
-            if ext not in ['png', 'jpg']:
-                path_block_1 = '{}-summary{}'.format(root, '.png')
-                path_block_2 = '{}-templates{}'.format(root, '.png')
+            if ext not in ["png", "jpg"]:
+                path_block_1 = "{}-summary{}".format(root, ".png")
+                path_block_2 = "{}-templates{}".format(root, ".png")
             else:
-                path_block_1 = '{}-summary{}'.format(root, ext)
-                path_block_2 = '{}-templates{}'.format(root, ext)
+                path_block_1 = "{}-summary{}".format(root, ext)
+                path_block_2 = "{}-templates{}".format(root, ext)
 
-            fig.savefig(path_block_1, dpi=200, bbox_inches='tight')
-            fig_2.savefig(path_block_2, dpi=200, bbox_inches='tight')
+            fig.savefig(path_block_1, dpi=200, bbox_inches="tight")
+            fig_2.savefig(path_block_2, dpi=200, bbox_inches="tight")
 
         mainloop()
 

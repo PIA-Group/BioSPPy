@@ -11,9 +11,8 @@ This module provides an interactive display option for the ACC plot.
 """
 
 # Imports
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.backend_bases import key_press_handler
-from matplotlib.backends.backend_wx import *
 import matplotlib.pyplot as plt
 import numpy as np
 from tkinter import *
@@ -29,12 +28,7 @@ MINOR_LW = 1.5
 MAX_ROWS = 10
 
 
-def plot_acc(ts=None,
-             raw=None,
-             vm=None,
-             sm=None,
-             spectrum=None,
-             path=None):
+def plot_acc(ts=None, raw=None, vm=None, sm=None, spectrum=None, path=None):
     """Create a summary plot from the output of signals.acc.acc.
 
     Parameters
@@ -60,24 +54,22 @@ def plot_acc(ts=None,
     root = Tk()
     root.resizable(False, False)  # default
     fig, axs_1 = plt.subplots(3, 1)
-    axs_1[0].plot(ts, acc_x, linewidth=MINOR_LW, label='Raw acc along X', color='C0')
-    axs_1[1].plot(ts, acc_y, linewidth=MINOR_LW, label='Raw acc along Y', color='C1')
-    axs_1[2].plot(ts, acc_z, linewidth=MINOR_LW, label='Raw acc along Z', color='C2')
+    axs_1[0].plot(ts, acc_x, linewidth=MINOR_LW, label="Raw acc along X", color="C0")
+    axs_1[1].plot(ts, acc_y, linewidth=MINOR_LW, label="Raw acc along Y", color="C1")
+    axs_1[2].plot(ts, acc_z, linewidth=MINOR_LW, label="Raw acc along Z", color="C2")
 
-    axs_1[0].set_ylabel('Amplitude ($m/s^2$)')
-    axs_1[1].set_ylabel('Amplitude ($m/s^2$)')
-    axs_1[2].set_ylabel('Amplitude ($m/s^2$)')
-    axs_1[2].set_xlabel('Time (s)')
+    axs_1[0].set_ylabel("Amplitude ($m/s^2$)")
+    axs_1[1].set_ylabel("Amplitude ($m/s^2$)")
+    axs_1[2].set_ylabel("Amplitude ($m/s^2$)")
+    axs_1[2].set_xlabel("Time (s)")
 
-    fig.set_size_inches(5, 5, forward=True)
-    fig.suptitle('Acceleration signals')
+    fig.suptitle("Acceleration signals")
 
     global share_axes_check_box
 
     class feature_figure:
-        def __init__(self, size_x=5, size_y=5, reset=False):
+        def __init__(self, reset=False):
             self.figure, self.axes = plt.subplots(1, 1)
-            self.figure.set_size_inches(size_x, size_y, forward=True)
             if not reset:
                 self.avail_plots = []
 
@@ -90,26 +82,32 @@ def plot_acc(ts=None,
 
         def hide_content(self):
             # setting every plot element to white
-            self.axes.spines['bottom'].set_color('white')
-            self.axes.spines['top'].set_color('white')
-            self.axes.spines['right'].set_color('white')
-            self.axes.spines['left'].set_color('white')
-            self.axes.tick_params(axis='x', colors='white')
-            self.axes.tick_params(axis='y', colors='white')
+            self.axes.spines["bottom"].set_color("white")
+            self.axes.spines["top"].set_color("white")
+            self.axes.spines["right"].set_color("white")
+            self.axes.spines["left"].set_color("white")
+            self.axes.tick_params(axis="x", colors="white")
+            self.axes.tick_params(axis="y", colors="white")
 
         def show_content(self):
             # setting every plot element to black
-            self.axes.spines['bottom'].set_color('black')
-            self.axes.spines['top'].set_color('black')
-            self.axes.spines['right'].set_color('black')
-            self.axes.spines['left'].set_color('black')
-            self.axes.tick_params(axis='x', colors='black')
-            self.axes.tick_params(axis='y', colors='black')
+            self.axes.spines["bottom"].set_color("black")
+            self.axes.spines["top"].set_color("black")
+            self.axes.spines["right"].set_color("black")
+            self.axes.spines["left"].set_color("black")
+            self.axes.tick_params(axis="x", colors="black")
+            self.axes.tick_params(axis="y", colors="black")
             self.axes.legend()
 
         def draw_in_canvas(self, root: Tk, grid_params=None):
             if grid_params is None:
-                grid_params = {'row': 2, 'column': 1, 'columnspan': 4, 'sticky': 'w', 'padx': 10}
+                grid_params = {
+                    "row": 2,
+                    "column": 1,
+                    "columnspan": 4,
+                    "sticky": "w",
+                    "padx": 10,
+                }
             # add an empty canvas for plotting
             self.canvas = FigureCanvasTkAgg(self.figure, master=root)
             self.canvas.get_tk_widget().grid(**grid_params)
@@ -125,7 +123,7 @@ def plot_acc(ts=None,
 
         def add_toolbar(self, root: Tk, grid_params=None):
             if grid_params is None:
-                grid_params = {'row': 5, 'column': 1, 'columnspan': 2, 'sticky': 'w'}
+                grid_params = {"row": 5, "column": 1, "columnspan": 2, "sticky": "w"}
             toolbarFramefeat = Frame(master=root)
             toolbarFramefeat.grid(**grid_params)
 
@@ -143,8 +141,14 @@ def plot_acc(ts=None,
 
         def _add_plot(self, feature_name: str, xdata, ydata, linewidth, label, color):
 
-            plot_params = {"feature_name": feature_name, "x": xdata, "y": ydata, "linewidth": linewidth, "label": label,
-                           "color": color}
+            plot_params = {
+                "feature_name": feature_name,
+                "x": xdata,
+                "y": ydata,
+                "linewidth": linewidth,
+                "label": label,
+                "color": color,
+            }
 
             plot_data = dict(plot_params)
             self.avail_plots.append(plot_data)
@@ -156,7 +160,11 @@ def plot_acc(ts=None,
 
         def remove_plot(self, feature_name: str):
             if self.avail_plots:
-                removed_index = [i for i, x in enumerate(self.avail_plots) if x["feature_name"] == feature_name]
+                removed_index = [
+                    i
+                    for i, x in enumerate(self.avail_plots)
+                    if x["feature_name"] == feature_name
+                ]
                 if len(removed_index) == 1:
                     self._remove_plot(removed_index)
 
@@ -187,15 +195,12 @@ def plot_acc(ts=None,
         path = utils.normpath(path)
         root_, ext = os.path.splitext(path)
         ext = ext.lower()
-        if ext not in ['png', 'jpg']:
-            path = root_ + '.png'
+        if ext not in ["png", "jpg"]:
+            path = root_ + ".png"
 
-        fig.savefig(path, dpi=200, bbox_inches='tight')
+        fig.savefig(path, dpi=200, bbox_inches="tight")
 
-    # window icon and title
-    base, _ = os.path.split(sys.argv[0])
-    icon_path = os.path.join(base, 'docs', 'favicon.ico')
-    root.iconbitmap(icon_path)
+    # window title
     root.wm_title("BioSPPy: acceleration signal")
 
     root.columnconfigure(0, weight=4)
@@ -204,7 +209,7 @@ def plot_acc(ts=None,
     root.columnconfigure(3, weight=1)
     root.columnconfigure(4, weight=1)
 
-    helv = tkFont.Font(family='Helvetica', size=20)
+    helv = tkFont.Font(family="Helvetica", size=20)
 
     # checkbox
     show_features_var = IntVar()
@@ -229,8 +234,14 @@ def plot_acc(ts=None,
 
             # add an empty canvas for plotting
             feat_fig = feature_figure()
-            share_axes_check_box = Checkbutton(root, text='Share axes', variable=share_axes_var, onvalue=1, offvalue=0,
-                                               command=lambda feat_fig=feat_fig: share_axes(feat_fig.get_axes()))
+            share_axes_check_box = Checkbutton(
+                root,
+                text="Share axes",
+                variable=share_axes_var,
+                onvalue=1,
+                offvalue=0,
+                command=lambda feat_fig=feat_fig: share_axes(feat_fig.get_axes()),
+            )
             share_axes_check_box.config(font=helv)
             share_axes_check_box.grid(row=4, column=1, sticky=W)
 
@@ -250,8 +261,14 @@ def plot_acc(ts=None,
                 ax.autoscale()
                 canvas_raw.draw()
 
-    check1 = Checkbutton(root, text='Show features', variable=show_features_var, onvalue=1, offvalue=0,
-                         command=show_features)
+    check1 = Checkbutton(
+        root,
+        text="Show features",
+        variable=show_features_var,
+        onvalue=1,
+        offvalue=0,
+        command=show_features,
+    )
     check1.config(font=helv)
     check1.grid(row=0, column=0, sticky=W)
 
@@ -263,7 +280,7 @@ def plot_acc(ts=None,
         global share_axes_check_box
 
         if feat_domain_var.get() == 1:
-            domain_feat_btn['text'] = "Domain: frequency"
+            domain_feat_btn["text"] = "Domain: frequency"
             feat_domain_var.set(0)
             feat_fig.remove_plot("VM")
             feat_fig.remove_plot("SM")
@@ -274,7 +291,7 @@ def plot_acc(ts=None,
             share_axes_var.set(0)
 
         else:
-            domain_feat_btn['text'] = "Domain: time"
+            domain_feat_btn["text"] = "Domain: time"
             feat_domain_var.set(1)
             feat_fig.remove_plot("SPECTRA X")
             feat_fig.remove_plot("SPECTRA Y")
@@ -284,18 +301,16 @@ def plot_acc(ts=None,
             drop_features2.reset_fields(["VM", "SM"])
             share_axes_check_box.config(state="normal")
 
-
     feat_domain_var = IntVar()
     feat_domain_var.set(1)
 
-    class feat_menu():
-
-        def __init__(self, fieldnames: list, entry_name='Select Features', font=helv):
-            self.feat_menu = Menubutton(root, text=entry_name, relief='raised')
+    class feat_menu:
+        def __init__(self, fieldnames: list, entry_name="Select Features", font=helv):
+            self.feat_menu = Menubutton(root, text=entry_name, relief="raised")
             self.feat_menu.grid(row=0, column=2, sticky=W)
             self.feat_menu.menu = Menu(self.feat_menu, tearoff=0)
             self.feat_menu["menu"] = self.feat_menu.menu
-            self.feat_menu['font'] = font
+            self.feat_menu["font"] = font
             self.font = font
             self.feat_activation = {}
 
@@ -304,19 +319,22 @@ def plot_acc(ts=None,
                 self.feat_activation[field] = False
 
             for field in fieldnames:
-                self.feat_menu.menu.add_command(label=field, font=helv,
-                                                command=lambda field=field: self.update_field(field),
-                                                foreground='gray')
+                self.feat_menu.menu.add_command(
+                    label=field,
+                    font=helv,
+                    command=lambda field=field: self.update_field(field),
+                    foreground="gray",
+                )
             self.fieldnames = fieldnames
 
             self.feat_menu.update()
 
-        def reset(self, entry_name='Select Features'):
-            self.feat_menu = Menubutton(root, text=entry_name, relief='raised')
+        def reset(self, entry_name="Select Features"):
+            self.feat_menu = Menubutton(root, text=entry_name, relief="raised")
             self.feat_menu.grid(row=0, column=2, sticky=W)
             self.feat_menu.menu = Menu(self.feat_menu, tearoff=0)
             self.feat_menu["menu"] = self.feat_menu.menu
-            self.feat_menu['font'] = self.font
+            self.feat_menu["font"] = self.font
             self.feat_menu.update()
 
         def update_field(self, field):
@@ -328,23 +346,35 @@ def plot_acc(ts=None,
 
             for field_ in self.fieldnames:
                 if self.feat_activation[field_]:
-                    self.feat_menu.menu.add_command(label=field_, font=helv,
-                                                    command=lambda field=field_: self.update_field(field))
+                    self.feat_menu.menu.add_command(
+                        label=field_,
+                        font=helv,
+                        command=lambda field=field_: self.update_field(field),
+                    )
                 else:
-                    self.feat_menu.menu.add_command(label=field_, font=helv,
-                                                    command=lambda field=field_: self.update_field(field),
-                                                    foreground='gray')
+                    self.feat_menu.menu.add_command(
+                        label=field_,
+                        font=helv,
+                        command=lambda field=field_: self.update_field(field),
+                        foreground="gray",
+                    )
 
                 if field == "SM":
                     if not self.feat_activation[field]:
                         feat_fig.remove_plot("SM")
                         if any(self.feat_activation.values()):
-                            feat_fig.set_labels('Time (s)', 'Amplitude ($m/s^2$)')
+                            feat_fig.set_labels("Time (s)", "Amplitude ($m/s^2$)")
 
                     else:
-                        feat_fig.add_plot("SM", ts, sm, linewidth=MINOR_LW, label='Signal Magnitude feature',
-                                          color='C4')
-                        feat_fig.set_labels('Time (s)', 'Amplitude ($m/s^2$)')
+                        feat_fig.add_plot(
+                            "SM",
+                            ts,
+                            sm,
+                            linewidth=MINOR_LW,
+                            label="Signal Magnitude feature",
+                            color="C4",
+                        )
+                        feat_fig.set_labels("Time (s)", "Amplitude ($m/s^2$)")
 
                     feat_fig.draw_in_canvas(root)
                     feat_fig.add_toolbar(root)
@@ -353,11 +383,17 @@ def plot_acc(ts=None,
                     if not self.feat_activation[field]:
                         feat_fig.remove_plot("VM")
                         if any(self.feat_activation.values()):
-                            feat_fig.set_labels('Time (s)', 'Amplitude ($m/s^2$)')
+                            feat_fig.set_labels("Time (s)", "Amplitude ($m/s^2$)")
                     else:
-                        feat_fig.add_plot("VM", ts, vm, linewidth=MINOR_LW, label='Vector Magnitude feature',
-                                          color='C3')
-                        feat_fig.set_labels('Time (s)', 'Amplitude ($m/s^2$)')
+                        feat_fig.add_plot(
+                            "VM",
+                            ts,
+                            vm,
+                            linewidth=MINOR_LW,
+                            label="Vector Magnitude feature",
+                            color="C3",
+                        )
+                        feat_fig.set_labels("Time (s)", "Amplitude ($m/s^2$)")
 
                     feat_fig.draw_in_canvas(root)
                     feat_fig.add_toolbar(root)
@@ -370,25 +406,42 @@ def plot_acc(ts=None,
 
                     else:
 
-                        feat_fig.add_plot("SPECTRA X", spectrum['freq']['x'], spectrum['abs_amp']['x'],
-                                          linewidth=MINOR_LW,
-                                          label='Spectrum along X', color='C0')
+                        feat_fig.add_plot(
+                            "SPECTRA X",
+                            spectrum["freq"]["x"],
+                            spectrum["abs_amp"]["x"],
+                            linewidth=MINOR_LW,
+                            label="Spectrum along X",
+                            color="C0",
+                        )
                         feat_fig.draw_in_canvas(root)
 
-                        feat_fig.add_plot("SPECTRA Y", spectrum['freq']['y'], spectrum['abs_amp']['y'],
-                                          linewidth=MINOR_LW,
-                                          label='Spectrum along Y', color='C1')
+                        feat_fig.add_plot(
+                            "SPECTRA Y",
+                            spectrum["freq"]["y"],
+                            spectrum["abs_amp"]["y"],
+                            linewidth=MINOR_LW,
+                            label="Spectrum along Y",
+                            color="C1",
+                        )
                         feat_fig.draw_in_canvas(root)
 
-                        feat_fig.add_plot("SPECTRA Z", spectrum['freq']['z'], spectrum['abs_amp']['z'],
-                                          linewidth=MINOR_LW,
-                                          label='Spectrum along Z', color='C2')
-                        feat_fig.set_labels('Frequency ($Hz$)', 'Normalized Amplitude [a.u.]')
+                        feat_fig.add_plot(
+                            "SPECTRA Z",
+                            spectrum["freq"]["z"],
+                            spectrum["abs_amp"]["z"],
+                            linewidth=MINOR_LW,
+                            label="Spectrum along Z",
+                            color="C2",
+                        )
+                        feat_fig.set_labels(
+                            "Frequency ($Hz$)", "Normalized Amplitude [a.u.]"
+                        )
 
                     feat_fig.draw_in_canvas(root)
                     feat_fig.add_toolbar(root)
 
-                self.feat_menu.config(state='normal')
+                self.feat_menu.config(state="normal")
                 self.feat_menu.update()
 
         def reset_fields(self, fieldnames):
@@ -399,9 +452,12 @@ def plot_acc(ts=None,
                 self.feat_activation[field] = False
 
             for field in fieldnames:
-                self.feat_menu.menu.add_command(label=field, font=helv,
-                                                command=lambda field=field: self.update_field(field),
-                                                foreground='gray')
+                self.feat_menu.menu.add_command(
+                    label=field,
+                    font=helv,
+                    command=lambda field=field: self.update_field(field),
+                    foreground="gray",
+                )
 
             self.fieldnames = fieldnames
 
@@ -416,12 +472,12 @@ def plot_acc(ts=None,
 
     temp_features = ["VM", "SM"]
 
-    drop_features2 = feat_menu(temp_features, entry_name='Select Features', font=helv)
+    drop_features2 = feat_menu(temp_features, entry_name="Select Features", font=helv)
     drop_features2.get_menu().config(state="disabled")
     drop_features2.get_menu().update()
 
     canvas_raw = FigureCanvasTkAgg(fig, master=root)
-    canvas_raw.get_tk_widget().grid(row=2, column=0, columnspan=1, sticky='w', padx=10)
+    canvas_raw.get_tk_widget().grid(row=2, column=0, columnspan=1, sticky="w", padx=10)
     canvas_raw.draw()
 
     toolbarFrame = Frame(master=root)
