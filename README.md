@@ -1,5 +1,7 @@
 # BioSPPy - Biosignal Processing in Python
 
+## Migrated to [scientisst/BioSPPy](https://github.com/scientisst/BioSPPy).
+
 *A toolbox for biosignal processing written in Python.*
 
 [![Image](https://github.com/PIA-Group/BioSPPy/raw/master/docs/logo/logo_400.png "I know you're listening! - xkcd.com/525")](http://biosppy.readthedocs.org/)
