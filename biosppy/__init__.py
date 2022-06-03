@@ -16,5 +16,6 @@ from __future__ import absolute_import, division, print_function
 from .__version__ import __version__
 
 # allow lazy loading
-from .signals import abp, bvp, ppg, ecg, eda, eeg, emg, resp, tools
+from .signals import acc, abp, bvp, ppg, pcg, ecg, eda, eeg, emg, resp, tools
 from .synthesizers import ecg
+from .inter_plotting import ecg, acc

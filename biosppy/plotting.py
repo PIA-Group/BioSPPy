@@ -209,6 +209,106 @@ def plot_spectrum(signal=None, sampling_rate=1000., path=None, show=True):
         plt.close(fig)
 
 
+def plot_acc(ts=None,
+             raw=None,
+             vm=None,
+             sm=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.acc.acc.
+
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw ACC signal.
+    vm : array
+        Vector Magnitude feature of the signal.
+    sm : array
+        Signal Magnitude feature of the signal
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+
+    """
+
+    raw_t = np.transpose(raw)
+    acc_x, acc_y, acc_z = raw_t[0], raw_t[1], raw_t[2]
+
+    fig = plt.figure()
+    fig.suptitle('ACC Summary')
+    gs = gridspec.GridSpec(6, 2)
+
+    # raw signal (acc_x)
+    ax1 = fig.add_subplot(gs[:2, 0])
+
+    ax1.plot(ts, acc_x, linewidth=MINOR_LW, label='Raw acc along X', color='C0')
+
+    ax1.set_ylabel('Amplitude ($m/s^2$)')
+    ax1.legend()
+    ax1.grid()
+
+    # raw signal (acc_y)
+    ax2 = fig.add_subplot(gs[2:4, 0], sharex=ax1)
+
+    ax2.plot(ts, acc_y, linewidth=MINOR_LW, label='Raw acc along Y', color='C1')
+
+    ax2.set_ylabel('Amplitude ($m/s^2$)')
+    ax2.legend()
+    ax2.grid()
+
+    # raw signal (acc_z)
+    ax3 = fig.add_subplot(gs[4:, 0], sharex=ax1)
+
+    ax3.plot(ts, acc_z, linewidth=MINOR_LW, label='Raw acc along Z', color='C2')
+
+    ax3.set_ylabel('Amplitude ($m/s^2$)')
+    ax3.set_xlabel('Time (s)')
+    ax3.legend()
+    ax3.grid()
+
+    # vector magnitude
+    ax4 = fig.add_subplot(gs[:3, 1], sharex=ax1)
+
+    ax4.plot(ts, vm, linewidth=MINOR_LW, label='Vector Magnitude feature', color='C3')
+
+    ax4.set_ylabel('Amplitude ($m/s^2$)')
+    ax4.legend()
+    ax4.grid()
+
+    # signal magnitude
+    ax5 = fig.add_subplot(gs[3:, 1], sharex=ax1)
+
+    ax5.plot(ts, sm, linewidth=MINOR_LW, label='Signal Magnitude feature', color='C4')
+
+    ax5.set_ylabel('Amplitude ($m/s^2$)')
+    ax5.set_xlabel('Time (s)')
+    ax5.legend()
+    ax5.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
+
+
 def plot_ppg(ts=None,
              raw=None,
              filtered=None,
@@ -836,6 +936,9 @@ def plot_eeg(ts=None,
     nrows = MAX_ROWS
     alpha = 2.
 
+    # Get number of channels
+    nch = raw.shape[1]
+
     figs = []
 
     # raw
@@ -875,17 +978,19 @@ def plot_eeg(ts=None,
                                  ylabel='Power')
         figs.append(('_' + n.replace(' ', '_'), fig))
 
-    # PLF
-    plf_labels = ['%s vs %s' % (labels[p[0]], labels[p[1]]) for p in plf_pairs]
-    fig = _plot_multichannel(ts=features_ts,
-                             signal=plf,
-                             labels=plf_labels,
-                             nrows=nrows,
-                             alpha=alpha,
-                             title='EEG Summary - Phase-Locking Factor',
-                             xlabel='Time (s)',
-                             ylabel='PLF')
-    figs.append(('_PLF', fig))
+    # Only plot/compute plf if there is more than one channel
+    if nch > 1:
+        # PLF
+        plf_labels = ['%s vs %s' % (labels[p[0]], labels[p[1]]) for p in plf_pairs]
+        fig = _plot_multichannel(ts=features_ts,
+                                 signal=plf,
+                                 labels=plf_labels,
+                                 nrows=nrows,
+                                 alpha=alpha,
+                                 title='EEG Summary - Phase-Locking Factor',
+                                 xlabel='Time (s)',
+                                 ylabel='PLF')
+        figs.append(('_PLF', fig))
 
     # save to file
     if path is not None:
@@ -1161,6 +1266,224 @@ def plot_ecg(ts=None,
         # close
         plt.close(fig)
 
+
+def plot_bcg(ts=None,
+             raw=None,
+             filtered=None,
+             jpeaks=None,
+             templates_ts=None,
+             templates=None,
+             heart_rate_ts=None,
+             heart_rate=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.bcg.bcg.
+
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw ECG signal.
+    filtered : array
+        Filtered ECG signal.
+    ipeaks : array
+        I-peak location indices.
+    templates_ts : array
+        Templates time axis reference (seconds).
+    templates : array
+        Extracted heartbeat templates.
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+
+    """
+
+    fig = plt.figure()
+    fig.suptitle('BCG Summary')
+    gs = gridspec.GridSpec(6, 2)
+
+    # raw signal
+    ax1 = fig.add_subplot(gs[:2, 0])
+
+    ax1.plot(ts, raw, linewidth=MAJOR_LW, label='Raw')
+
+    ax1.set_ylabel('Amplitude')
+    ax1.legend()
+    ax1.grid()
+
+    # filtered signal with rpeaks
+    ax2 = fig.add_subplot(gs[2:4, 0], sharex=ax1)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+
+    ax2.plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered')
+    ax2.vlines(ts[jpeaks], ymin, ymax,
+               color='m',
+               linewidth=MINOR_LW,
+               label='J-peaks')
+
+    ax2.set_ylabel('Amplitude')
+    ax2.legend()
+    ax2.grid()
+
+    # heart rate
+    ax3 = fig.add_subplot(gs[4:, 0], sharex=ax1)
+
+    ax3.plot(heart_rate_ts, heart_rate, linewidth=MAJOR_LW, label='Heart Rate')
+
+    ax3.set_xlabel('Time (s)')
+    ax3.set_ylabel('Heart Rate (bpm)')
+    ax3.legend()
+    ax3.grid()
+
+    # templates
+    ax4 = fig.add_subplot(gs[1:5, 1])
+
+    ax4.plot(templates_ts, templates.T, 'm', linewidth=MINOR_LW, alpha=0.7)
+
+    ax4.set_xlabel('Time (s)')
+    ax4.set_ylabel('Amplitude')
+    ax4.set_title('Templates')
+    ax4.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
+
+def plot_pcg(ts=None,
+             raw=None,
+             filtered=None,
+             peaks=None,
+             heart_sounds=None,
+             heart_rate_ts=None,
+             inst_heart_rate=None,
+             path=None,
+             show=False):
+    """Create a summary plot from the output of signals.pcg.pcg.
+    Parameters
+    ----------
+    ts : array
+        Signal time axis reference (seconds).
+    raw : array
+        Raw PCG signal.
+    filtered : array
+        Filtered PCG signal.
+    peaks : array
+        Peak location indices.
+    heart_sounds : array
+        Classification of peaks as S1 or S2
+    heart_rate_ts : array
+        Heart rate time axis reference (seconds).
+    inst_heart_rate : array
+        Instantaneous heart rate (bpm).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
+    show : bool, optional
+        If True, show the plot immediately.
+        
+    """
+
+    fig = plt.figure()
+    fig.suptitle('PCG Summary')
+    gs = gridspec.GridSpec(6, 2)
+
+    # raw signal
+    ax1 = fig.add_subplot(gs[:2, 0])
+
+    ax1.plot(ts, raw, linewidth=MAJOR_LW,label='raw')
+    
+    ax1.set_ylabel('Amplitude')
+    ax1.legend()
+    ax1.grid()
+
+    # filtered signal with rpeaks
+    ax2 = fig.add_subplot(gs[2:4, 0], sharex=ax1)
+
+    ymin = np.min(filtered)
+    ymax = np.max(filtered)
+    alpha = 0.1 * (ymax - ymin)
+    ymax += alpha
+    ymin -= alpha
+    
+    ax2.plot(ts, filtered, linewidth=MAJOR_LW, label='Filtered')
+    ax2.vlines(ts[peaks], ymin, ymax,
+                color='m',
+                linewidth=MINOR_LW,
+                label='Peaks')
+
+    ax2.set_ylabel('Amplitude')
+    ax2.legend()
+    ax2.grid()
+
+    # heart rate
+    ax3 = fig.add_subplot(gs[4:, 0], sharex=ax1)
+
+    ax3.plot(heart_rate_ts,inst_heart_rate, linewidth=MAJOR_LW, label='Heart rate')
+    
+    ax3.set_xlabel('Time (s)')
+    ax3.set_ylabel('Heart Rate (bpm)')
+    ax3.legend()
+    ax3.grid()
+    
+    # heart sounds
+    ax4 = fig.add_subplot(gs[1:5, 1])
+
+    ax4.plot(ts,filtered,linewidth=MAJOR_LW, label='PCG heart sounds')
+    for i in range(0, len(peaks)):
+
+        text = "S" + str(int(heart_sounds[i]))
+        plt.annotate(text,(ts[peaks[i]], ymax-alpha),ha='center', va='center',size = 13) 
+            
+    ax4.set_xlabel('Time (s)')
+    ax4.set_ylabel('Amplitude')
+    ax4.set_title('Heart sounds')
+    ax4.grid()
+
+    # make layout tight
+    gs.tight_layout(fig)
+
+    # save to file
+    if path is not None:
+        path = utils.normpath(path)
+        root, ext = os.path.splitext(path)
+        ext = ext.lower()
+        if ext not in ['png', 'jpg']:
+            path = root + '.png'
+
+        fig.savefig(path, dpi=200, bbox_inches='tight')
+
+    # show
+    if show:
+        plt.show()
+    else:
+        # close
+        plt.close(fig)
 
 def _plot_rates(thresholds, rates, variables,
                 lw=1,

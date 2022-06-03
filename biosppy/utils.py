@@ -41,7 +41,7 @@ def normpath(path):
 
     """
 
-    if '~' in path:
+    if "~" in path:
         out = os.path.abspath(os.path.expanduser(path))
     else:
         out = os.path.abspath(path)
@@ -51,12 +51,12 @@ def normpath(path):
 
 def fileparts(path):
     """split a file path into its directory, name, and extension.
-    
+
     Parameters
     ----------
     path : str
         Input file path.
-    
+
     Returns
     -------
     dirname : str
@@ -65,53 +65,53 @@ def fileparts(path):
         File name.
     ext : str
         File extension.
-    
+
     Notes
     -----
     * Removes the dot ('.') from the extension.
-    
+
     """
-    
+
     dirname, fname = os.path.split(path)
     fname, ext = os.path.splitext(fname)
-    ext = ext.replace('.', '')
-    
+    ext = ext.replace(".", "")
+
     return dirname, fname, ext
 
 
 def fullfile(*args):
     """Join one or more file path components, assuming the last is
     the extension.
-    
+
     Parameters
     ----------
     ``*args`` : list, optional
         Components to concatenate.
-    
+
     Returns
     -------
     fpath : str
         The concatenated file path.
-    
+
     """
-    
+
     nb = len(args)
     if nb == 0:
-        return ''
+        return ""
     elif nb == 1:
         return args[0]
     elif nb == 2:
         return os.path.join(*args)
-    
-    fpath = os.path.join(*args[:-1]) + '.' + args[-1]
-    
+
+    fpath = os.path.join(*args[:-1]) + "." + args[-1]
+
     return fpath
 
 
 def walktree(top=None, spec=None):
     """Iterator to recursively descend a directory and return all files
     matching the spec.
-    
+
     Parameters
     ----------
     top : str, optional
@@ -122,31 +122,31 @@ def walktree(top=None, spec=None):
             * `r'\.txt$'` - matches files with '.txt' extension;
             * `r'^File_'` - matches files starting with 'File\_'
             * `r'^File_.+\.txt$'` - matches files starting with 'File\_' and ending with the '.txt' extension.
-    
+
     Yields
     ------
     fpath : str
         Absolute file path.
-    
+
     Notes
     -----
     * Partial matches are also selected.
-    
+
     See Also
     --------
     * https://docs.python.org/3/library/re.html
     * https://regex101.com/
-    
+
     """
-    
+
     if top is None:
         top = os.getcwd()
-    
+
     if spec is None:
-        spec = r'.*?'
-    
+        spec = r".*?"
+
     prog = re.compile(spec)
-    
+
     for root, _, files in os.walk(top):
         for name in files:
             if prog.search(name):
@@ -184,11 +184,11 @@ def remainderAllocator(votes, k, reverse=True, check=False):
 
     # frequencies
     length = len(votes)
-    freqs = np.array(votes, dtype='float') / tot
+    freqs = np.array(votes, dtype="float") / tot
 
     # assign items
     aux = k * freqs
-    seats = aux.astype('int')
+    seats = aux.astype("int")
 
     # leftovers
     nb = k - seats.sum()
@@ -204,7 +204,7 @@ def remainderAllocator(votes, k, reverse=True, check=False):
     return seats.tolist()
 
 
-def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
+def highestAveragesAllocator(votes, k, divisor="dHondt", check=False):
     """Allocate k seats proportionally using the Highest Averages Method.
 
     Parameters
@@ -232,16 +232,16 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
         k = tot
 
     # select divisor
-    if divisor == 'dHondt':
+    if divisor == "dHondt":
         fcn = lambda i: float(i)
-    elif divisor == 'Huntington-Hill':
-        fcn = lambda i: np.sqrt(i * (i + 1.))
-    elif divisor == 'Sainte-Lague':
+    elif divisor == "Huntington-Hill":
+        fcn = lambda i: np.sqrt(i * (i + 1.0))
+    elif divisor == "Sainte-Lague":
         fcn = lambda i: i - 0.5
-    elif divisor == 'Imperiali':
+    elif divisor == "Imperiali":
         fcn = lambda i: float(i + 1)
-    elif divisor == 'Danish':
-        fcn = lambda i: 3. * (i - 1.) + 1.
+    elif divisor == "Danish":
+        fcn = lambda i: 3.0 * (i - 1.0) + 1.0
     else:
         raise ValueError("Unknown divisor method.")
 
@@ -256,9 +256,9 @@ def highestAveragesAllocator(votes, k, divisor='dHondt', check=False):
     # sort
     tab.sort(key=lambda item: item[1], reverse=True)
     tab = tab[:k]
-    tab = np.array([item[0] for item in tab], dtype='int')
+    tab = np.array([item[0] for item in tab], dtype="int")
 
-    seats = np.zeros(length, dtype='int')
+    seats = np.zeros(length, dtype="int")
     for i in range(length):
         seats[i] = np.sum(tab == i)
 
@@ -294,7 +294,7 @@ def random_fraction(indx, fraction, sort=True):
     aux = copy.deepcopy(indx)
 
     # shuffle
-    np.random.shuffle(indx)
+    np.random.shuffle(aux)
 
     # select
     use = aux[:nb]
@@ -341,7 +341,7 @@ class ReturnTuple(tuple):
 
         if names is None:
             # create names
-            names = ['_%d' % i for i in range(nargs)]
+            names = ["_%d" % i for i in range(nargs)]
         else:
             # check length
             if len(names) != nargs:
@@ -353,16 +353,18 @@ class ReturnTuple(tuple):
             # check for keywords, alphanumeric, digits, repeats
             seen = set()
             for name in names:
-                if not all(c.isalnum() or (c == '_') for c in name):
-                    raise ValueError("Names can only contain alphanumeric \
-                                      characters and underscores: %r." % name)
+                if not all(c.isalnum() or (c == "_") for c in name):
+                    raise ValueError(
+                        "Names can only contain alphanumeric \
+                                      characters and underscores: %r."
+                        % name
+                    )
 
                 if keyword.iskeyword(name):
                     raise ValueError("Names cannot be a keyword: %r." % name)
 
                 if name[0].isdigit():
-                    raise ValueError("Names cannot start with a number: %r." %
-                                     name)
+                    raise ValueError("Names cannot start with a number: %r." % name)
 
                 if name in seen:
                     raise ValueError("Encountered duplicate name: %r." % name)
@@ -413,11 +415,11 @@ class ReturnTuple(tuple):
     def __repr__(self):
         """Return representation string."""
 
-        tpl = '%s=%r'
+        tpl = "%s=%r"
 
-        rp = ', '.join(tpl % item for item in zip(self._names, self))
+        rp = ", ".join(tpl % item for item in zip(self._names, self))
 
-        return 'ReturnTuple(%s)' % rp
+        return "ReturnTuple(%s)" % rp
 
     def __getnewargs__(self):
         """Return self as a plain tuple; used for copy and pickle."""

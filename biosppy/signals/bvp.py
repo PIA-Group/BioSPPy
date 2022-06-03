@@ -28,7 +28,7 @@ from . import ppg
 from .. import plotting, utils
 
 
-def bvp(signal=None, sampling_rate=1000., show=True):
+def bvp(signal=None, sampling_rate=1000., path=None, show=True):
     """Process a raw BVP signal and extract relevant signal features using
     default parameters.
     Parameters
@@ -37,6 +37,8 @@ def bvp(signal=None, sampling_rate=1000., show=True):
         Raw BVP signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
     Returns
@@ -71,7 +73,7 @@ def bvp(signal=None, sampling_rate=1000., show=True):
                                       sampling_rate=sampling_rate)
 
     # find onsets
-    onsets, = ppg.find_onsets_elgendi2013(signal=filtered, sampling_rate=sampling_rate)
+    onsets,_ = ppg.find_onsets_elgendi2013(signal=filtered, sampling_rate=sampling_rate)
 
     # compute heart rate
     hr_idx, hr = st.get_heart_rate(beats=onsets,
@@ -93,7 +95,7 @@ def bvp(signal=None, sampling_rate=1000., show=True):
                           onsets=onsets,
                           heart_rate_ts=ts_hr,
                           heart_rate=hr,
-                          path=None,
+                          path=path,
                           show=True)
 
     # output

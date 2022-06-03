@@ -23,7 +23,7 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
+def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
     """Process raw EEG signals and extract relevant signal features using
     default parameters.
 
@@ -35,6 +35,8 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
         Sampling frequency (Hz).
     labels : list, optional
         Channel labels.
+    path : str, optional
+        If provided, the plot will be saved to the specified file.
     show : bool, optional
         If True, show a summary plot.
 
@@ -115,11 +117,16 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
     beta = out['beta']
     gamma = out['gamma']
 
-    # PLF features
-    _, plf_pairs, plf = get_plf_features(signal=filtered,
-                                         sampling_rate=sampling_rate,
-                                         size=0.25,
-                                         overlap=0.5)
+    # If the input EEG is single channel do not extract plf
+    # Initialises plf related vars for input and output requirement of plot_eeg function in case of nch <=1
+    plf_pairs = []
+    plf = []
+    if nch > 1:
+        # PLF features
+        _, plf_pairs, plf = get_plf_features(signal=filtered,
+                                             sampling_rate=sampling_rate,
+                                             size=0.25,
+                                             overlap=0.5)
 
     # get time vectors
     length = len(signal)
@@ -140,7 +147,7 @@ def eeg(signal=None, sampling_rate=1000., labels=None, show=True):
                           gamma=gamma,
                           plf_pairs=plf_pairs,
                           plf=plf,
-                          path=None,
+                          path=path,
                           show=True)
 
     # output
@@ -177,7 +184,6 @@ def car_reference(signal=None):
     out = signal - np.tile(avg.reshape((length, 1)), nch)
 
     return utils.ReturnTuple((out,), ('signal',))
-
 
 def get_power_features(signal=None,
                        sampling_rate=1000.,
