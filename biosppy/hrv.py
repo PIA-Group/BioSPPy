@@ -25,9 +25,11 @@ import numpy as np
 
 
 
-def hrv(rpeaks=None, npeaks=None, short_term=True, show=True):
+def hrv(rpeaks=None, npeaks=None, fs=1000., short_term=True, show=True):
     
     # returns an hrv report
+  
+    # convert rpeaks and npeaks from index to ms (check if it's correct?)
     
     # check if recording is Short term or Long-term (can be overriden)
     # and call hrv functions to output the recommended data and plots
