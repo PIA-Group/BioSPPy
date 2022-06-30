@@ -1298,7 +1298,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.0):
     return utils.ReturnTuple((rpeaks,), ("rpeaks",))
 
 
-def ASI_segmenter(signal=None, sampling_rate=1000.0):
+def ASI_segmentor(signal=None, sampling_rate=1000.0, Pth=5.0):
     """ECG R-peak segmentation algorithm.
 
     Parameters
@@ -1307,6 +1307,8 @@ def ASI_segmenter(signal=None, sampling_rate=1000.0):
         Input ECG signal.
     sampling_rate : int, float, optional
         Sampling frequency (Hz).
+    Pth : int, float, optional
+        Free parameter used in exponential decay
 
     Returns
     -------
@@ -1325,7 +1327,6 @@ def ASI_segmenter(signal=None, sampling_rate=1000.0):
 
     N = round(3 * sampling_rate / 128)
     Nd = N - 1
-    Pth = (0.7 * sampling_rate) / 128 + 4.7
     Rmin = 0.26
 
     rpeaks = []
