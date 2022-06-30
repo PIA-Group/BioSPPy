@@ -44,22 +44,45 @@ covered by `biosppy`.
 Blood Volume Pulse
 ------------------
 
-Photoplethysmogram (PPG) signals are...
+Photoplethysmogram (PPG) signals is an optical technique used to detect blood volume changes
+within the microvascular bed of your tissue. A PPG wave is made of a pulsatile physiological
+measurement taken at the skin surface. The baseline is made of a superimposed varying baseline 
+with various lower frequency componenets attributed to respiration, thermoregulation, and 
+sympathetic nervous system activity. Due to it's low cost and simplicity it can be found within
+personal devices such as Smart Watches, Phones, and handheld heart rate monitors. 
 
 Electrocardiogram
 -----------------
 
-Electrocardiogrm (ECG) signals are...
+Electrocardiogrm (ECG/EKG) signals are a measure of the electrical heartbeat of the heart.
+Each heartbeat an electrical impulse travels through the heart, causing your heart to 
+pump blood from the heart throughout your body. Often times upto twelve non-invasive 
+electrodes are attached to your chest and limbs. They record the electrical signals that 
+result in a heartbeat and output them onto ECG charts either on paper or on a computer.
+ECG/EKG signals can be processed in time and frequency domains. A healthy adult ECG/EKG is
+often predictable while adults with heart problems are often unpredictable.  
 
 Electrodermal Activity
 ----------------------
 
-Electrodermal Activity (EDA) signals are...
+Electrodermal Activity (EDA) signals are measures of the electrical characteristics of the skin 
+using methods such as skin potential (SP), skin conductance response (SCR), skin potential response (SPR). 
+Training in EDA allows the patient to become more aware of stress. It is not commonly used 
+and, when used, it is often in conjunction with other forms of biofeedback. Because EDA 
+measures only skin changes, it does not provide feedback about more complex physiological 
+reactions. When used for treatment, it tends to be as a monitoring system for unresolved 
+issues in psychotherapy or for general stress.
 
 Electroencephalogram
 --------------------
 
-Electroencephalogram (EEG) signals are...
+Electroencephalogram (EEG) signals are measures of electrical activity in the brain using 
+electrodes attached to the scalp. Generally the process used to get an EEG is non-invasive.
+An EEG measures voltage fluctuations resulting from ionic currents within nuerons, which can 
+be recorded over a period of time thus allowing for analysis within the time domain. 
+The recording is obtained by placing electrodes on the scalp with a conductive gel, 
+usually after preparing the scalp area by light abrasion to reduce impedance due to dead skin cells.
+
 
 Electromyogram
 --------------
@@ -89,7 +112,10 @@ Respiration (Resp) signals are...
 What is Pattern Recognition?
 ============================
 
-To do.
+Pattern Recognition is an automated analytical recognition of patterns and 
+regularities within a piece of data. Often time stastical fields such as 
+Machine Learning rely on pattern recognition to find similarities within 
+data in order to predict future data.
 
 A Note on Return Objects
 ========================
