@@ -1298,7 +1298,7 @@ def hamilton_segmenter(signal=None, sampling_rate=1000.0):
     return utils.ReturnTuple((rpeaks,), ("rpeaks",))
 
 
-def ASI_segmentor(signal=None, sampling_rate=1000.0, Pth=5.0):
+def ASI_segmenter(signal=None, sampling_rate=1000.0, Pth=5.0):
     """ECG R-peak segmentation algorithm.
 
     Parameters
