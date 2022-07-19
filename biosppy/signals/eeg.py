@@ -77,6 +77,7 @@ def eeg(signal=None, sampling_rate=1000.0, labels=None, path=None, show=True):
 
     # ensure numpy
     signal = np.array(signal)
+    signal = np.reshape(signal, (signal.shape[0], -1))
 
     sampling_rate = float(sampling_rate)
     nch = signal.shape[1]
