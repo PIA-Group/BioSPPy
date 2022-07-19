@@ -23,9 +23,10 @@ from . import tools as st
 from .. import plotting, utils
 
 
-def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
+def eeg(signal=None, sampling_rate=1000.0, labels=None, path=None, show=True):
     """Process raw EEG signals and extract relevant signal features using
     default parameters.
+
 
     Parameters
     ----------
@@ -81,41 +82,45 @@ def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
     nch = signal.shape[1]
 
     if labels is None:
-        labels = ['Ch. %d' % i for i in range(nch)]
+        labels = ["Ch. %d" % i for i in range(nch)]
     else:
         if len(labels) != nch:
             raise ValueError(
-                "Number of channels mismatch between signal matrix and labels.")
+                "Number of channels mismatch between signal matrix and labels."
+            )
 
     # high pass filter
-    b, a = st.get_filter(ftype='butter',
-                         band='highpass',
-                         order=8,
-                         frequency=4,
-                         sampling_rate=sampling_rate)
+    b, a = st.get_filter(
+        ftype="butter",
+        band="highpass",
+        order=8,
+        frequency=4,
+        sampling_rate=sampling_rate,
+    )
 
     aux, _ = st._filter_signal(b, a, signal=signal, check_phase=True, axis=0)
 
     # low pass filter
-    b, a = st.get_filter(ftype='butter',
-                         band='lowpass',
-                         order=16,
-                         frequency=40,
-                         sampling_rate=sampling_rate)
+    b, a = st.get_filter(
+        ftype="butter",
+        band="lowpass",
+        order=16,
+        frequency=40,
+        sampling_rate=sampling_rate,
+    )
 
     filtered, _ = st._filter_signal(b, a, signal=aux, check_phase=True, axis=0)
 
     # band power features
-    out = get_power_features(signal=filtered,
-                             sampling_rate=sampling_rate,
-                             size=0.25,
-                             overlap=0.5)
-    ts_feat = out['ts']
-    theta = out['theta']
-    alpha_low = out['alpha_low']
-    alpha_high = out['alpha_high']
-    beta = out['beta']
-    gamma = out['gamma']
+    out = get_power_features(
+        signal=filtered, sampling_rate=sampling_rate, size=0.25, overlap=0.5
+    )
+    ts_feat = out["ts"]
+    theta = out["theta"]
+    alpha_low = out["alpha_low"]
+    alpha_high = out["alpha_high"]
+    beta = out["beta"]
+    gamma = out["gamma"]
 
     # If the input EEG is single channel do not extract plf
     # Initialises plf related vars for input and output requirement of plot_eeg function in case of nch <=1
@@ -123,10 +128,9 @@ def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
     plf = []
     if nch > 1:
         # PLF features
-        _, plf_pairs, plf = get_plf_features(signal=filtered,
-                                             sampling_rate=sampling_rate,
-                                             size=0.25,
-                                             overlap=0.5)
+        _, plf_pairs, plf = get_plf_features(
+            signal=filtered, sampling_rate=sampling_rate, size=0.25, overlap=0.5
+        )
 
     # get time vectors
     length = len(signal)
@@ -135,26 +139,48 @@ def eeg(signal=None, sampling_rate=1000., labels=None, path=None, show=True):
 
     # plot
     if show:
-        plotting.plot_eeg(ts=ts,
-                          raw=signal,
-                          filtered=filtered,
-                          labels=labels,
-                          features_ts=ts_feat,
-                          theta=theta,
-                          alpha_low=alpha_low,
-                          alpha_high=alpha_high,
-                          beta=beta,
-                          gamma=gamma,
-                          plf_pairs=plf_pairs,
-                          plf=plf,
-                          path=path,
-                          show=True)
+        plotting.plot_eeg(
+            ts=ts,
+            raw=signal,
+            filtered=filtered,
+            labels=labels,
+            features_ts=ts_feat,
+            theta=theta,
+            alpha_low=alpha_low,
+            alpha_high=alpha_high,
+            beta=beta,
+            gamma=gamma,
+            plf_pairs=plf_pairs,
+            plf=plf,
+            path=path,
+            show=True,
+        )
 
     # output
-    args = (ts, filtered, ts_feat, theta, alpha_low, alpha_high, beta, gamma,
-            plf_pairs, plf)
-    names = ('ts', 'filtered', 'features_ts', 'theta', 'alpha_low',
-             'alpha_high', 'beta', 'gamma', 'plf_pairs', 'plf')
+    args = (
+        ts,
+        filtered,
+        ts_feat,
+        theta,
+        alpha_low,
+        alpha_high,
+        beta,
+        gamma,
+        plf_pairs,
+        plf,
+    )
+    names = (
+        "ts",
+        "filtered",
+        "features_ts",
+        "theta",
+        "alpha_low",
+        "alpha_high",
+        "beta",
+        "gamma",
+        "plf_pairs",
+        "plf",
+    )
 
     return utils.ReturnTuple(args, names)
 
@@ -183,12 +209,10 @@ def car_reference(signal=None):
 
     out = signal - np.tile(avg.reshape((length, 1)), nch)
 
-    return utils.ReturnTuple((out,), ('signal',))
+    return utils.ReturnTuple((out,), ("signal",))
 
-def get_power_features(signal=None,
-                       sampling_rate=1000.,
-                       size=0.25,
-                       overlap=0.5):
+
+def get_power_features(signal=None, sampling_rate=1000.0, size=0.25, overlap=0.5):
     """Extract band power features from EEG signals.
 
     Computes the average signal power, with overlapping windows, in typical
@@ -257,13 +281,15 @@ def get_power_features(signal=None,
     nb = len(bands)
 
     # windower
-    fcn_kwargs = {'sampling_rate': sampling_rate, 'bands': bands, 'pad': pad}
-    index, values = st.windower(signal=signal,
-                                size=size,
-                                step=step,
-                                kernel='hann',
-                                fcn=_power_features,
-                                fcn_kwargs=fcn_kwargs)
+    fcn_kwargs = {"sampling_rate": sampling_rate, "bands": bands, "pad": pad}
+    index, values = st.windower(
+        signal=signal,
+        size=size,
+        step=step,
+        kernel="hann",
+        fcn=_power_features,
+        fcn_kwargs=fcn_kwargs,
+    )
 
     # median filter
     md_size = int(0.625 * sampling_rate / float(step))
@@ -273,9 +299,9 @@ def get_power_features(signal=None,
 
     for i in range(nb):
         for j in range(nch):
-            values[:, i, j], _ = st.smoother(signal=values[:, i, j],
-                                             kernel='median',
-                                             size=md_size)
+            values[:, i, j], _ = st.smoother(
+                signal=values[:, i, j], kernel="median", size=md_size
+            )
 
     # extract individual bands
     theta = values[:, 0, :]
@@ -285,16 +311,16 @@ def get_power_features(signal=None,
     gamma = values[:, 4, :]
 
     # convert indices to seconds
-    ts = index.astype('float') / sampling_rate
+    ts = index.astype("float") / sampling_rate
 
     # output
     args = (ts, theta, alpha_low, alpha_high, beta, gamma)
-    names = ('ts', 'theta', 'alpha_low', 'alpha_high', 'beta', 'gamma')
+    names = ("ts", "theta", "alpha_low", "alpha_high", "beta", "gamma")
 
     return utils.ReturnTuple(args, names)
 
 
-def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
+def get_plf_features(signal=None, sampling_rate=1000.0, size=0.25, overlap=0.5):
     """Extract Phase-Locking Factor (PLF) features from EEG signals between all
     channel pairs.
 
@@ -345,13 +371,15 @@ def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
     nb = len(pairs)
 
     # windower
-    fcn_kwargs = {'pairs': pairs, 'N': N}
-    index, values = st.windower(signal=signal,
-                                size=size,
-                                step=step,
-                                kernel='hann',
-                                fcn=_plf_features,
-                                fcn_kwargs=fcn_kwargs)
+    fcn_kwargs = {"pairs": pairs, "N": N}
+    index, values = st.windower(
+        signal=signal,
+        size=size,
+        step=step,
+        kernel="hann",
+        fcn=_plf_features,
+        fcn_kwargs=fcn_kwargs,
+    )
 
     # median filter
     md_size = int(0.625 * sampling_rate / float(step))
@@ -360,21 +388,21 @@ def get_plf_features(signal=None, sampling_rate=1000., size=0.25, overlap=0.5):
         md_size += 1
 
     for i in range(nb):
-        values[:, i], _ = st.smoother(signal=values[:, i],
-                                      kernel='median',
-                                      size=md_size)
+        values[:, i], _ = st.smoother(
+            signal=values[:, i], kernel="median", size=md_size
+        )
 
     # convert indices to seconds
-    ts = index.astype('float') / sampling_rate
+    ts = index.astype("float") / sampling_rate
 
     # output
     args = (ts, pairs, values)
-    names = ('ts', 'plf_pairs', 'plf')
+    names = ("ts", "plf_pairs", "plf")
 
     return utils.ReturnTuple(args, names)
 
 
-def _power_features(signal=None, sampling_rate=1000., bands=None, pad=0):
+def _power_features(signal=None, sampling_rate=1000.0, bands=None, pad=0):
     """Helper function to compute band power features for each window.
 
     Parameters
@@ -398,21 +426,20 @@ def _power_features(signal=None, sampling_rate=1000., bands=None, pad=0):
 
     nch = signal.shape[1]
 
-    out = np.zeros((len(bands), nch), dtype='float')
+    out = np.zeros((len(bands), nch), dtype="float")
     for i in range(nch):
         # compute power spectrum
-        freqs, power = st.power_spectrum(signal=signal[:, i],
-                                         sampling_rate=sampling_rate,
-                                         pad=pad,
-                                         pow2=False,
-                                         decibel=False)
+        freqs, power = st.power_spectrum(
+            signal=signal[:, i],
+            sampling_rate=sampling_rate,
+            pad=pad,
+            pow2=False,
+            decibel=False,
+        )
 
         # compute average band power
         for j, b in enumerate(bands):
-            avg, = st.band_power(freqs=freqs,
-                                 power=power,
-                                 frequency=b,
-                                 decibel=False)
+            (avg,) = st.band_power(freqs=freqs, power=power, frequency=b, decibel=False)
             out[j, i] = avg
 
     return out
@@ -437,11 +464,11 @@ def _plf_features(signal=None, pairs=None, N=None):
 
     """
 
-    out = np.zeros(len(pairs), dtype='float')
+    out = np.zeros(len(pairs), dtype="float")
     for i, p in enumerate(pairs):
         # compute PLF
         s1 = signal[:, p[0]]
         s2 = signal[:, p[1]]
-        out[i], = st.phase_locking(signal1=s1, signal2=s2, N=N)
+        (out[i],) = st.phase_locking(signal1=s1, signal2=s2, N=N)
 
     return out
