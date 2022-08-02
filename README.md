@@ -1,3 +1,5 @@
+> This repository is archived. The BioSPPy toolbox is now maintained at [scientisst/BioSPPy](https://github.com/scientisst/BioSPPy).
+
 # BioSPPy - Biosignal Processing in Python
 
 *A toolbox for biosignal processing written in Python.*
